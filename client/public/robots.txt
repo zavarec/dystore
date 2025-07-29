@@ -1,0 +1,31 @@
+User-agent: *
+Allow: /
+
+# Блокируем доступ к служебным страницам
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+Disallow: /cart
+Disallow: /auth
+
+# Директивы для поисковых ботов
+Disallow: /*?*
+Disallow: /*utm_*
+Disallow: /*ref=*
+
+# Sitemap
+Sitemap: https://dystore.ru/sitemap.xml
+
+# Время задержки между запросами (в секундах)
+Crawl-delay: 1
+
+# Специфичные директивы для Яндекса
+User-agent: Yandex
+Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term
+Clean-param: ref&from&fbclid&gclid
+
+# Специфичные директивы для Google
+User-agent: Googlebot
+Allow: /
+Disallow: /cart
+Disallow: /auth 

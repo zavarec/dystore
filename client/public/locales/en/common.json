@@ -1,0 +1,60 @@
+{
+  "site": {
+    "title": "DyStore - Official Dyson Technology Store",
+    "description": "Buy Dyson technology with official warranty"
+  },
+  "navigation": {
+    "home": "Home",
+    "catalog": "Catalog",
+    "categories": "Categories",
+    "about": "About",
+    "contacts": "Contacts",
+    "search": "Search"
+  },
+  "categories": {
+    "vacuum-cleaners": "Vacuum Cleaners",
+    "hair-care": "Hair Care",
+    "air-purifiers": "Air Purifiers",
+    "lighting": "Lighting",
+    "fans": "Fans",
+    "accessories": "Accessories"
+  },
+  "product": {
+    "price": "Price",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "addToCart": "Add to Cart",
+    "buyNow": "Buy Now",
+    "specifications": "Specifications",
+    "features": "Features",
+    "reviews": "Reviews",
+    "warranty": "Warranty",
+    "delivery": "Delivery"
+  },
+  "buttons": {
+    "viewAll": "View All",
+    "loadMore": "Load More",
+    "back": "Back",
+    "next": "Next",
+    "close": "Close",
+    "apply": "Apply",
+    "reset": "Reset"
+  },
+  "filters": {
+    "filters": "Filters",
+    "sortBy": "Sort By",
+    "priceRange": "Price Range",
+    "category": "Category",
+    "brand": "Brand",
+    "rating": "Rating",
+    "availability": "Availability"
+  },
+  "sorting": {
+    "popularity": "Popularity",
+    "priceAsc": "Price (Low to High)",
+    "priceDesc": "Price (High to Low)",
+    "rating": "Rating",
+    "newest": "Newest",
+    "name": "Name"
+  }
+}

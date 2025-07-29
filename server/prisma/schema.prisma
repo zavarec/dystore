@@ -1,0 +1,131 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Пользователи
+model User {
+  id        String    @id @default(uuid())
+  phone     String?   @unique
+  email     String?   @unique
+  password  String?
+  name      String?
+  createdAt DateTime  @default(now())
+  
+  // Связи
+  carts     Cart[]
+  orders    Order[]
+  
+  @@map("users")
+}
+
+// Категории
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String
+  slug     String    @unique
+  image    String?   // URL изображения категории
+  parentId Int?      // Родительская категория (null для корневых)
+  
+  // Связи
+  parent     Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children   Category[] @relation("CategoryHierarchy")
+  products   Product[]
+}
+
+// Продукты
+model Product {
+  id               Int      @id @default(autoincrement())
+  name             String
+  description      String?
+  shortDescription String?
+  price            Float
+  stock            Int      @default(0)
+  imageUrl         String?
+  categoryId       Int
+  
+  // Связи
+  category    Category    @relation(fields: [categoryId], references: [id])
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+
+  isFeatured  Boolean  @default(false)
+  popularity  Int      @default(0)
+}
+
+// Корзины
+model Cart {
+  id        Int       @id @default(autoincrement())
+  userId    String
+  createdAt DateTime  @default(now())
+  
+  // Связи
+  user  User       @relation(fields: [userId], references: [id])
+  items CartItem[]
+  
+  @@map("carts")
+}
+
+// Элементы корзины
+model CartItem {
+  id        Int @id @default(autoincrement())
+  cartId    Int
+  productId Int
+  quantity  Int @default(1)
+  
+  // Связи
+  cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+  
+  @@map("cart_items")
+}
+
+// Заказы
+model Order {
+  id         Int         @id @default(autoincrement())
+  userId     String
+  totalPrice Float
+  status     OrderStatus @default(PENDING)
+  createdAt  DateTime    @default(now())
+  
+  // Связи
+  user  User        @relation(fields: [userId], references: [id])
+  items OrderItem[]
+  
+  @@map("orders")
+}
+
+// Элементы заказа
+model OrderItem {
+  id              Int     @id @default(autoincrement())
+  orderId         Int
+  productId       Int
+  quantity        Int
+  priceAtPurchase Float
+  
+  // Связи
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+  
+  @@map("order_items")
+}
+
+// Enum для статуса заказа
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+}

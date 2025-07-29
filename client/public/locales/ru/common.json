@@ -1,0 +1,60 @@
+{
+  "site": {
+    "title": "DyStore - Официальный магазин техники Dyson",
+    "description": "Купить технику Dyson с официальной гарантией"
+  },
+  "navigation": {
+    "home": "Главная",
+    "catalog": "Каталог",
+    "categories": "Категории",
+    "about": "О нас",
+    "contacts": "Контакты",
+    "search": "Поиск"
+  },
+  "categories": {
+    "vacuum-cleaners": "Пылесосы",
+    "hair-care": "Уход за волосами",
+    "air-purifiers": "Очистители воздуха",
+    "lighting": "Освещение",
+    "fans": "Вентиляторы",
+    "accessories": "Аксессуары"
+  },
+  "product": {
+    "price": "Цена",
+    "inStock": "В наличии",
+    "outOfStock": "Нет в наличии",
+    "addToCart": "В корзину",
+    "buyNow": "Купить сейчас",
+    "specifications": "Характеристики",
+    "features": "Особенности",
+    "reviews": "Отзывы",
+    "warranty": "Гарантия",
+    "delivery": "Доставка"
+  },
+  "buttons": {
+    "viewAll": "Смотреть все",
+    "loadMore": "Загрузить ещё",
+    "back": "Назад",
+    "next": "Далее",
+    "close": "Закрыть",
+    "apply": "Применить",
+    "reset": "Сбросить"
+  },
+  "filters": {
+    "filters": "Фильтры",
+    "sortBy": "Сортировать по",
+    "priceRange": "Цена",
+    "category": "Категория",
+    "brand": "Бренд",
+    "rating": "Рейтинг",
+    "availability": "Наличие"
+  },
+  "sorting": {
+    "popularity": "По популярности",
+    "priceAsc": "По цене (возрастание)",
+    "priceDesc": "По цене (убывание)",
+    "rating": "По рейтингу",
+    "newest": "Новинки",
+    "name": "По названию"
+  }
+}
