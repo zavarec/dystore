@@ -24,15 +24,10 @@ interface AddToCartButtonProps {
   style?: React.CSSProperties;
 }
 
-interface SimpleCartItem {
-  id: number;
-  productId: number;
-  quantity: number;
-  name: string;
-  price: number;
-  imageUrl: string;
-}
+// Заменить импорты
+import { useLocalStorage } from '@/utils/ssr';
 
+// Заменить в компоненте AddToCartButton:
 export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   product,
   variant = ButtonVariant.PRIMARY,
@@ -44,85 +39,51 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   style,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [quantityInCart, setQuantityInCart] = useState(0);
 
-  // Проверяем количество товара в корзине при загрузке
-  useEffect(() => {
-    const cartData = localStorage.getItem('simpleCart');
-    if (cartData) {
-      try {
-        const cart: SimpleCartItem[] = JSON.parse(cartData);
-        const existingItem = cart.find(item => item.productId === product.id);
-        setQuantityInCart(existingItem?.quantity || 0);
-      } catch (error) {
-        console.error('Ошибка чтения корзины:', error);
-      }
-    }
-  }, [product.id]);
+  // ✅ ИСПРАВЛЕНИЕ: Используем безопасный хук
+  const [cartItems, setCartItems, isHydrated] = useLocalStorage('simpleCart', []);
+
+  // Вычисляем количество только после hydration
+  const quantityInCart = isHydrated
+    ? cartItems.find((item: any) => item.productId === product.id)?.quantity || 0
+    : 0;
 
   const handleAddToCart = async () => {
-    const isInStock = product.stock > 0;
+    if (!isHydrated) return; // Не позволяем добавлять до hydration
 
+    const isInStock = product.stock > 0;
     if (!isInStock) {
       toast.error('Товар временно отсутствует в наличии');
       return;
     }
 
     setIsLoading(true);
-
     try {
-      // Получаем текущую корзину из localStorage
-      const cartData = localStorage.getItem('simpleCart');
-      let cart: SimpleCartItem[] = [];
+      let updatedCart = [...cartItems];
+      const existingItemIndex = updatedCart.findIndex(item => item.productId === product.id);
 
-      if (cartData) {
-        cart = JSON.parse(cartData);
-      }
-
-      // Ищем товар в корзине
-      const existingItemIndex = cart.findIndex(item => item.productId === product.id);
-
-      if (existingItemIndex >= 0 && cart[existingItemIndex]) {
-        // Увеличиваем количество
-        cart[existingItemIndex].quantity += quantity;
+      if (existingItemIndex >= 0) {
+        updatedCart[existingItemIndex].quantity += 1;
       } else {
-        console.log(product, 'product');
-
-        // Добавляем новый товар
-        const imageUrl = product.imageUrl ?? '/images/placeholder.webp';
-
-        const newItem: SimpleCartItem = {
+        const newItem = {
           id: Date.now(),
           productId: product.id,
-          quantity: quantity,
+          quantity: 1,
           name: product.name,
           price: product.price,
-          imageUrl: imageUrl,
+          imageUrl: product.imageUrl ?? '/images/placeholder.webp',
         };
-        cart.push(newItem);
+        updatedCart.push(newItem);
       }
 
-      // Сохраняем корзину в localStorage
-      localStorage.setItem('simpleCart', JSON.stringify(cart));
+      setCartItems(updatedCart);
 
-      // Обновляем локальное состояние
-      const updatedItem = cart.find(item => item.productId === product.id);
-      if (updatedItem) {
-        setQuantityInCart(updatedItem.quantity);
+      // Уведомляем другие компоненты об обновлении
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('cartUpdated'));
       }
 
-      // Показываем уведомление
-      toast.success(`${product.name} добавлен в корзину`, {
-        position: 'bottom-right',
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
-
-      // Обновляем глобальное состояние (для отображения счетчика в хедере)
-      window.dispatchEvent(new Event('cartUpdated'));
+      toast.success(`${product.name} добавлен в корзину`);
     } catch (error) {
       console.error('Ошибка добавления в корзину:', error);
       toast.error('Произошла ошибка при добавлении товара');
@@ -131,21 +92,27 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
     }
   };
 
-  const isInStock = product.stock > 0;
-
   return (
     <AddToCartButtonWrapper className={className} style={style}>
       <Button
         variant={variant}
         size={size}
         onClick={handleAddToCart}
-        disabled={!isInStock || isLoading || disabled}
+        disabled={!product.stock || isLoading || !isHydrated} // Блокируем до hydration
         fullWidth={true}
       >
-        {!isInStock ? 'Нет в наличии' : quantityInCart > 0 ? 'Добавить ещё' : 'В корзину'}
+        {!isHydrated
+          ? 'Загрузка...'
+          : !product.stock
+            ? 'Нет в наличии'
+            : quantityInCart > 0
+              ? 'Добавить ещё'
+              : 'В корзину'}
       </Button>
 
-      {showQuantity && quantityInCart > 0 && <QuantityBadge>{quantityInCart}</QuantityBadge>}
+      {showQuantity && isHydrated && quantityInCart > 0 && (
+        <QuantityBadge>{quantityInCart}</QuantityBadge>
+      )}
     </AddToCartButtonWrapper>
   );
 };

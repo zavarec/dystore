@@ -15,7 +15,7 @@ export const DropdownTrigger = styled.button<{
   font-weight: ${props => (props.$isActive ? '600' : '400')};
   font-size: 14px;
   position: relative;
-  padding: 8px 16px 8px 0;
+  padding: 32px 16px 24px 8px;
   background: none;
   border: none;
   cursor: pointer;
@@ -25,27 +25,8 @@ export const DropdownTrigger = styled.button<{
   gap: 4px;
 
   &:hover {
-    color: rgb(143, 145, 148);
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: ${props => (props.$isActive ? '100%' : '0')};
-    height: 2px;
-    background: rgb(223, 224, 224);
-    transition: width 0.3s ease;
-  }
-
-  &:hover::after {
-    width: 100%;
-  }
-
-  svg {
-    transition: transform 0.3s ease;
-    transform: ${props => (props.$isOpen ? 'rotate(180deg)' : 'rotate(0deg)')};
+    background: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid white;
   }
 `;
 

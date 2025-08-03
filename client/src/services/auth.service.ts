@@ -9,6 +9,7 @@ import {
 } from '@/types/models/auth.model';
 import { apiClient } from './api';
 import { User } from '@/types/models/user.model';
+import { isServer, safeLocalStorage } from '@/utils/ssr';
 
 export class AuthService {
   // Отправка кода подтверждения
@@ -41,23 +42,31 @@ export class AuthService {
     return response.data;
   }
 
-  // Сохранение токена
+  // ✅ ИСПРАВЛЕНИЕ: Безопасное сохранение токена
   static saveToken(token: string): void {
-    localStorage.setItem('access_token', token);
+    safeLocalStorage.setItem('access_token', token);
   }
 
-  // Получение токена
+  // ✅ ИСПРАВЛЕНИЕ: Безопасное получение токена
   static getToken(): string | null {
-    return localStorage.getItem('access_token');
+    return safeLocalStorage.getItem('access_token');
   }
 
-  // Удаление токена
+  // ✅ ИСПРАВЛЕНИЕ: Безопасное удаление токена
   static removeToken(): void {
-    localStorage.removeItem('access_token');
+    if (isServer) return;
+    
+    try {
+      localStorage.removeItem('access_token');
+    } catch (error) {
+      // Игнорируем ошибки (например, если localStorage недоступен)
+      console.warn('Не удалось удалить токен из localStorage:', error);
+    }
   }
 
-  // Проверка авторизации
+  // ✅ ИСПРАВЛЕНИЕ: Безопасная проверка авторизации
   static isAuthenticated(): boolean {
+    if (isServer) return false;
     return !!this.getToken();
   }
 }

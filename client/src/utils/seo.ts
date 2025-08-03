@@ -1,35 +1,36 @@
-import { Product, ProductStructuredData } from '@/types/models/product.model';
+import { ProductWithDetails, ProductStructuredData } from '@/types/models/product.model';
 import { SEOProps } from '@/types/common';
 
 // Генерация структурированных данных для продуктов - потому что Google любит порядок
 export const generateProductStructuredData = (
-  product: Product,
+  product: ProductWithDetails,
   baseUrl: string,
 ): ProductStructuredData => {
   const structuredData: ProductStructuredData = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.name,
-    description: product.description,
-    image: product.images.filter(img => img.isPrimary).map(img => `${baseUrl}${img.url}`),
+    description: product.description || product.shortDescription || '',
+    image: product.images?.filter(img => img.isPrimary).map(img => `${baseUrl}${img.url}`) || [
+      product.imageUrl || '',
+    ],
     brand: {
       '@type': 'Brand',
-      name: product.brand,
+      name: product.brand || 'Dyson',
     },
     offers: {
       '@type': 'Offer',
       price: product.price.toString(),
-      priceCurrency: product.currency,
-      availability: product.inStock
-        ? 'https://schema.org/InStock'
-        : 'https://schema.org/OutOfStock',
-      url: `${baseUrl}/product/${product.slug}`,
+      priceCurrency: product.currency || 'RUB',
+      availability:
+        product.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      url: `${baseUrl}/product/${product.slug || product.id}`,
     },
-    sku: product.sku,
-    mpn: product.model,
+    sku: product.sku || product.id.toString(),
+    mpn: product.model || product.name,
   };
 
-  if (product.reviewCount > 0) {
+  if (product.reviewCount && product.reviewCount > 0 && product.rating) {
     structuredData.aggregateRating = {
       '@type': 'AggregateRating',
       ratingValue: product.rating.toString(),
@@ -58,26 +59,28 @@ export const generateBreadcrumbStructuredData = (
 };
 
 // Генерация SEO мета-тегов для продукта
-export const generateProductSEO = (product: Product, baseUrl: string): SEOProps => {
-  const primaryImage = product.images.find(img => img.isPrimary);
-  const imageUrl = primaryImage ? `${baseUrl}${primaryImage.url}` : '';
+export const generateProductSEO = (product: ProductWithDetails, baseUrl: string): SEOProps => {
+  const primaryImage = product.images?.find(img => img.isPrimary);
+  const imageUrl = primaryImage ? `${baseUrl}${primaryImage.url}` : product.imageUrl || '';
 
   return {
-    title: product.metaTitle,
-    description: product.metaDescription,
+    title: product.metaTitle || product.name,
+    description: product.metaDescription || product.description || product.shortDescription || '',
     keywords: [
-      product.brand,
-      product.category,
-      ...product.tags,
-      ...product.features.slice(0, 3),
-    ].join(', '),
-    canonical: `${baseUrl}/product/${product.slug}`,
+      product.brand || 'Dyson',
+      product.category?.name || '',
+      ...(product.tags || []),
+      ...(product.features || []).slice(0, 3),
+    ]
+      .filter(Boolean)
+      .join(', '),
+    canonical: `${baseUrl}/product/${product.slug || product.id}`,
     openGraph: {
-      title: product.metaTitle,
-      description: product.metaDescription,
+      title: product.metaTitle || product.name,
+      description: product.metaDescription || product.description || product.shortDescription || '',
       image: imageUrl,
       imageAlt: primaryImage?.alt || product.name,
-      url: `${baseUrl}/product/${product.slug}`,
+      url: `${baseUrl}/product/${product.slug || product.id}`,
       type: 'product',
       siteName: 'DyStore',
       locale: 'ru_RU',

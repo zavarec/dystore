@@ -10,6 +10,8 @@ import { CategoryDropdown } from '@/components/atoms/category-dropdown';
 import { CategoryTreeUtils } from '@/types/models/category.model';
 import { CartButton } from '@/components/atoms/cart-button/cart-button';
 
+import { useLocalStorage } from '@/utils/ssr';
+
 import {
   MotionHeaderContainer,
   HeaderContent,
@@ -26,6 +28,7 @@ import {
 } from './header.style';
 
 import { selectIsAuthenticated, selectUser } from '@/store/slices/auth-slice/auth.selectors';
+import { NoSSR } from '@/components/atoms/no-ssr/no-ssr';
 
 interface HeaderProps {
   className?: string;
@@ -37,51 +40,46 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const router = useRouter();
-
   const dispatch = useAppDispatch();
 
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const user = useAppSelector(selectUser);
-  const [cartItemsCount, setCartItemsCount] = useState(0);
+
+  // ✅ ИСПРАВЛЕНИЕ: Безопасное получение данных корзины
+  const [cartItems, , isCartHydrated] = useLocalStorage('simpleCart', []);
 
   // Загружаем категории
   const { categories, loading: categoriesLoading } = useCategories();
 
-  // Функция для подсчета товаров в корзине
-  const updateCartCount = () => {
-    const cartData = localStorage.getItem('simpleCart');
-    if (cartData) {
-      try {
-        const cart = JSON.parse(cartData);
-        const totalItems = cart.reduce((sum: number, item: any) => sum + item.quantity, 0);
-        setCartItemsCount(totalItems);
-      } catch (error) {
-        setCartItemsCount(0);
-      }
-    } else {
-      setCartItemsCount(0);
-    }
-  };
-
-  // Обновляем счетчик при загрузке и при изменении корзины
-  useEffect(() => {
-    updateCartCount();
-    window.addEventListener('cartUpdated', updateCartCount);
-    return () => window.removeEventListener('cartUpdated', updateCartCount);
-  }, []);
+  // ✅ ИСПРАВЛЕНИЕ: Безопасное вычисление количества товаров в корзине
+  const cartItemsCount = isCartHydrated
+    ? (cartItems as any[]).reduce((sum: number, item: any) => sum + (item.quantity || 0), 0)
+    : 0;
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
 
+    const handleCartUpdate = () => {
+      // Обновление произойдет автоматически через useLocalStorage
+    };
+
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('cartUpdated', handleCartUpdate);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('cartUpdated', handleCartUpdate);
+    };
   }, []);
 
   // Строим дерево категорий (только корневые категории для навигации)
   const categoryTree = React.useMemo(() => {
     if (!categories || categories.length === 0) return [];
+
+    console.log(categories, 'categories');
+
     const tree = CategoryTreeUtils.buildTree(categories);
     // Возвращаем только корневые категории для главной навигации
     return tree;
@@ -147,26 +145,35 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
             />
           </form>
 
-          {isAuthenticated && user ? (
-            <UserInfo>
-              <UserName>{user.username}</UserName>
-              <LogoutButton onClick={handleLogout} aria-label="Выйти из аккаунта">
-                Выйти
-              </LogoutButton>
-            </UserInfo>
-          ) : (
-            <AuthButton onClick={handleAuthClick} aria-label="Войти в аккаунт">
-              Войти
-            </AuthButton>
-          )}
+          {/* ✅ ИСПРАВЛЕНИЕ: Информация о пользователе безопасно рендерится */}
+          <NoSSR
+            fallback={
+              <AuthButton onClick={handleAuthClick} aria-label="Войти в аккаунт">
+                Войти
+              </AuthButton>
+            }
+          >
+            {isAuthenticated && user ? (
+              <UserInfo>
+                <UserName>{user.username}</UserName>
+                <LogoutButton onClick={handleLogout} aria-label="Выйти из аккаунта">
+                  Выйти
+                </LogoutButton>
+              </UserInfo>
+            ) : (
+              <AuthButton onClick={handleAuthClick} aria-label="Войти в аккаунт">
+                Войти
+              </AuthButton>
+            )}
+          </NoSSR>
 
+          {/* ✅ ИСПРАВЛЕНИЕ: Корзина с безопасным отображением счетчика */}
           <Link href="/cart" passHref legacyBehavior>
-            <CartButton count={cartItemsCount} />
+            <CartButton count={isCartHydrated ? cartItemsCount : 0} />
           </Link>
         </SearchContainer>
 
         <MobileMenuButton onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-label="Меню">
-          Меню
           {[0, 1, 2].map(index => (
             <MenuLine key={index} $isOpen={isMobileMenuOpen} $index={index} />
           ))}

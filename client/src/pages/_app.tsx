@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { AppProps } from 'next/app';
 import { appWithTranslation } from 'next-i18next';
 import { Global, css } from '@emotion/react';
@@ -9,9 +9,10 @@ import { Layout } from '@/components/layout';
 import { useAppDispatch } from '@/hooks/redux';
 import { loadUserProfile } from '@/store/slices/auth-slice/auth.thunks';
 import { initializeAuth } from '@/store/slices/auth-slice/auth.slice';
+import { fetchCart } from '@/store/slices/cart-slice/cart.thunks';
+import { safeLocalStorage } from '@/utils/ssr';
 
 import 'react-toastify/dist/ReactToastify.css';
-import { fetchCart } from '@/store/slices/cart-slice/cart.thunks';
 
 // Глобальные стили - чистые как после уборки Dyson
 const globalStyles = css`
@@ -113,38 +114,31 @@ const globalStyles = css`
   }
 `;
 
-// Компонент для инициализации аутентификации
+// ✅ ИСПРАВЛЕНИЕ: Компонент для инициализации аутентификации с SSR поддержкой
 const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const dispatch = useAppDispatch();
-
-  // useEffect(() => {
-  //   // Инициализируем состояние аутентификации
-  //   dispatch(initializeAuth());
-
-  //   // Загружаем корзину из localStorage
-  //   dispatch(fetchCart());
-
-  //   // Если пользователь авторизован, загружаем профиль
-  //   // Но НЕ на странице авторизации, чтобы избежать зацикливания
-  //   const token = localStorage.getItem('access_token');
-  //   const isAuthPage =
-  //     typeof window !== 'undefined' && window.location.pathname === '/auth';
-
-  //   if (token && !isAuthPage) {
-  //     dispatch(loadUserProfile());
-  //   }
-  // }, [dispatch]);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
+    // Помечаем как hydrated
+    setIsHydrated(true);
+    
+    // Инициализируем состояние аутентификации
     dispatch(initializeAuth());
     dispatch(fetchCart());
 
-    const token = localStorage.getItem('access_token');
-
+    // ✅ ИСПРАВЛЕНИЕ: Безопасная проверка токена только после hydration
+    const token = safeLocalStorage.getItem('access_token');
     if (token) {
       dispatch(loadUserProfile());
     }
   }, [dispatch]);
+
+  // ✅ ИСПРАВЛЕНИЕ: Предотвращаем hydration mismatch
+  // Показываем контент с suppressHydrationWarning до завершения hydration
+  if (!isHydrated) {
+    return <div suppressHydrationWarning>{children}</div>;
+  }
 
   return <>{children}</>;
 };

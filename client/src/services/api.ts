@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { isServer, safeLocalStorage } from '@/utils/ssr';
 
 // Базовый URL API
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
@@ -11,12 +12,15 @@ export const apiClient = axios.create({
   },
 });
 
-// Интерцептор для добавления токена авторизации
+// ✅ ИСПРАВЛЕНИЕ: Интерцептор для добавления токена авторизации с SSR проверками
 apiClient.interceptors.request.use(
   config => {
-    const token = localStorage.getItem('access_token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // Добавляем токен только на клиенте
+    if (!isServer) {
+      const token = safeLocalStorage.getItem('access_token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
@@ -25,25 +29,5 @@ apiClient.interceptors.request.use(
   },
 );
 
-// Интерцептор для обработки ошибок авторизации
-apiClient.interceptors.response.use(
-  response => response,
-  error => {
-    if (error.response?.status === 401) {
-      // Удаляем токен при ошибке авторизации
-      localStorage.removeItem('access_token');
-
-      // УБРАНО: Автоматический редирект на страницу авторизации
-      // Теперь авторизация происходит только по кнопке "Войти"
-      // if (
-      //   typeof window !== 'undefined' &&
-      //   window.location.pathname !== '/auth'
-      // ) {
-      //   window.location.href = '/auth';
-      // }
-    }
-    return Promise.reject(error);
-  },
-);
-
-export default apiClient;
+// ✅ ИСПРАВЛЕНИЕ: Интерцептор для обработки ошибок авторизации с SSR проверками
+apiClient.interceptors

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { NextPage } from 'next';
 import { GetStaticProps } from 'next';
 import Head from 'next/head';
@@ -9,6 +9,8 @@ import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
 import { Button } from '@/components/atoms/button';
 import { ButtonVariant } from '@/components/atoms/button/button.style';
+import { useLocalStorage } from '@/utils/ssr';
+
 import {
   CartPageContainer,
   CartHeader,
@@ -32,6 +34,7 @@ import {
   EmptyCartTitle,
   EmptyCartDescription,
 } from '@/styles/pages/cart.style';
+import { NoSSR } from '@/components/atoms/no-ssr/no-ssr';
 
 interface SimpleCartItem {
   id: number;
@@ -42,75 +45,81 @@ interface SimpleCartItem {
   imageUrl: string;
 }
 
-const CartPage: NextPage = () => {
+// Компонент загрузки корзины
+const CartLoading = () => (
+  <CartPageContainer>
+    <div style={{ textAlign: 'center', padding: '40px' }}>
+      <div>Загрузка корзины...</div>
+    </div>
+  </CartPageContainer>
+);
+
+// Основной компонент корзины
+const CartContent: React.FC = () => {
   const router = useRouter();
-  const [items, setItems] = useState<SimpleCartItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
-  // Загружаем корзину из localStorage
-  const loadCart = () => {
-    const cartData = localStorage.getItem('simpleCart');
-    if (cartData) {
-      try {
-        const cart: SimpleCartItem[] = JSON.parse(cartData);
-        setItems(cart);
-      } catch (error) {
-        console.error('Ошибка загрузки корзины:', error);
-        setItems([]);
-      }
-    } else {
-      setItems([]);
-    }
-  };
+  // ✅ ИСПРАВЛЕНИЕ: Безопасная работа с корзиной
+  const [items, setItems, isHydrated] = useLocalStorage('simpleCart', []);
 
-  // Сохраняем корзину в localStorage
-  const saveCart = (cart: SimpleCartItem[]) => {
-    localStorage.setItem('simpleCart', JSON.stringify(cart));
-    setItems(cart);
-    // Обновляем счетчик в хедере
-    window.dispatchEvent(new Event('cartUpdated'));
-  };
-
-  useEffect(() => {
-    loadCart();
-  }, []);
-
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  // Безопасные вычисления только после hydration
+  const cartItems = isHydrated ? (items as SimpleCartItem[]) : [];
+  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   const handleQuantityChange = (itemId: number, newQuantity: number) => {
+    if (!isHydrated) return;
+
     if (newQuantity < 1) {
       handleRemoveItem(itemId);
       return;
     }
 
-    const updatedCart = items.map(item =>
+    const updatedCart = cartItems.map(item =>
       item.id === itemId ? { ...item, quantity: newQuantity } : item,
     );
-    saveCart(updatedCart);
+    setItems(updatedCart);
+
+    // Уведомляем другие компоненты об обновлении
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('cartUpdated'));
+    }
   };
 
   const handleRemoveItem = (itemId: number) => {
-    const updatedCart = items.filter(item => item.id !== itemId);
-    saveCart(updatedCart);
+    if (!isHydrated) return;
+
+    const updatedCart = cartItems.filter(item => item.id !== itemId);
+    setItems(updatedCart);
 
     toast.info('Товар удален из корзины', {
       position: 'bottom-right',
       autoClose: 2000,
     });
+
+    // Уведомляем другие компоненты об обновлении
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('cartUpdated'));
+    }
   };
 
   const handleClearCart = () => {
-    saveCart([]);
+    if (!isHydrated) return;
+
+    setItems([]);
     toast.info('Корзина очищена', {
       position: 'bottom-right',
       autoClose: 2000,
     });
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('cartUpdated'));
+    }
   };
 
   const handleCheckout = async () => {
-    if (items.length === 0) {
+    if (!isHydrated || cartItems.length === 0) {
       toast.error('Корзина пуста');
       return;
     }
@@ -146,7 +155,8 @@ const CartPage: NextPage = () => {
     }
   };
 
-  if (items.length === 0) {
+  // Показываем пустую корзину
+  if (isHydrated && cartItems.length === 0) {
     return (
       <>
         <Head>
@@ -166,7 +176,6 @@ const CartPage: NextPage = () => {
               Добавьте товары из нашего каталога, чтобы оформить заказ
             </EmptyCartDescription>
             <Link href="/" passHref legacyBehavior>
-              {/* <ContinueShoppingButton as="a">Перейти к покупкам</ContinueShoppingButton> */}
               <Button>Перейти к покупкам</Button>
             </Link>
           </EmptyCart>
@@ -175,6 +184,7 @@ const CartPage: NextPage = () => {
     );
   }
 
+  // Показываем корзину с товарами
   return (
     <>
       <Head>
@@ -199,7 +209,7 @@ const CartPage: NextPage = () => {
           }}
         >
           <CartItems>
-            {items.map(item => (
+            {cartItems.map(item => (
               <CartItem key={item.id}>
                 <ItemImage>
                   <Image
@@ -285,6 +295,14 @@ const CartPage: NextPage = () => {
         </div>
       </CartPageContainer>
     </>
+  );
+};
+
+const CartPage: NextPage = () => {
+  return (
+    <NoSSR fallback={<CartLoading />}>
+      <CartContent />
+    </NoSSR>
   );
 };
 

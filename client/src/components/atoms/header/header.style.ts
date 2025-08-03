@@ -29,7 +29,7 @@ export const HeaderContent = styled.div`
   margin-top: 8px;
   gap: 24px;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1100px) {
     padding: 0 16px;
     height: 60px;
     justify-content: space-between;
@@ -49,7 +49,7 @@ export const Logo = styled(Link)`
     color: #007bff;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1100px) {
     font-size: 1.5rem;
   }
 `;
@@ -60,12 +60,13 @@ export const Navigation = styled.nav<{ $isOpen: boolean }>`
   gap: 32px;
   position: static;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1100px) {
     position: fixed;
     top: 60px;
     left: 0;
     right: 0;
     background: rgba(0, 0, 0, 0.98);
+    background: red;
     backdrop-filter: blur(10px);
     flex-direction: column;
     padding: 20px;
@@ -87,6 +88,7 @@ export const StyledNavLink = styled.a<{ $isActive: boolean }>`
   position: relative;
   padding: 8px 0;
   transition: color 0.3s ease;
+  background-color: red;
 
   &:hover {
     color: rgb(143, 145, 148);
@@ -118,7 +120,7 @@ export const MobileMenuButton = styled.button`
   position: absolute;
   right: 20px;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1100px) {
     display: flex;
     flex-direction: column;
     gap: 4px;
@@ -160,7 +162,7 @@ export const SearchContainer = styled.div`
   align-items: center;
   gap: 16px;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1100px) {
     width: 100%;
     order: -1;
   }
@@ -182,7 +184,7 @@ export const SearchInput = styled.input`
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1100px) {
     width: 100%;
   }
 `;
@@ -210,7 +212,7 @@ export const AuthButton = styled.button`
     box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1100px) {
     padding: 6px 12px;
     font-size: 13px;
   }
@@ -221,7 +223,7 @@ export const UserInfo = styled.div`
   align-items: center;
   gap: 12px;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1100px) {
     flex-direction: column;
     gap: 8px;
   }
@@ -233,7 +235,7 @@ export const UserName = styled.span`
   font-weight: 500;
   white-space: nowrap;
 
-  @media (max-width: 768px) {
+  @media (max-width: 1100px) {
     font-size: 13px;
   }
 `;
@@ -261,7 +263,7 @@ export const LogoutButton = styled.button`
     box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1100px) {
     padding: 4px 8px;
     font-size: 11px;
   }
