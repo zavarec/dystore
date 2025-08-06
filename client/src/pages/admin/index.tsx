@@ -1,4 +1,3 @@
-// client/src/pages/admin/index.tsx
 import React, { useEffect, useState } from 'react';
 import { GetServerSideProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -19,7 +18,7 @@ import {
   Table,
   Td,
   Th,
-} from './admin-page.style';
+} from './admin-dashboard.style';
 
 interface DashboardStats {
   totalProducts: number;

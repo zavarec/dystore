@@ -7,11 +7,17 @@ import {
   CategoriesTitle,
 } from './categories.style';
 import { fetchRootCategories } from '@/store/slices/categories-slice/categories.thunks';
-import { CategoriesGrid, CategoriesSkeleton } from './components';
+import {  CategoriesSkeleton, CategoryCard } from './components';
 import {
   selectIsRootCategoriesLoading,
   selectRootCategories,
 } from '@/store/slices/categories-slice/categories.selectors';
+
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+
+import { Navigation } from 'swiper/modules';
 
 export const Categories: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -21,6 +27,7 @@ export const Categories: React.FC = () => {
 
   useEffect(() => {
     dispatch(fetchRootCategories());
+    console.log(categories, 'categories');
   }, [dispatch]);
 
   const handleCategoryClick = (categorySlug: string) => {
@@ -47,7 +54,27 @@ export const Categories: React.FC = () => {
         <CategoriesHeader>
           <CategoriesTitle>Категории товаров</CategoriesTitle>
         </CategoriesHeader>
-        <CategoriesGrid categories={categories} onCategoryClick={handleCategoryClick} />
+
+        <Swiper
+          modules={[Navigation]}
+          spaceBetween={55}
+          slidesPerView={2}
+          navigation
+          breakpoints={{
+            640: { slidesPerView: 2 },
+            768: { slidesPerView: 3 },
+            1024: { slidesPerView: 4 },
+            1280: { slidesPerView: 5 },
+          }}
+        >
+          {categories.map(category => (
+            <SwiperSlide key={category.id} style={{ height: 'auto' }}>
+              <div style={{ height: '100%' }}>
+                <CategoryCard category={category} onClick={handleCategoryClick} />
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
       </CategoriesContainer>
     </CategoriesSection>
   );

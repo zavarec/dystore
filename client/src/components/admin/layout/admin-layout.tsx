@@ -1,4 +1,3 @@
-// client/src/components/admin/layout/AdminLayout.tsx
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -44,7 +43,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => 
         { href: '/admin/products', label: 'Все продукты', icon: List },
         { href: '/admin/products/new', label: 'Добавить продукт', icon: Plus },
         { href: '/admin/categories', label: 'Категории', icon: FolderOpen },
-        { href: '/admin/categories/new', label: 'Добавить категорию', icon: Plus },
+        { href: '/admin/categories/new-category-page', label: 'Добавить категорию', icon: Plus },
       ],
     },
   ];

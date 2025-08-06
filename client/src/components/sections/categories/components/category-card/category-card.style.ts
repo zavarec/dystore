@@ -7,7 +7,8 @@ export const CategoryCardWrapper = styled(motion.div)`
   height: 350px;
   background: white;
   border-radius: 24px;
-  overflow: hidden;
+  overflow: hidden; // было: hidden
+
   cursor: pointer;
   border: 1px solid #e9ecef;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
