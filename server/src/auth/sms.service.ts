@@ -1,17 +1,25 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from "@nestjs/common";
 
 @Injectable()
 export class SmsService {
   private readonly logger = new Logger(SmsService.name);
 
   async sendVerificationCode(phone: string, code: string): Promise<void> {
-    // В реальном проекте здесь будет интеграция с SMS-провайдером
-    // Например: Twilio, AWS SNS, или российские провайдеры
-    this.logger.log(`📱 Отправка SMS на номер ${phone} с кодом: ${code}`);
+    if (process.env.NODE_ENV === "production") {
+      // Здесь реальная отправка SMS
+      // await this.smsProvider.send(phone, `Ваш код: ${code}`);
+      this.logger.log(`SMS sent to ${this.maskPhone(phone)}`);
+    } else {
+      // В разработке логируем код
+      await Promise.resolve();
+      this.logger.warn(
+        `DEV MODE - SMS code for ${this.maskPhone(phone)}: ${code}`,
+      );
+    }
+  }
 
-    // Имитация отправки SMS
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    this.logger.log(`✅ SMS успешно отправлено на ${phone}`);
+  private maskPhone(phone: string): string {
+    // Маскируем номер для безопасности: +7912***45-67
+    return phone.replace(/(\+7\d{3})\d{3}(\d{2}-?\d{2})/, "$1***$2");
   }
 }

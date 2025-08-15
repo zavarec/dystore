@@ -8,7 +8,7 @@ import { useAppDispatch } from '@/hooks/redux';
 import { ProductWithDetails } from '@/types/models/product.model';
 import { useProducts } from '@/hooks/useProducts';
 import { adaptProductsForUI, getProductBySlug } from '@/utils/product-adapters';
-import { AddToCartButton } from '@/components/atoms/add-to-cart-button';
+import { AddToCartButton } from '@/features/cart/add-to-cart-button';
 import { ButtonVariant } from '@/components/atoms/button/button.style';
 import {
   ProductPageContainer,
@@ -26,7 +26,7 @@ import {
   OutOfStockBadge,
 } from '@/styles/pages/product-slug.style';
 import { fetchCart } from '@/store/slices/cart-slice/cart.thunks';
-import { AddToCartButtonVariant } from '@/components/atoms/add-to-cart-button/add-to-cart-button';
+import { AddToCartButtonVariant } from '@/features/cart/add-to-cart-button/add-to-cart-button';
 
 interface ProductPageProps {
   productId: string;

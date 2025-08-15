@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Category } from '@/types/models/category.model';
@@ -12,6 +12,7 @@ import {
   EmptyMessage,
   LoadingSpinner,
 } from './category-dropdown.style';
+import { useDropdownToggle } from '../hooks/use-dropdown-toggle';
 
 interface CategoryDropdownProps {
   category: Category;
@@ -19,27 +20,19 @@ interface CategoryDropdownProps {
   loading?: boolean;
 }
 
-const ChevronDownIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M7 10l5 5 5-5z" />
-  </svg>
-);
-
 export const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
   category,
   isActive = false,
   loading = false,
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const { isOpen, close, cancelClose } = useDropdownToggle(300);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  // Закрытие дропдауна при клике вне его
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+        close();
       }
     };
 
@@ -49,21 +42,6 @@ export const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
     };
   }, []);
 
-  const handleMouseEnter = () => {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-      setTimeoutId(null);
-    }
-    setIsOpen(true);
-  };
-
-  const handleMouseLeave = () => {
-    const id = setTimeout(() => {
-      setIsOpen(false);
-    }, 300); // Задержка перед закрытием
-    setTimeoutId(id);
-  };
-
   const handleTriggerClick = () => {
     router.push(`/category/${category.slug}`);
   };
@@ -71,11 +49,23 @@ export const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
   const hasSubcategories = category.children && category.children.length > 0;
 
   return (
-    <div onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+    <div onMouseEnter={cancelClose} onMouseLeave={close}>
       <DropdownContainer ref={dropdownRef}>
-        <DropdownTrigger $isActive={isActive} $isOpen={isOpen} onClick={handleTriggerClick}>
+        <DropdownTrigger
+          $isActive={isActive}
+          $isOpen={isOpen}
+          onClick={handleTriggerClick}
+          role="button"
+          aria-expanded={isOpen}
+          aria-haspopup="true"
+          aria-controls={`dropdown-${category.id}`}
+        >
           {category.name}
-          {hasSubcategories && <ChevronDownIcon />}
+          {hasSubcategories && (
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M7 10l5 5 5-5z" />
+            </svg>
+          )}
         </DropdownTrigger>
       </DropdownContainer>
 

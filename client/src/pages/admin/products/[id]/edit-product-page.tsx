@@ -1,11 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { GetServerSideProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useRouter } from 'next/router';
 
-import { ProductsService } from '@/services';
-import { Product, UpdateProductDto } from '@/types/models/product.model';
-import { toast } from 'react-toastify';
+import { useEditProduct } from '@/hooks/useEditProduct';
 import { AdminLayout } from '@/components/admin/layout/admin-layout';
 import { ProductForm } from '@/components/admin/forms/product-form/product-form';
 
@@ -14,74 +11,24 @@ interface EditProductPageProps {
 }
 
 const EditProductPage: NextPage<EditProductPageProps> = ({ productId }) => {
-  const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const [product, setProduct] = useState<Product | null>(null);
-  const [fetchingProduct, setFetchingProduct] = useState(true);
-
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const data = await ProductsService.getProductById(parseInt(productId));
-        setProduct(data);
-      } catch (error) {
-        console.error('Error fetching product:', error);
-        toast.error('Продукт не найден');
-        router.push('/admin/products');
-      } finally {
-        setFetchingProduct(false);
-      }
-    };
-
-    if (productId) {
-      fetchProduct();
-    }
-  }, [productId, router]);
-
-  const handleSubmit = async (data: UpdateProductDto) => {
-    setLoading(true);
-    try {
-      await ProductsService.updateProduct(parseInt(productId), data);
-      toast.success('Продукт успешно обновлен');
-      router.push('/admin/products');
-    } catch (error: any) {
-      console.error('Error updating product:', error);
-      toast.error(error.response?.data?.message || 'Ошибка при обновлении продукта');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { product, handleSubmit, loading, fetchingProduct } = useEditProduct(productId);
 
   if (fetchingProduct) {
-    return (
-      <AdminLayout title="Редактирование продукта">
-        <div>Загрузка...</div>
-      </AdminLayout>
-    );
-  }
-
-  if (!product) {
-    return (
-      <AdminLayout title="Редактирование продукта">
-        <div>Продукт не найден</div>
-      </AdminLayout>
-    );
+    return <div>Loading...</div>;
   }
 
   return (
-    <AdminLayout title={`Редактирование: ${product.name}`}>
-      <ProductForm product={product} onSubmit={handleSubmit} loading={loading} />
+    <AdminLayout title="Редактирование продукта">
+      {product && <ProductForm onSubmit={handleSubmit} loading={loading} initialValues={product} />}
     </AdminLayout>
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ params, locale }) => {
-  const productId = params?.id as string;
-
+export const getServerSideProps: GetServerSideProps = async ({ locale, params }) => {
   return {
     props: {
       ...(await serverSideTranslations(locale ?? 'ru', ['common'])),
-      productId,
+      productId: params?.id || '',
     },
   };
 };

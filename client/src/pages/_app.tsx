@@ -122,7 +122,7 @@ const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) 
   useEffect(() => {
     // Помечаем как hydrated
     setIsHydrated(true);
-    
+
     // Инициализируем состояние аутентификации
     dispatch(initializeAuth());
     dispatch(fetchCart());

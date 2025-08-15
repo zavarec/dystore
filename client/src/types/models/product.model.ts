@@ -95,6 +95,10 @@ export interface CreateProductDto {
   stock: number;
   /** ID категории продукта */
   categoryId: number;
+  /** URL изображения продукта */
+  imageUrl?: string;
+  /** Является ли продукт рекомендуемым */
+  isFeatured?: boolean;
 }
 
 export interface UpdateProductDto {
@@ -108,6 +112,10 @@ export interface UpdateProductDto {
   stock?: number;
   /** Новый ID категории продукта */
   categoryId?: number;
+  /** Новый URL изображения продукта */
+  imageUrl?: string;
+  /** Является ли продукт рекомендуемым */
+  isFeatured?: boolean;
 }
 
 export interface ProductImage {

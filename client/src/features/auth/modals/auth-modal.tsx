@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
 import { Modal } from '@/components/atoms/modal';
-import { AuthModalContent } from '@/components/atoms/auth-modal-content';
+import { AuthModalContent } from '@/features/auth/modals/auth-modal-content';
 import { useAppSelector, useAppDispatch } from '@/hooks/redux';
 import { setAuthModalOpen } from '@/store/slices/uiSlice';
 import { selectIsAuthenticated } from '@/store/slices/auth-slice/auth.selectors';
 
-export const GlobalAuthModal: React.FC = () => {
+export const AuthModal: React.FC = () => {
   const dispatch = useAppDispatch();
   const isAuthModalOpen = useAppSelector(state => state.uiSlice.isAuthModalOpen);
   const isAuthenticated = useAppSelector(selectIsAuthenticated);

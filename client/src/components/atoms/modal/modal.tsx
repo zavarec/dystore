@@ -1,6 +1,7 @@
-import React, { useEffect } from 'react';
+// modal.tsx
+import React, { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ModalOverlay, ModalContainer, ModalContent, ModalCloseButton } from './modal.style';
 
 interface ModalProps {
@@ -18,61 +19,69 @@ export const Modal: React.FC<ModalProps> = ({
   closeOnOverlayClick = true,
   closeOnEsc = true,
 }) => {
-  useEffect(() => {
-    if (!closeOnEsc) return;
+  const modalRef = useRef<HTMLDivElement>(null);
 
-    const handleEsc = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose();
-      }
+  // ESC key listener
+  useEffect(() => {
+    if (!closeOnEsc || !isOpen) return;
+
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
     };
 
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, [isOpen, closeOnEsc, onClose]);
+
+  // prevent body scroll
+  useEffect(() => {
     if (isOpen) {
-      document.addEventListener('keydown', handleEsc);
-      // Блокируем скролл body
       document.body.style.overflow = 'hidden';
     }
-
     return () => {
-      document.removeEventListener('keydown', handleEsc);
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen, onClose, closeOnEsc]);
+  }, [isOpen]);
 
   const handleOverlayClick = (e: React.MouseEvent) => {
-    if (closeOnOverlayClick && e.target === e.currentTarget) {
+    if (e.target === e.currentTarget && closeOnOverlayClick) {
       onClose();
     }
   };
 
-  if (!isOpen) return null;
+  if (typeof window === 'undefined') return null;
 
-  const modalContent = (
+  return createPortal(
     <AnimatePresence>
-      <ModalOverlay
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.2 }}
-        onClick={handleOverlayClick}
-      >
-        <ModalContainer
-          initial={{ opacity: 0, scale: 0.95, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 20 }}
+      {isOpen && (
+        <ModalOverlay
+          as={motion.div}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
+          onClick={handleOverlayClick}
+          aria-modal="true"
+          role="dialog"
+          ref={modalRef}
         >
-          <ModalContent>
-            <ModalCloseButton onClick={onClose} aria-label="Закрыть модальное окно">
-              ✕
-            </ModalCloseButton>
-            {children}
-          </ModalContent>
-        </ModalContainer>
-      </ModalOverlay>
-    </AnimatePresence>
+          <ModalContainer
+            as={motion.div}
+            initial={{ scale: 0.95, y: 20, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            exit={{ scale: 0.95, y: 20, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <ModalContent>
+              <ModalCloseButton onClick={onClose} aria-label="Закрыть модальное окно">
+                ✕
+              </ModalCloseButton>
+              {children}
+            </ModalContent>
+          </ModalContainer>
+        </ModalOverlay>
+      )}
+    </AnimatePresence>,
+    document.body
   );
-
-  // Рендерим модальное окно в body через портал
-  return typeof window !== 'undefined' ? createPortal(modalContent, document.body) : null;
 };

@@ -5,7 +5,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useRouter } from 'next/router';
 import { useAppSelector } from '@/hooks/redux';
 import { selectIsAuthenticated } from '@/store/slices/auth-slice/auth.selectors';
-import { UsernameAuthForm } from '@/components/atoms/username-auth-form';
+import { UsernameAuthForm } from '@/features/auth/forms/username-auth-form';
 import {
   LoginContainer,
   LoginCard,

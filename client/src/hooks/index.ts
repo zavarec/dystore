@@ -5,3 +5,8 @@ export { useAppDispatch, useAppSelector } from './redux';
 export * from './useProducts';
 export * from './useCategories';
 export * from './useCategoryProducts';
+
+// Custom hooks
+export * from './useNewProduct';
+export * from './useProducts';
+export * from './useEditProduct';

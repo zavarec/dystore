@@ -17,9 +17,9 @@ import {
   SaveAmount,
   ProductTitleWithImageWrapper,
 } from './dyson-product-card.style';
-import { AddToCartButton } from '@/components/atoms/add-to-cart-button';
+import { AddToCartButton } from '@/features/cart/add-to-cart-button';
 import { ButtonVariant } from '@/components/atoms/button/button.style';
-import { AddToCartButtonVariant } from '@/components/atoms/add-to-cart-button/add-to-cart-button';
+import { AddToCartButtonVariant } from '@/features/cart/add-to-cart-button/add-to-cart-button';
 
 interface DysonProductCardProps {
   product: ProductWithDetails;

@@ -12,7 +12,7 @@ import {
 } from './admin-login-page.style';
 import { useAppSelector } from '@/hooks';
 import { selectIsAuthenticated } from '@/store/slices/auth-slice/auth.selectors';
-import { UsernameAuthForm } from '@/components/atoms/username-auth-form';
+import { UsernameAuthForm } from '@/features/auth/forms/username-auth-form';
 
 const AdminLoginPage: NextPage = () => {
   const router = useRouter();

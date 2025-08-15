@@ -6,9 +6,7 @@ import { useAppSelector, useAppDispatch } from '@/hooks/redux';
 import { logout } from '@/store/slices/auth-slice/auth.thunks';
 import { setAuthModalOpen } from '@/store/slices/uiSlice';
 import { useCategories } from '@/hooks/useCategories';
-import { CategoryDropdown } from '@/components/atoms/category-dropdown';
 import { CategoryTreeUtils } from '@/types/models/category.model';
-import { CartButton } from '@/components/atoms/cart-button/cart-button';
 
 import { useLocalStorage } from '@/utils/ssr';
 
@@ -29,6 +27,8 @@ import {
 
 import { selectIsAuthenticated, selectUser } from '@/store/slices/auth-slice/auth.selectors';
 import { NoSSR } from '@/components/atoms/no-ssr/no-ssr';
+import { CategoryDropdown } from '@/features/categories/category-dropdown';
+import { CartButton } from '@/features/cart/cart-button/cart-button';
 
 interface HeaderProps {
   className?: string;
