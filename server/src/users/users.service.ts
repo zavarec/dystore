@@ -2,10 +2,10 @@ import {
   Injectable,
   ConflictException,
   BadRequestException,
-} from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
-import { PrismaService } from '../database/prisma.service';
-import { User } from '@prisma/client';
+} from "@nestjs/common";
+import * as bcrypt from "bcrypt";
+import { PrismaService } from "../database/prisma.service";
+import { User } from "@prisma/client";
 
 @Injectable()
 export class UsersService {
@@ -31,12 +31,12 @@ export class UsersService {
     name?: string,
   ): Promise<User> {
     if (!email || !password) {
-      throw new BadRequestException('Email и пароль обязательны');
+      throw new BadRequestException("Email и пароль обязательны");
     }
 
     const existingUser = await this.findByEmail(email);
     if (existingUser) {
-      throw new ConflictException('Пользователь с таким email уже существует');
+      throw new ConflictException("Пользователь с таким email уже существует");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
