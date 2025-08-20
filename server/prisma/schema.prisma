@@ -1,18 +1,17 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
-
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+// Роли пользователей
+enum Role {
+  USER
+  ADMIN
+  MODERATOR
 }
 
 // Пользователи
@@ -22,27 +21,39 @@ model User {
   email     String?   @unique
   password  String?
   name      String?
+  role      Role      @default(USER)
+  isActive  Boolean   @default(true)
   createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   
   // Связи
   carts     Cart[]
   orders    Order[]
   
   @@map("users")
+  @@index([email])
+  @@index([phone])
 }
 
 // Категории
 model Category {
-  id       Int       @id @default(autoincrement())
-  name     String
-  slug     String    @unique
-  image    String?   // URL изображения категории
-  parentId Int?      // Родительская категория (null для корневых)
+  id          Int       @id @default(autoincrement())
+  name        String
+  slug        String    @unique
+  image       String?
+  description String?
+  parentId    Int?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   
   // Связи
   parent     Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children   Category[] @relation("CategoryHierarchy")
   products   Product[]
+  
+  @@index([slug])
+  @@index([parentId])
 }
 
 // Продукты
@@ -55,14 +66,20 @@ model Product {
   stock            Int      @default(0)
   imageUrl         String?
   categoryId       Int
+  isFeatured       Boolean  @default(false)
+  popularity       Int      @default(0)
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
   
   // Связи
   category    Category    @relation(fields: [categoryId], references: [id])
   cartItems   CartItem[]
   orderItems  OrderItem[]
-
-  isFeatured  Boolean  @default(false)
-  popularity  Int      @default(0)
+  
+  @@index([categoryId])
+  @@index([isFeatured])
+  @@index([popularity])
 }
 
 // Корзины
@@ -70,12 +87,14 @@ model Cart {
   id        Int       @id @default(autoincrement())
   userId    String
   createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   
   // Связи
   user  User       @relation(fields: [userId], references: [id])
   items CartItem[]
   
   @@map("carts")
+  @@index([userId])
 }
 
 // Элементы корзины
@@ -89,22 +108,28 @@ model CartItem {
   cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id])
   
+  @@unique([cartId, productId])
   @@map("cart_items")
 }
 
 // Заказы
 model Order {
-  id         Int         @id @default(autoincrement())
-  userId     String
-  totalPrice Float
-  status     OrderStatus @default(PENDING)
-  createdAt  DateTime    @default(now())
+  id              Int         @id @default(autoincrement())
+  userId          String
+  totalPrice      Float
+  status          OrderStatus @default(PENDING)
+  deliveryAddress String?
+  comment         String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
   
   // Связи
   user  User        @relation(fields: [userId], references: [id])
   items OrderItem[]
   
   @@map("orders")
+  @@index([userId])
+  @@index([status])
 }
 
 // Элементы заказа
@@ -125,7 +150,10 @@ model OrderItem {
 // Enum для статуса заказа
 enum OrderStatus {
   PENDING
+  CONFIRMED
   PAID
+  PROCESSING
   SHIPPED
   DELIVERED
+  CANCELLED
 }

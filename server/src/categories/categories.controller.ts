@@ -6,143 +6,108 @@ import {
   Param,
   Put,
   Delete,
-  ValidationPipe,
   ParseIntPipe,
   UseGuards,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
-import { CategoriesService } from './categories.service';
-import { Category } from '@prisma/client';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+  Query,
+} from "@nestjs/common";
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiQuery,
+} from "@nestjs/swagger";
+import { CategoriesService } from "./categories.service";
+import { CreateCategoryDto } from "./dto/create-category.dto";
+import { UpdateCategoryDto } from "./dto/update-category.dto";
+import { CategoryResponseDto } from "./dto/category-response.dto";
+import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
+import { RolesGuard } from "../common/guards/roles.guard";
+import { Roles } from "../common/decorators/roles.decorator";
+import { Role } from "@prisma/client";
+import { PaginationDto } from "../common/dto/pagination.dto";
+import { ApiPaginatedResponse } from "../common/decorators/api-paginated-response.decorator";
 
-@Controller('categories')
+@ApiTags("Categories")
+@Controller("categories")
 export class CategoriesController {
-  constructor(private readonly service: CategoriesService) {}
+  constructor(private readonly categoriesService: CategoriesService) {}
 
+  @ApiOperation({ summary: "Get all categories" })
+  @ApiPaginatedResponse(CategoryResponseDto)
+  @ApiQuery({ name: "includeInactive", required: false, type: Boolean })
   @Get()
-  async findAll(): Promise<Category[]> {
-    try {
-      return await this.service.findAll();
-    } catch (error) {
-      throw new HttpException(
-        `Ошибка при получении списка категорий,  ${error}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+  async findAll(
+    @Query() paginationDto: PaginationDto,
+    @Query("includeInactive") includeInactive?: boolean,
+  ) {
+    return this.categoriesService.findAll(paginationDto, includeInactive);
   }
 
-  @Get('tree')
-  async getCategoryTree(): Promise<Category[]> {
-    try {
-      return await this.service.getCategoryTree();
-    } catch (error) {
-      throw new HttpException(
-        `Ошибка при получении дерева категорий,  ${error}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+  @ApiOperation({ summary: "Get category tree" })
+  @ApiResponse({ status: 200, type: [CategoryResponseDto] })
+  @Get("tree")
+  async getCategoryTree() {
+    return this.categoriesService.getCategoryTree();
   }
 
-  @Get('root')
-  async findRootCategories(): Promise<Category[]> {
-    try {
-      return await this.service.findRootCategories();
-    } catch (error) {
-      throw new HttpException(
-        `Ошибка при получении корневых категорий,  ${error}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+  @ApiOperation({ summary: "Get root categories" })
+  @ApiResponse({ status: 200, type: [CategoryResponseDto] })
+  @Get("root")
+  async findRootCategories() {
+    return this.categoriesService.findRootCategories();
   }
 
-  @Get(':id/descendants')
-  async findDescendants(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<Category[]> {
-    try {
-      return await this.service.findDescendants(id);
-    } catch (error) {
-      throw new HttpException(
-        `Ошибка при получении дочерних категорий,  ${error}`,
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+  @ApiOperation({ summary: "Get category by ID" })
+  @ApiResponse({ status: 200, type: CategoryResponseDto })
+  @ApiResponse({ status: 404, description: "Category not found" })
+  @Get(":id")
+  async findOne(@Param("id", ParseIntPipe) id: number) {
+    return this.categoriesService.findOne(id);
   }
 
-  @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Category> {
-    try {
-      const category = await this.service.findOne(id);
-      if (!category) {
-        throw new HttpException('Категория не найдена', HttpStatus.NOT_FOUND);
-      }
-      return category;
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      throw new HttpException(
-        'Ошибка при получении категории',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+  @ApiOperation({ summary: "Get category descendants" })
+  @ApiResponse({ status: 200, type: [CategoryResponseDto] })
+  @Get(":id/descendants")
+  async findDescendants(@Param("id", ParseIntPipe) id: number) {
+    return this.categoriesService.findDescendants(id);
   }
 
-  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: "Create new category (Admin only)" })
+  @ApiResponse({ status: 201, type: CategoryResponseDto })
+  @ApiResponse({ status: 403, description: "Forbidden" })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
   @Post()
-  async create(
-    @Body(ValidationPipe) createCategoryDto: CreateCategoryDto,
-  ): Promise<Category> {
-    try {
-      return await this.service.create(createCategoryDto);
-    } catch (error) {
-      throw new HttpException(
-        `Ошибка при создании категории, ${error}`,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+  async create(@Body() createCategoryDto: CreateCategoryDto) {
+    return this.categoriesService.create(createCategoryDto);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Put(':id')
+  @ApiOperation({ summary: "Update category (Admin only)" })
+  @ApiResponse({ status: 200, type: CategoryResponseDto })
+  @ApiResponse({ status: 403, description: "Forbidden" })
+  @ApiResponse({ status: 404, description: "Category not found" })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @Put(":id")
   async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body(ValidationPipe) updateCategoryDto: UpdateCategoryDto,
-  ): Promise<Category> {
-    try {
-      await this.service.update(id, updateCategoryDto);
-      const category = await this.service.findOne(id);
-      if (!category) {
-        throw new HttpException('Категория не найдена', HttpStatus.NOT_FOUND);
-      }
-      return category;
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      throw new HttpException(
-        'Ошибка при обновлении категории',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    @Param("id", ParseIntPipe) id: number,
+    @Body() updateCategoryDto: UpdateCategoryDto,
+  ) {
+    return this.categoriesService.update(id, updateCategoryDto);
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  async remove(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<{ message: string }> {
-    try {
-      await this.service.remove(id);
-      return { message: 'Категория успешно удалена' };
-    } catch (error) {
-      throw new HttpException(
-        `Ошибка при удалении категории, ${error}`,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+  @ApiOperation({ summary: "Delete category (Admin only)" })
+  @ApiResponse({ status: 200, description: "Category deleted" })
+  @ApiResponse({ status: 403, description: "Forbidden" })
+  @ApiResponse({ status: 404, description: "Category not found" })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @Delete(":id")
+  async remove(@Param("id", ParseIntPipe) id: number) {
+    return this.categoriesService.remove(id);
   }
 }
