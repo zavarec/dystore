@@ -2,7 +2,7 @@ import { registerAs } from "@nestjs/config";
 
 export const appConfig = registerAs("app", () => ({
   nodeEnv: process.env.NODE_ENV || "development",
-  port: parseInt(process.env.PORT, 10) || 3000,
+  port: parseInt(process.env.PORT ?? "3001", 10) || 3000,
   apiPrefix: process.env.API_PREFIX || "api/v1",
 }));
 
@@ -19,14 +19,14 @@ export const jwtConfig = registerAs("jwt", () => ({
 
 export const redisConfig = registerAs("redis", () => ({
   host: process.env.REDIS_HOST || "localhost",
-  port: parseInt(process.env.REDIS_PORT, 10) || 6379,
   password: process.env.REDIS_PASSWORD,
-  ttl: parseInt(process.env.REDIS_TTL, 10) || 300,
+  port: parseInt(process.env.REDIS_PORT ?? "6379", 10),
+  ttl: parseInt(process.env.REDIS_TTL ?? "300", 10),
 }));
 
 export const throttleConfig = registerAs("throttle", () => ({
-  ttl: parseInt(process.env.THROTTLE_TTL, 10) || 60000,
-  limit: parseInt(process.env.THROTTLE_LIMIT, 10) || 10,
+  ttl: parseInt(process.env.THROTTLE_TTL ?? "6000", 10) || 60000,
+  limit: parseInt(process.env.THROTTLE_LIMIT ?? "10", 10) || 10,
 }));
 
 export const swaggerConfig = registerAs("swagger", () => ({

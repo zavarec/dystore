@@ -2,6 +2,7 @@ import React from 'react';
 import { NextPage } from 'next';
 import { GetStaticProps } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
 import Link from 'next/link';
 import { SEOHead } from '@/components/atoms/seo-head/seo-head';
 import { Button } from '@/components/atoms/button';
