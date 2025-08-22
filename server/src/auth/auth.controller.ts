@@ -19,8 +19,6 @@ import { SendCodeDto } from "./dto/send-code.dto";
 import { VerifyCodeDto } from "./dto/verify-code.dto";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
-import { RefreshTokenDto } from "./dto/refresh-token.dto";
-import { AuthResponseDto } from "./dto/auth-response.dto";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { CurrentUser } from "../common/decorators/current-user.decorator";
 import { User } from "@prisma/client";
@@ -42,7 +40,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: "Verify SMS code" })
-  @ApiResponse({ status: 200, type: AuthResponseDto })
+  @ApiResponse({ status: 200, description: "Authentication successful" })
   @ApiResponse({ status: 400, description: "Invalid code" })
   @Post("verify-code")
   @HttpCode(HttpStatus.OK)
@@ -51,7 +49,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: "Register new user" })
-  @ApiResponse({ status: 201, type: AuthResponseDto })
+  @ApiResponse({ status: 201, description: "User registered successfully" })
   @ApiResponse({ status: 409, description: "User already exists" })
   @Post("register")
   async register(@Body() registerDto: RegisterDto) {
@@ -59,21 +57,12 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: "Login user" })
-  @ApiResponse({ status: 200, type: AuthResponseDto })
+  @ApiResponse({ status: 200, description: "Login successful" })
   @ApiResponse({ status: 401, description: "Invalid credentials" })
   @Post("login")
   @HttpCode(HttpStatus.OK)
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
-  }
-
-  @ApiOperation({ summary: "Refresh access token" })
-  @ApiResponse({ status: 200, type: AuthResponseDto })
-  @ApiResponse({ status: 401, description: "Invalid refresh token" })
-  @Post("refresh")
-  @HttpCode(HttpStatus.OK)
-  async refresh(@Body() refreshTokenDto: RefreshTokenDto) {
-    return this.authService.refreshToken(refreshTokenDto);
   }
 
   @ApiOperation({ summary: "Get current user profile" })
@@ -83,16 +72,13 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get("profile")
   async getProfile(@CurrentUser() user: User) {
-    return this.authService.getProfile(user.id);
-  }
-
-  @ApiOperation({ summary: "Logout user" })
-  @ApiResponse({ status: 200, description: "Logged out successfully" })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  @Post("logout")
-  @HttpCode(HttpStatus.OK)
-  async logout(@CurrentUser() user: User) {
-    return this.authService.logout(user.id);
+    return {
+      id: user.id,
+      email: user.email,
+      phone: user.phone,
+      name: user.name,
+      role: user.role,
+      createdAt: user.createdAt,
+    };
   }
 }

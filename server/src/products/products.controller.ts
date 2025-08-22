@@ -1,3 +1,4 @@
+// src/products/products.controller.ts
 import {
   Controller,
   Get,
@@ -8,26 +9,19 @@ import {
   Delete,
   ParseIntPipe,
   UseGuards,
-  Query,
+  HttpException,
+  HttpStatus,
 } from "@nestjs/common";
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
-  ApiQuery,
 } from "@nestjs/swagger";
 import { ProductsService } from "./products.service";
 import { CreateProductDto } from "./dto/create-product.dto";
 import { UpdateProductDto } from "./dto/update-product.dto";
-import { ProductResponseDto } from "./dto/update-product.dto";
-import { ProductsFilterDto } from "./dto/update-product.dto";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
-import { RolesGuard } from "../common/guards/role.guard";
-import { Roles } from "../common/decorators/role.decorator";
-import { Role } from "@prisma/client";
-import { PaginationDto } from "../common/dto/pagination.dto";
-import { ApiPaginatedResponse } from "../common/decorators/api-paginated-response.decorator";
 
 @ApiTags("Products")
 @Controller("products")
@@ -35,96 +29,132 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @ApiOperation({ summary: "Get all products" })
-  @ApiPaginatedResponse(ProductResponseDto)
+  @ApiResponse({ status: 200, description: "List of products" })
   @Get()
-  async findAll(
-    @Query() paginationDto: PaginationDto,
-    @Query() filterDto: ProductsFilterDto,
-  ) {
-    return this.productsService.findAll(paginationDto, filterDto);
-  }
-
-  @ApiOperation({ summary: "Get featured products" })
-  @ApiResponse({ status: 200, type: [ProductResponseDto] })
-  @Get("featured")
-  async findFeatured(@Query("limit") limit?: number) {
-    return this.productsService.findFeatured(limit || 10);
-  }
-
-  @ApiOperation({ summary: "Get popular products" })
-  @ApiResponse({ status: 200, type: [ProductResponseDto] })
-  @Get("popular")
-  async findPopular(@Query("limit") limit?: number) {
-    return this.productsService.findPopular(limit || 10);
+  async findAll() {
+    try {
+      return await this.productsService.findAll();
+    } catch (error) {
+      throw new HttpException(
+        'Ошибка при получении списка товаров',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   @ApiOperation({ summary: "Get product by ID" })
-  @ApiResponse({ status: 200, type: ProductResponseDto })
+  @ApiResponse({ status: 200, description: "Product details" })
   @ApiResponse({ status: 404, description: "Product not found" })
   @Get(":id")
   async findOne(@Param("id", ParseIntPipe) id: number) {
-    return this.productsService.findOne(id);
+    try {
+      const product = await this.productsService.findOne(id);
+      if (!product) {
+        throw new HttpException('Товар не найден', HttpStatus.NOT_FOUND);
+      }
+      return product;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        'Ошибка при получении товара',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   @ApiOperation({ summary: "Get products by category" })
-  @ApiPaginatedResponse(ProductResponseDto)
+  @ApiResponse({ status: 200, description: "Products in category" })
   @Get("category/:categoryId")
-  async findByCategory(
-    @Param("categoryId", ParseIntPipe) categoryId: number,
-    @Query() paginationDto: PaginationDto,
-  ) {
-    return this.productsService.findByCategory(categoryId, paginationDto);
+  async findByCategory(@Param("categoryId", ParseIntPipe) categoryId: number) {
+    try {
+      return await this.productsService.findByCategory(categoryId);
+    } catch (error) {
+      throw new HttpException(
+        'Ошибка при получении товаров категории',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
-  @ApiOperation({ summary: "Create new product (Admin only)" })
-  @ApiResponse({ status: 201, type: ProductResponseDto })
-  @ApiResponse({ status: 403, description: "Forbidden" })
+  @ApiOperation({ summary: "Get products by category including descendants" })
+  @ApiResponse({ status: 200, description: "Products with subcategories" })
+  @Get("category/:categoryId/with-descendants")
+  async findByCategoryIncludingDescendants(
+    @Param("categoryId", ParseIntPipe) categoryId: number,
+  ) {
+    try {
+      return await this.productsService.findByCategoryIncludingDescendants(categoryId);
+    } catch (error) {
+      throw new HttpException(
+        'Ошибка при получении товаров с подкатегориями',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @ApiOperation({ summary: "Create new product (requires authentication)" })
+  @ApiResponse({ status: 201, description: "Product created" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Body() createProductDto: CreateProductDto) {
-    return this.productsService.create(createProductDto);
+    try {
+      return await this.productsService.create(createProductDto);
+    } catch (error) {
+      throw new HttpException(
+        'Ошибка при создании товара',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
-  @ApiOperation({ summary: "Update product (Admin only)" })
-  @ApiResponse({ status: 200, type: ProductResponseDto })
-  @ApiResponse({ status: 403, description: "Forbidden" })
+  @ApiOperation({ summary: "Update product (requires authentication)" })
+  @ApiResponse({ status: 200, description: "Product updated" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
   @ApiResponse({ status: 404, description: "Product not found" })
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard)
   @Put(":id")
   async update(
     @Param("id", ParseIntPipe) id: number,
     @Body() updateProductDto: UpdateProductDto,
   ) {
-    return this.productsService.update(id, updateProductDto);
+    try {
+      const updatedProduct = await this.productsService.update(id, updateProductDto);
+      if (!updatedProduct) {
+        throw new HttpException('Товар не найден', HttpStatus.NOT_FOUND);
+      }
+      return updatedProduct;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        'Ошибка при обновлении товара',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
-  @ApiOperation({ summary: "Delete product (Admin only)" })
+  @ApiOperation({ summary: "Delete product (requires authentication)" })
   @ApiResponse({ status: 200, description: "Product deleted" })
-  @ApiResponse({ status: 403, description: "Forbidden" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
   @ApiResponse({ status: 404, description: "Product not found" })
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard)
   @Delete(":id")
   async remove(@Param("id", ParseIntPipe) id: number) {
-    return this.productsService.remove(id);
-  }
-
-  @ApiOperation({ summary: "Update product stock (Admin/Moderator)" })
-  @ApiResponse({ status: 200, type: ProductResponseDto })
-  @ApiResponse({ status: 403, description: "Forbidden" })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN, Role.MODERATOR)
-  @Put(":id/stock")
-  async updateStock(
-    @Param("id", ParseIntPipe) id: number,
-    @Body("stock") stock: number,
-  ) {
-    return this.productsService.updateStock(id, stock);
+    try {
+      await this.productsService.remove(id);
+      return { message: 'Товар успешно удален' };
+    } catch (error) {
+      throw new HttpException(
+        'Ошибка при удалении товара',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }

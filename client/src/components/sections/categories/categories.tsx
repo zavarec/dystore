@@ -7,7 +7,7 @@ import {
   CategoriesTitle,
 } from './categories.style';
 import { fetchRootCategories } from '@/store/slices/categories-slice/categories.thunks';
-import {  CategoriesSkeleton, CategoryCard } from './components';
+import { CategoriesSkeleton, CategoryCard } from './components';
 import {
   selectIsRootCategoriesLoading,
   selectRootCategories,
@@ -27,7 +27,6 @@ export const Categories: React.FC = () => {
 
   useEffect(() => {
     dispatch(fetchRootCategories());
-    console.log(categories, 'categories');
   }, [dispatch]);
 
   const handleCategoryClick = (categorySlug: string) => {

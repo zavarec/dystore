@@ -1,3 +1,4 @@
+// src/orders/orders.controller.ts
 import {
   Controller,
   Get,
@@ -5,26 +6,36 @@ import {
   Body,
   Param,
   UseGuards,
-  ValidationPipe,
   ParseIntPipe,
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { User } from '@prisma/client';
 
+@ApiTags('Orders')
 @Controller('order')
 @UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  @ApiOperation({ summary: 'Create new order' })
+  @ApiResponse({ status: 201, description: 'Order created successfully' })
+  @ApiResponse({ status: 400, description: 'Cart is empty or invalid data' })
   @Post()
   async createOrder(
     @CurrentUser() user: User,
-    @Body(ValidationPipe) createOrderDto: CreateOrderDto,
+    @Body() createOrderDto: CreateOrderDto,
   ) {
     try {
       return await this.ordersService.createOrder(user.id, createOrderDto);
@@ -39,6 +50,8 @@ export class OrdersController {
     }
   }
 
+  @ApiOperation({ summary: 'Get user order history' })
+  @ApiResponse({ status: 200, description: 'List of user orders' })
   @Get('history')
   async getOrderHistory(@CurrentUser() user: User) {
     try {
@@ -51,6 +64,9 @@ export class OrdersController {
     }
   }
 
+  @ApiOperation({ summary: 'Get order by ID' })
+  @ApiResponse({ status: 200, description: 'Order details' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
   @Get(':id')
   async getOrder(
     @CurrentUser() user: User,
