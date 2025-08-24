@@ -1,4 +1,5 @@
-import { IsString, IsPhoneNumber, IsOptional } from "class-validator";
+import { IsString, IsPhoneNumber, IsOptional, IsEnum } from "class-validator";
+import { Role } from "@prisma/client";
 
 export class CreateUserDto {
   @IsString({ message: "Номер телефона должен быть строкой" })
@@ -8,4 +9,8 @@ export class CreateUserDto {
   @IsOptional()
   @IsString({ message: "Имя должно быть строкой" })
   name?: string;
+
+  @IsOptional()
+  @IsEnum(Role, { message: "Некорректная роль" })
+  role?: Role;
 }

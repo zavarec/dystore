@@ -1,4 +1,11 @@
-import { Category, PrismaClient, Product, Role } from "@prisma/client";
+import {
+  Category,
+  PrismaClient,
+  Product,
+  Role,
+  PageKey,
+  SectionKey,
+} from "@prisma/client";
 import * as bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
@@ -12,6 +19,9 @@ async function main() {
   await prisma.order.deleteMany({});
   await prisma.cartItem.deleteMany({});
   await prisma.cart.deleteMany({});
+  // Важно: удалить секции страниц ДО пользователей (FK createdById)
+  await prisma.pageSection.deleteMany({});
+  await prisma.promotion.deleteMany({});
   await prisma.product.deleteMany({});
   await prisma.category.deleteMany({});
   await prisma.user.deleteMany({});
@@ -212,27 +222,167 @@ async function main() {
     allProducts.push(...unique, ...copies);
   }
 
-  const adminEmail = "admin@dystore.local";
+  const adminEmail = "director@dystore.local";
 
-  // Проверим, есть ли уже админ
-  const admin = await prisma.user.findUnique({ where: { email: adminEmail } });
+  const hashedPassword = await bcrypt.hash("SuperSecret123!", 10);
+  await prisma.user.upsert({
+    where: { email: adminEmail },
+    update: {
+      // Не меняем пароль при повторном запуске, только гарантируем роль и имя
+      role: Role.DIRECTOR,
+      name: "Super Director",
+      phone: "79990000000",
+    },
+    create: {
+      email: adminEmail,
+      phone: "79990000000",
+      password: hashedPassword,
+      name: "Super Director",
+      role: Role.DIRECTOR,
+    },
+  });
+  console.log(
+    `✅ Директор гарантированно существует: ${adminEmail} (пароль: SuperSecret123!)`,
+  );
 
-  if (!admin) {
-    const hashedPassword = await bcrypt.hash("SuperSecret123!", 10);
+  // Создаём MANAGER
+  const managerEmail = "manager@dystore.local";
+  const managerPassword = await bcrypt.hash("ManagerSecret123!", 10);
+  const manager = await prisma.user.upsert({
+    where: { email: managerEmail },
+    update: {
+      role: Role.MANAGER,
+      name: "Content Manager",
+      phone: "79990000001",
+    },
+    create: {
+      email: managerEmail,
+      phone: "79990000001",
+      password: managerPassword,
+      name: "Content Manager",
+      role: Role.MANAGER,
+    },
+  });
 
-    await prisma.user.create({
-      data: {
-        email: adminEmail,
-        phone: "79990000000",
-        password: hashedPassword,
-        name: "Super Admin",
-        role: Role.ADMIN,
+  // Промо-сиды
+  const now = new Date();
+  const dayMs = 24 * 60 * 60 * 1000;
+  const start = new Date(now.getTime() - 1 * dayMs);
+  const end = new Date(now.getTime() + 7 * dayMs);
+
+  const sampleProduct = await prisma.product.findFirst();
+
+  // PRODUCT_OF_DAY (опубликованный)
+  await prisma.promotion.create({
+    data: {
+      slot: "PRODUCT_OF_DAY",
+      title: "Товар дня",
+      ctaText: "Купить со скидкой",
+      product: sampleProduct
+        ? { connect: { id: sampleProduct.id } }
+        : undefined,
+      bgImageUrl:
+        "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/products/beauty/hair-stylers/airwrap-origin/rcc/Web-EntrySkus-308C-overview-banner-2.jpg?$responsive$&cropPathE=desktop&fit=stretch,1&fmt=pjpeg&wid=1920",
+      isPublished: true,
+      startAt: start,
+      endAt: end,
+      position: 0,
+      createdBy: { connect: { id: manager.id } },
+    },
+  });
+
+  // FEATURED (2 шт)
+  await prisma.promotion.createMany({
+    data: [
+      {
+        slot: "FEATURED",
+        title: "Хиты недели",
+        ctaText: "Смотреть",
+        ctaLink: "/catalog/hits",
+        bgImageUrl:
+          "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/countries/ca/products/air-treatment/EC_Home-Editorial_Banner-3.jpg?$responsive$&cropPathE=desktop&fit=stretch,1&fmt=pjpeg&wid=1920",
+        isPublished: true,
+        startAt: start,
+        endAt: end,
+        position: 0,
+        createdById: manager.id,
       },
-    });
+      {
+        slot: "FEATURED",
+        title: "Рекомендации",
+        ctaText: "Перейти",
+        ctaLink: "/catalog/recommended",
+        bgImageUrl:
+          "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/campaigns/summer-sales/Labor-Day_2025_FC_V12.jpg?$responsive$&cropPathE=desktop&fit=stretch,1&fmt=pjpeg&wid=3840",
+        isPublished: true,
+        startAt: start,
+        endAt: end,
+        position: 1,
+        createdById: manager.id,
+      },
+    ],
+  });
 
-    console.log(`✅ Админ создан: ${adminEmail} / SuperSecret123!`);
+  // CUSTOM (1 шт)
+  await prisma.promotion.create({
+    data: {
+      slot: "CUSTOM",
+      title: "Эксклюзив",
+      ctaText: "Подробнее",
+      ctaLink: "/landing/exclusive",
+      bgImageUrl:
+        "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/campaigns/summer-sales/Labor-Day_2025_FC_V12.jpg?$responsive$&cropPathE=desktop&fit=stretch,1&fmt=pjpeg&wid=3840",
+      isPublished: true,
+      startAt: start,
+      endAt: end,
+      position: 0,
+      createdById: manager.id,
+    },
+  });
+
+  const allPromotions = await prisma.promotion.findMany();
+
+  // Секции главной (дефолтный порядок)
+  console.log("🧩 Создаю секции главной страницы...");
+  const existingSections = await prisma.pageSection.findMany({
+    where: { page: PageKey.HOME },
+  });
+  if (existingSections.length === 0) {
+    await prisma.pageSection.createMany({
+      data: [
+        {
+          page: PageKey.HOME,
+          key: SectionKey.PRODUCT_OF_DAY,
+          title: "Товар дня",
+          position: 0,
+          createdById: manager.id,
+        },
+        {
+          page: PageKey.HOME,
+          key: SectionKey.FEATURED,
+          title: "Избранное",
+          position: 1,
+          createdById: manager.id,
+        },
+        {
+          page: PageKey.HOME,
+          key: SectionKey.HITS,
+          title: "Хиты",
+          position: 2,
+          createdById: manager.id,
+        },
+        {
+          page: PageKey.HOME,
+          key: SectionKey.CUSTOM,
+          title: "Спецпредложения",
+          position: 3,
+          createdById: manager.id,
+        },
+      ],
+    });
+    console.log("✅ Секции главной созданы по умолчанию");
   } else {
-    console.log("ℹ️ Админ уже существует");
+    console.log("ℹ️ Секции главной уже существуют, пропускаю создание");
   }
 
   console.log("🎉 База данных успешно заполнена!");
@@ -240,6 +390,7 @@ async function main() {
   console.log(`   📂 Основных категорий: ${categories.length}`);
   console.log(`   📁 Подкатегорий: ${createdSubcategories.length}`);
   console.log(`   🛍️ Товаров: ${allProducts.length}`);
+  console.log(`   🛍️ Промо: ${allPromotions.length}`);
 }
 
 main()

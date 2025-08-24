@@ -7,11 +7,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Шрифты для промо
+enum PromoFont {
+  INTER
+  ROBOTO
+  MONTSERRAT
+  POPPINS
+}
+
 // Роли пользователей
 enum Role {
-  USER
-  ADMIN
-  MODERATOR
+  DIRECTOR
+  MANAGER
+  CUSTOMER
 }
 
 // Пользователи
@@ -21,7 +29,7 @@ model User {
   email     String?   @unique
   password  String?
   name      String?
-  role      Role      @default(USER)
+  role      Role      @default(CUSTOMER)
   isActive  Boolean   @default(true)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -29,6 +37,8 @@ model User {
   // Связи
   carts     Cart[]
   orders    Order[]
+  createdPromotions Promotion[]
+  createdPageSections PageSection[]
   
   @@map("users")
   @@index([email])
@@ -76,6 +86,7 @@ model Product {
   category    Category    @relation(fields: [categoryId], references: [id])
   cartItems   CartItem[]
   orderItems  OrderItem[]
+  promotions  Promotion[]
   
   @@index([categoryId])
   @@index([isFeatured])
@@ -156,4 +167,73 @@ enum OrderStatus {
   SHIPPED
   DELIVERED
   CANCELLED
+}
+
+// Промо-слоты
+enum PromotionSlot {
+  HERO
+  PRODUCT_OF_DAY
+  FEATURED
+  CUSTOM
+}
+
+// Промо
+model Promotion {
+  id           Int            @id @default(autoincrement())
+  slot         PromotionSlot
+  productId    Int?
+  product      Product?       @relation(fields: [productId], references: [id])
+  title        String?
+  subtitle     String?
+  ctaText      String?
+  ctaLink      String?
+  bgImageUrl   String?
+  bgVideoUrl   String?
+  isPublished  Boolean        @default(false)
+  startAt      DateTime
+  endAt        DateTime
+  position     Int            @default(0)
+  createdById  String
+  createdBy    User           @relation(fields: [createdById], references: [id])
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  // Стили
+  font         PromoFont?
+  titleColor   String?
+  textColor    String?
+  ctaBg        String?
+  ctaColor     String?
+
+  @@index([slot, isPublished, startAt, endAt])
+  @@index([slot, position])
+}
+
+// Ключи страниц и секций для конфигурирования главной
+enum PageKey {
+  HOME
+}
+
+enum SectionKey {
+  PRODUCT_OF_DAY
+  FEATURED
+  CUSTOM
+  HITS
+}
+
+model PageSection {
+  id          Int       @id @default(autoincrement())
+  page        PageKey
+  key         SectionKey
+  title       String?
+  isEnabled   Boolean   @default(true)
+  position    Int       @default(0)
+  settings    Json?
+  createdById String
+  createdBy   User      @relation(fields: [createdById], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([page, key])
+  @@index([page, isEnabled, position])
 }

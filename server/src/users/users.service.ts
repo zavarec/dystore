@@ -5,11 +5,17 @@ import {
 } from "@nestjs/common";
 import * as bcrypt from "bcrypt";
 import { PrismaService } from "../database/prisma.service";
-import { User } from "@prisma/client";
+import { Role, User } from "@prisma/client";
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async findAll() {
+    return this.prisma.user.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+  }
 
   async findByPhone(phone: string): Promise<User | null> {
     return this.prisma.user.findUnique({ where: { phone } });
@@ -19,9 +25,13 @@ export class UsersService {
     return this.prisma.user.findUnique({ where: { email } });
   }
 
-  async createUser(phone: string, name?: string): Promise<User> {
+  async createUser(
+    phone: string,
+    name?: string,
+    role: Role = Role.CUSTOMER,
+  ): Promise<User> {
     return this.prisma.user.create({
-      data: { phone, name },
+      data: { phone, name, role },
     });
   }
 
@@ -29,6 +39,7 @@ export class UsersService {
     email: string,
     password: string,
     name?: string,
+    role: Role = Role.CUSTOMER,
   ): Promise<User> {
     if (!email || !password) {
       throw new BadRequestException("Email и пароль обязательны");
@@ -46,6 +57,7 @@ export class UsersService {
         email,
         password: hashedPassword,
         name,
+        role,
       },
     });
   }

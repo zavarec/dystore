@@ -3,17 +3,18 @@ import {
   BadRequestException,
   UnauthorizedException,
   Logger,
-} from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import Redis from 'ioredis';
-import { UsersService } from '../users/users.service';
-import { SmsService } from './sms.service';
-import { SendCodeDto } from './dto/send-code.dto';
-import { VerifyCodeDto } from './dto/verify-code.dto';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
-import { JwtPayload } from './jwt.strategy';
+} from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { ConfigService } from "@nestjs/config";
+import Redis from "ioredis";
+import { UsersService } from "../users/users.service";
+import { SmsService } from "./sms.service";
+import { SendCodeDto } from "./dto/send-code.dto";
+import { VerifyCodeDto } from "./dto/verify-code.dto";
+import { RegisterDto } from "./dto/register.dto";
+import { Role } from "@prisma/client";
+import { LoginDto } from "./dto/login.dto";
+import { JwtPayload } from "./jwt.strategy";
 
 @Injectable()
 export class AuthService {
@@ -27,9 +28,9 @@ export class AuthService {
     private readonly smsService: SmsService,
   ) {
     this.redis = new Redis({
-      host: this.configService.get<string>('REDIS_HOST', 'localhost'),
-      port: this.configService.get<number>('REDIS_PORT', 6379),
-      password: this.configService.get<string>('REDIS_PASSWORD'),
+      host: this.configService.get<string>("REDIS_HOST", "localhost"),
+      port: this.configService.get<number>("REDIS_PORT", 6379),
+      password: this.configService.get<string>("REDIS_PASSWORD"),
       maxRetriesPerRequest: 3,
     });
   }
@@ -45,7 +46,7 @@ export class AuthService {
 
     if (lastRequest) {
       throw new BadRequestException(
-        'Код можно запросить не чаще одного раза в минуту',
+        "Код можно запросить не чаще одного раза в минуту",
       );
     }
 
@@ -57,14 +58,14 @@ export class AuthService {
     await this.redis.setex(codeKey, 300, code); // 300 секунд = 5 минут
 
     // Устанавливаем rate limit на 1 минуту
-    await this.redis.setex(rateLimitKey, 60, '1');
+    await this.redis.setex(rateLimitKey, 60, "1");
 
     // Отправляем SMS
     await this.smsService.sendVerificationCode(phone, code);
 
     this.logger.log(`Код подтверждения отправлен на номер ${phone}`);
 
-    return { message: 'Код отправлен' };
+    return { message: "Код отправлен" };
   }
 
   async verifyCode(
@@ -77,11 +78,11 @@ export class AuthService {
     const storedCode = await this.redis.get(codeKey);
 
     if (!storedCode) {
-      throw new BadRequestException('Код истёк или не найден');
+      throw new BadRequestException("Код истёк или не найден");
     }
 
     if (storedCode !== code) {
-      throw new UnauthorizedException('Неверный код подтверждения');
+      throw new UnauthorizedException("Неверный код подтверждения");
     }
 
     // Удаляем использованный код
@@ -112,6 +113,7 @@ export class AuthService {
       email,
       password,
       name,
+      Role.CUSTOMER,
     );
 
     const payload: JwtPayload = {
@@ -142,7 +144,7 @@ export class AuthService {
     const user = await this.usersService.findByEmail(email);
 
     if (!user) {
-      throw new UnauthorizedException('Неверный email или пароль');
+      throw new UnauthorizedException("Неверный email или пароль");
     }
 
     const isPasswordValid = await this.usersService.validatePassword(
@@ -151,7 +153,7 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Неверный email или пароль');
+      throw new UnauthorizedException("Неверный email или пароль");
     }
 
     const payload: JwtPayload = {
