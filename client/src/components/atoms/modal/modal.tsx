@@ -1,7 +1,7 @@
 // modal.tsx
 import React, { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { ModalOverlay, ModalContainer, ModalContent, ModalCloseButton } from './modal.style';
 
 interface ModalProps {
@@ -55,7 +55,6 @@ export const Modal: React.FC<ModalProps> = ({
     <AnimatePresence>
       {isOpen && (
         <ModalOverlay
-          as={motion.div}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -66,7 +65,6 @@ export const Modal: React.FC<ModalProps> = ({
           ref={modalRef}
         >
           <ModalContainer
-            as={motion.div}
             initial={{ scale: 0.95, y: 20, opacity: 0 }}
             animate={{ scale: 1, y: 0, opacity: 1 }}
             exit={{ scale: 0.95, y: 20, opacity: 0 }}
@@ -82,6 +80,6 @@ export const Modal: React.FC<ModalProps> = ({
         </ModalOverlay>
       )}
     </AnimatePresence>,
-    document.body
+    document.body,
   );
 };

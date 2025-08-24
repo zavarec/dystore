@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { House, Package, FolderOpen, SignOut, Plus, List } from '@phosphor-icons/react';
+import { House, FolderOpen, SignOut, Plus, List } from '@phosphor-icons/react';
 import {
   Header,
   LayoutContainer,

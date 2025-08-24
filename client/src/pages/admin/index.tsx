@@ -18,7 +18,7 @@ import {
   Table,
   Td,
   Th,
-} from './admin-dashboard.style';
+} from '@/styles/pages/admin/admin-dashboard.style';
 
 interface DashboardStats {
   totalProducts: number;
@@ -161,4 +161,5 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   };
 };
 
-export default AdminDashboard;
+import { withAdmin } from '@/features/auth/with-admin';
+export default withAdmin(AdminDashboard);

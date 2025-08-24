@@ -8,22 +8,23 @@ import { Product } from '@/types/models/product.model';
 import { Pencil, Trash, Plus } from '@phosphor-icons/react';
 import { toast } from 'react-toastify';
 import { AdminLayout } from '@/components/admin/layout/admin-layout';
+
 import {
-  ActionsBar,
-  SearchInput,
-  AddButton,
-  TableContainer,
-  Table,
-  Th,
-  Td,
-  ProductImage,
-  StockBadge,
-  ActionButtons,
-  ActionButton,
-  EmptyState,
-  Pagination,
-  PageButton,
-} from './admin-products-page.style';
+  ActionsBar as SActionsBar,
+  SearchInput as SSearchInput,
+  AddButton as SAddButton,
+  TableContainer as STableContainer,
+  Table as STable,
+  Th as STh,
+  Td as STd,
+  ProductImage as SProductImage,
+  StockBadge as SStockBadge,
+  ActionButtons as SActionButtons,
+  ActionButton as SActionButton,
+  EmptyState as SEmptyState,
+  Pagination as SPagination,
+  PageButton as SPageButton,
+} from '@/styles/pages/admin/admin-products-page.style';
 
 const AdminProductsPage: NextPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -90,109 +91,109 @@ const AdminProductsPage: NextPage = () => {
 
   return (
     <AdminLayout title="Продукты">
-      <ActionsBar>
-        <SearchInput
+      <SActionsBar>
+        <SSearchInput
           type="text"
           placeholder="Поиск продуктов..."
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
         />
         <Link href="/admin/products/new" passHref legacyBehavior>
-          <AddButton>
+          <SAddButton>
             <Plus size={20} />
             Добавить продукт
-          </AddButton>
+          </SAddButton>
         </Link>
-      </ActionsBar>
+      </SActionsBar>
 
-      <TableContainer>
+      <STableContainer>
         {currentProducts.length === 0 ? (
-          <EmptyState>
+          <SEmptyState>
             <p>Продукты не найдены</p>
-          </EmptyState>
+          </SEmptyState>
         ) : (
           <>
-            <Table>
+            <STable>
               <thead>
                 <tr>
-                  <Th>ID</Th>
-                  <Th>Изображение</Th>
-                  <Th>Название</Th>
-                  <Th>Категория</Th>
-                  <Th>Цена</Th>
-                  <Th>На складе</Th>
-                  <Th>Статус</Th>
-                  <Th>Действия</Th>
+                  <STh>ID</STh>
+                  <STh>Изображение</STh>
+                  <STh>Название</STh>
+                  <STh>Категория</STh>
+                  <STh>Цена</STh>
+                  <STh>На складе</STh>
+                  <STh>Статус</STh>
+                  <STh>Действия</STh>
                 </tr>
               </thead>
               <tbody>
                 {currentProducts.map(product => (
                   <tr key={product.id}>
-                    <Td>{product.id}</Td>
-                    <Td>
-                      <ProductImage
+                    <STd>{product.id}</STd>
+                    <STd>
+                      <SProductImage
                         src={product.imageUrl || '/images/placeholder.webp'}
                         alt={product.name}
                       />
-                    </Td>
-                    <Td>{product.name}</Td>
-                    <Td>{product.category?.name || 'Без категории'}</Td>
-                    <Td>₽{product.price.toLocaleString()}</Td>
-                    <Td>{product.stock} шт.</Td>
-                    <Td>
-                      <StockBadge $inStock={product.stock > 0}>
+                    </STd>
+                    <STd>{product.name}</STd>
+                    <STd>{product.category?.name || 'Без категории'}</STd>
+                    <STd>₽{product.price.toLocaleString()}</STd>
+                    <STd>{product.stock} шт.</STd>
+                    <STd>
+                      <SStockBadge $inStock={product.stock > 0}>
                         {product.stock > 0 ? 'В наличии' : 'Нет в наличии'}
-                      </StockBadge>
-                    </Td>
-                    <Td>
-                      <ActionButtons>
+                      </SStockBadge>
+                    </STd>
+                    <STd>
+                      <SActionButtons>
                         <Link href={`/admin/products/${product.id}/edit`} passHref legacyBehavior>
-                          <ActionButton as="a" $variant="edit">
+                          <SActionButton as="a" $variant="edit">
                             <Pencil size={16} />
                             Изменить
-                          </ActionButton>
+                          </SActionButton>
                         </Link>
-                        <ActionButton $variant="delete" onClick={() => handleDelete(product.id)}>
+                        <SActionButton $variant="delete" onClick={() => handleDelete(product.id)}>
                           <Trash size={16} />
                           Удалить
-                        </ActionButton>
-                      </ActionButtons>
-                    </Td>
+                        </SActionButton>
+                      </SActionButtons>
+                    </STd>
                   </tr>
                 ))}
               </tbody>
-            </Table>
+            </STable>
 
             {totalPages > 1 && (
-              <Pagination>
-                <PageButton
+              <SPagination>
+                <SPageButton
                   onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                   disabled={currentPage === 1}
                 >
                   Назад
-                </PageButton>
+                </SPageButton>
 
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                  <PageButton
+                  <SPageButton
                     key={page}
                     $active={page === currentPage}
                     onClick={() => setCurrentPage(page)}
                   >
                     {page}
-                  </PageButton>
+                  </SPageButton>
                 ))}
 
-                <PageButton
+                <SPageButton
                   onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                   disabled={currentPage === totalPages}
                 >
                   Вперед
-                </PageButton>
-              </Pagination>
+                </SPageButton>
+              </SPagination>
             )}
           </>
         )}
-      </TableContainer>
+      </STableContainer>
     </AdminLayout>
   );
 };
@@ -205,4 +206,5 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   };
 };
 
-export default AdminProductsPage;
+import { withAdmin } from '@/features/auth/with-admin';
+export default withAdmin(AdminProductsPage);

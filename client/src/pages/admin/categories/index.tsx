@@ -20,7 +20,7 @@ import {
   ActionButtons,
   ActionButton,
   EmptyState,
-} from './admin-categories-page.style';
+} from '@/styles/pages/admin/admin-categories-page.style';
 
 const AdminCategoriesPage: NextPage = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -137,4 +137,5 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   };
 };
 
-export default AdminCategoriesPage;
+import { withAdmin } from '@/features/auth/with-admin';
+export default withAdmin(AdminCategoriesPage);

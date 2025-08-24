@@ -1,7 +1,9 @@
 import React from 'react';
 import { StyledButton, LoadingSpinner, ButtonVariant } from './button.style';
+import { MotionStyle } from 'framer-motion';
+type NativeButtonProps = React.ComponentProps<typeof StyledButton>;
 
-interface ButtonProps {
+interface ButtonProps extends Omit<NativeButtonProps, 'variant' | 'size'> {
   children: React.ReactNode;
   variant?: ButtonVariant;
   size?: 'small' | 'medium' | 'large';
@@ -11,9 +13,9 @@ interface ButtonProps {
   onClick?: () => void;
   type?: 'button' | 'submit' | 'reset';
   'aria-label'?: string;
+  style?: MotionStyle;
 }
 
-// Компонент кнопки - простой как пылесос, но мощный как Dyson V15
 export const Button: React.FC<ButtonProps> = ({
   children,
   variant = ButtonVariant.PRIMARY,
@@ -24,6 +26,7 @@ export const Button: React.FC<ButtonProps> = ({
   onClick,
   type = 'button',
   'aria-label': ariaLabel,
+  style,
   ...props
 }) => {
   return (
@@ -35,6 +38,7 @@ export const Button: React.FC<ButtonProps> = ({
       onClick={onClick}
       type={type}
       aria-label={ariaLabel}
+      {...(style ? ({ style } as { style: MotionStyle }) : {})}
       whileTap={{ scale: disabled ? 1 : 0.98 }}
       transition={{ duration: 0.1 }}
       {...props}

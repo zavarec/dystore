@@ -3,7 +3,7 @@ import { GetStaticProps, GetStaticPaths, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { SEOHead } from '@/components/atoms/seo-head/seo-head';
-import { ProductWithDetails, ProductSortBy } from '@/types/models/product.model';
+import { ProductSortBy } from '@/types/models/product.model';
 import { useCategoryBySlug, useCategoryProducts } from '@/hooks';
 import { adaptProductsForUI } from '@/utils/product-adapters';
 import { ProductSection } from '@/components/sections/product-section';

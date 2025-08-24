@@ -24,4 +24,5 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   };
 };
 
-export default NewProductPage;
+import { withAdmin } from '@/features/auth/with-admin';
+export default withAdmin(NewProductPage);

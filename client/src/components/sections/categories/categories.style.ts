@@ -3,17 +3,19 @@ import styled from '@emotion/styled';
 export const CategoriesSection = styled.section`
   padding: 40px 0;
   background: rgb(255, 255, 255);
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
 `;
 
 export const CategoriesContainer = styled.div`
+  width: 100%;
   max-width: 1600px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding-left: 40px;
 `;
 
 export const CategoriesHeader = styled.div`
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   text-align: center;
 `;
 
@@ -24,21 +26,33 @@ export const CategoriesTitle = styled.h2`
   margin: 0;
   position: relative;
 
-  &::after {
-    content: '';
-    display: block;
-    width: 60px;
-    height: 3px;
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-    margin: 16px auto 0;
-    border-radius: 2px;
-  }
-
   @media (max-width: 768px) {
     font-size: 2rem;
   }
 
   @media (max-width: 480px) {
     font-size: 1.5rem;
+  }
+`;
+
+export const ScrollContainer = styled.div`
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 24px;
+  padding-bottom: 10px;
+  padding-right: 40px;
+
+  /* Скрыть скроллбар везде */
+  -ms-overflow-style: none; /* IE и Edge */
+  scrollbar-width: none; /* Firefox */
+  &::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+    width: 0;
+    height: 0;
+    
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent; /* убираем серый фон */
   }
 `;

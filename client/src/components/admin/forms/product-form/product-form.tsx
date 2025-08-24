@@ -28,6 +28,7 @@ interface ProductFormProps {
   onSubmit: (data: CreateProductDto | UpdateProductDto) => Promise<void>;
   loading?: boolean;
   initialValues?: Partial<CreateProductDto | UpdateProductDto>;
+  isEdit?: boolean;
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({
@@ -35,6 +36,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   onSubmit,
   loading,
   initialValues,
+  isEdit,
 }) => {
   const { categories, error } = useCategories();
 
@@ -196,7 +198,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         </Link>
         <Button type="submit" disabled={loading}>
           <FloppyDisk size={18} />
-          {loading ? 'Сохранение...' : product ? 'Обновить' : 'Создать'}
+          {loading ? 'Сохранение...' : isEdit ? 'Обновить' : 'Создать'}
         </Button>
       </FormActions>
     </FormContainer>

@@ -32,7 +32,18 @@ export const useEditProduct = (productId: string) => {
   const handleSubmit = async (data: UpdateProductDto) => {
     setLoading(true);
     try {
-      await ProductsService.updateProduct(parseInt(productId), data);
+      // Собираем только разрешённые сервером поля (без id, isFeatured, popularity, isActive, createdAt, updatedAt, category)
+      const payload: Partial<UpdateProductDto> = {};
+      if (typeof data.name !== 'undefined') payload.name = data.name;
+      if (typeof data.description !== 'undefined') payload.description = data.description;
+      if (typeof (data as any).shortDescription !== 'undefined')
+        (payload as any).shortDescription = (data as any).shortDescription;
+      if (typeof data.price !== 'undefined') payload.price = Number(data.price);
+      if (typeof data.stock !== 'undefined') payload.stock = Number(data.stock);
+      if (typeof data.imageUrl !== 'undefined') payload.imageUrl = data.imageUrl;
+      if (typeof data.categoryId !== 'undefined') payload.categoryId = Number(data.categoryId);
+
+      await ProductsService.updateProduct(parseInt(productId), payload as UpdateProductDto);
       toast.success('Продукт успешно обновлен');
       router.push('/admin/products');
     } catch (error: any) {

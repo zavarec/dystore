@@ -6,19 +6,18 @@ import {
   CategoryTreeNode,
   CategoryTreeUtils,
 } from '@/types/models/category.model';
-import { mockedCategories } from './mocks/categories.mock';
 
 export class CategoriesService {
   // Получить все категории
   static async getAllCategories(): Promise<Category[]> {
-    // const response = await apiClient.get<Category[]>('/categories');
-    return mockedCategories;
+    const response = await apiClient.get<Category[]>('/categories');
+    return response.data;
   }
 
   // Получить только корневые категории (без родителей)
   static async getRootCategories(): Promise<Category[]> {
-    // const response = await apiClient.get<Category[]>('/categories/root');
-    return mockedCategories;
+    const response = await apiClient.get<Category[]>('/categories/root');
+    return response.data;
   }
 
   // Получить дерево категорий (иерархическая структура)

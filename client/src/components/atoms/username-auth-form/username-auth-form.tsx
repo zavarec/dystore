@@ -60,6 +60,7 @@ export const UsernameAuthForm: React.FC<UsernameAuthFormProps> = ({
       }, 5000);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [error, dispatch]);
 
   // Закрытие модалки или перенаправление после успешной авторизации
@@ -85,7 +86,7 @@ export const UsernameAuthForm: React.FC<UsernameAuthFormProps> = ({
 
   const onRegisterSubmit = async (data: RegisterFormData) => {
     try {
-      const { confirmPassword, ...registerData } = data;
+      const { ...registerData } = data;
       await dispatch(registerWithPassword(registerData)).unwrap();
     } catch (error) {
       console.error('Ошибка регистрации:', error);

@@ -19,7 +19,9 @@ const EditProductPage: NextPage<EditProductPageProps> = ({ productId }) => {
 
   return (
     <AdminLayout title="Редактирование продукта">
-      {product && <ProductForm onSubmit={handleSubmit} loading={loading} initialValues={product} />}
+      {product && (
+        <ProductForm onSubmit={handleSubmit} loading={loading} initialValues={product} isEdit />
+      )}
     </AdminLayout>
   );
 };
@@ -33,4 +35,5 @@ export const getServerSideProps: GetServerSideProps = async ({ locale, params })
   };
 };
 
-export default EditProductPage;
+import { withAdmin } from '@/features/auth/with-admin';
+export default withAdmin<EditProductPageProps>(EditProductPage);

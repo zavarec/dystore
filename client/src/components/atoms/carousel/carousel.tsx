@@ -13,6 +13,7 @@ export interface CarouselSlide {
   title: string;
   subtitle: string;
   background?: string;
+  video?: string;
 }
 
 interface CarouselProps {
@@ -71,9 +72,31 @@ export const Carousel: React.FC<CarouselProps> = ({
           exit="exit"
           transition={{ duration: 0.8, ease: 'easeInOut' }}
           background={
-            slides[currentSlide]?.background || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+            slides[currentSlide]?.video
+              ? ''
+              : slides[currentSlide]?.background ||
+                'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
           }
         >
+          <video
+            key={slides[currentSlide]?.video} // перезапуск при смене слайда
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              zIndex: 0,
+            }}
+          >
+            <source src={slides[currentSlide]?.video} type="video/mp4" />
+          </video>
+
           <CarouselContent>
             {children && slides[currentSlide] ? (
               children(slides[currentSlide], currentSlide)
