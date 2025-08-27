@@ -21,7 +21,6 @@ import { JwtPayload } from "./jwt.strategy";
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
-  private readonly redis: Redis;
 
   constructor(
     private readonly jwtService: JwtService,
@@ -29,14 +28,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly smsService: SmsService,
     private readonly otpService: OtpService,
-  ) {
-    this.redis = new Redis({
-      host: this.configService.get<string>("REDIS_HOST", "localhost"),
-      port: this.configService.get<number>("REDIS_PORT", 6379),
-      password: this.configService.get<string>("REDIS_PASSWORD"),
-      maxRetriesPerRequest: 3,
-    });
-  }
+  ) {}
 
   async sendVerificationCode(
     sendCodeDto: SendCodeDto,
@@ -65,9 +57,7 @@ export class AuthService {
     return { message: "Код отправлен" };
   }
 
-  async verifyCode(
-    verifyCodeDto: VerifyCodeDto,
-  ): Promise<{
+  async verifyCode(verifyCodeDto: VerifyCodeDto): Promise<{
     accessToken: string;
     refreshToken: string;
     access_token: string;
@@ -199,9 +189,5 @@ export class AuthService {
     });
 
     return { accessToken, refreshToken };
-  }
-
-  async onModuleDestroy() {
-    await this.redis.quit();
   }
 }

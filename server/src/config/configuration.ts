@@ -17,13 +17,6 @@ export const jwtConfig = registerAs("jwt", () => ({
   refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "30d",
 }));
 
-export const redisConfig = registerAs("redis", () => ({
-  host: process.env.REDIS_HOST || "localhost",
-  password: process.env.REDIS_PASSWORD,
-  port: parseInt(process.env.REDIS_PORT ?? "6379", 10),
-  ttl: parseInt(process.env.REDIS_TTL ?? "300", 10),
-}));
-
 export const throttleConfig = registerAs("throttle", () => ({
   ttl: parseInt(process.env.THROTTLE_TTL ?? "6000", 10) || 60000,
   limit: parseInt(process.env.THROTTLE_LIMIT ?? "10", 10) || 10,
@@ -38,5 +31,5 @@ export const swaggerConfig = registerAs("swagger", () => ({
 }));
 
 export const corsConfig = registerAs("cors", () => ({
-  origins: process.env.CORS_ORIGINS?.split(",") || ["http://localhost:3001"],
+  origins: process.env.CORS_ORIGINS?.split(",") || ["http://localhost:3000"],
 }));
