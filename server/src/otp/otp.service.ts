@@ -18,7 +18,7 @@ export class OtpService {
     const pipeline = this.redis.multi();
     pipeline.get(key);
     pipeline.del(key);
-    const [getRes, _delRes] = (await pipeline.exec()) as any[];
+    const [getRes] = (await pipeline.exec()) as any[];
     return getRes?.[1] ?? null;
   }
 
