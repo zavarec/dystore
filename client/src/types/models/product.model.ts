@@ -106,6 +106,8 @@ export interface UpdateProductDto {
   name?: string;
   /** Новое описание продукта */
   description?: string;
+  /** Новое краткое описание продукта */
+  shortDescription?: string;
   /** Новая цена продукта в рублях */
   price?: number;
   /** Новое количество товара в наличии */

@@ -7,7 +7,7 @@ import { useAppDispatch } from '@/hooks/redux';
 
 import { ProductWithDetails } from '@/types/models/product.model';
 import { useProducts } from '@/hooks/useProducts';
-import { adaptProductsForUI, getProductBySlug } from '@/utils/product-adapters';
+import { adaptProductsForUI } from '@/utils/product-adapters';
 import { AddToCartButton } from '@/features/cart/add-to-cart-button';
 import { ButtonVariant } from '@/components/atoms/button/button.style';
 import {
@@ -32,16 +32,16 @@ interface ProductPageProps {
   productId: string;
 }
 
-// Утилиты для работы с продуктом
-const generateProductSlug = (product: ProductWithDetails): string => {
-  return (
-    product.slug ||
-    product.name
-      .toLowerCase()
-      .replace(/\s+/g, '-')
-      .replace(/[^\w\-]/g, '')
-  );
-};
+// // Утилиты для работы с продуктом
+// const generateProductSlug = (product: ProductWithDetails): string => {
+//   return (
+//     product.slug ||
+//     product.name
+//       .toLowerCase()
+//       .replace(/\s+/g, '-')
+//       .replace(/[^\w\-]/g, '')
+//   );
+// };
 
 const getProductImage = (product: ProductWithDetails): string => {
   return product.images?.[0]?.url || '/images/placeholder.webp';
@@ -85,7 +85,6 @@ const ProductPage: NextPage<ProductPageProps> = ({ productId }) => {
     );
   }
 
-  const productSlug = generateProductSlug(product);
   const imageUrl = getProductImage(product);
   const categorySlug = getCategorySlug(product.category);
   const isInStock = product.stock > 0;

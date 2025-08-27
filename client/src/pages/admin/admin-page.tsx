@@ -19,7 +19,7 @@ import {
   Table,
   Td,
   Th,
-} from './admin-page.style';
+} from '@/styles/pages/admin/admin-page.style';
 
 interface DashboardStats {
   totalProducts: number;

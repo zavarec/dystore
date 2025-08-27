@@ -84,6 +84,8 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({
 
       return () => clearInterval(timer);
     }
+
+    return undefined;
   }, [canResendCodeAt]);
 
   // Очистка ошибок при изменении формы
@@ -94,6 +96,8 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({
       }, 5000);
       return () => clearTimeout(timer);
     }
+
+    return undefined;
   }, [error, dispatch]);
 
   // Закрытие модалки или перенаправление после успешной авторизации

@@ -23,7 +23,7 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
       <SectionTitle>{title}</SectionTitle>
       <ProductGrid>
         {displayProducts.map((product, index) => (
-          <DysonProductCard key={product.id} product={product} index={index} />
+          <DysonProductCard key={product.id} product={product} index={index} variant={variant} />
         ))}
       </ProductGrid>
     </Section>

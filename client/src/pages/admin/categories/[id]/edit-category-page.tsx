@@ -86,4 +86,5 @@ export const getServerSideProps: GetServerSideProps = async ({ params, locale })
   };
 };
 
-export default EditCategoryPage;
+import { withAdmin } from '@/features/auth/with-admin';
+export default withAdmin<EditCategoryPageProps>(EditCategoryPage);

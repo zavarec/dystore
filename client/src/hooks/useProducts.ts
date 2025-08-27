@@ -83,9 +83,9 @@ export const useProductsByCategory = (categoryId: number) => {
     setLoading(true);
     setError(null);
     try {
-      const allProducts = await ProductsService.getAllProducts();
-      const filteredProducts = allProducts.filter(product => product.categoryId === categoryId);
-      setProducts(filteredProducts);
+      // Серверная фильтрация: быстрее и экономит трафик
+      const data = await ProductsService.getProductsByCategoryIncludingDescendants(categoryId);
+      setProducts(data);
     } catch (err: any) {
       setError(err.message || 'Ошибка загрузки продуктов');
     } finally {

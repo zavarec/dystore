@@ -22,6 +22,9 @@ import { CategoriesService } from "./categories.service";
 import { CreateCategoryDto } from "./dto/create-category.dto";
 import { UpdateCategoryDto } from "./dto/update-category.dto";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
+import { RolesGuard } from "../common/guards/role.guard";
+import { Roles } from "../common/decorators/role.decorator";
+import { Role } from "@prisma/client";
 
 @ApiTags("Categories")
 @Controller("categories")
@@ -78,7 +81,7 @@ export class CategoriesController {
     try {
       const category = await this.categoriesService.findOne(id);
       if (!category) {
-        throw new HttpException('Категория не найдена', HttpStatus.NOT_FOUND);
+        throw new HttpException("Категория не найдена", HttpStatus.NOT_FOUND);
       }
       return category;
     } catch (error) {
@@ -86,7 +89,7 @@ export class CategoriesController {
         throw error;
       }
       throw new HttpException(
-        'Ошибка при получении категории',
+        "Ошибка при получении категории",
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -110,7 +113,8 @@ export class CategoriesController {
   @ApiResponse({ status: 201, description: "Category created" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MANAGER, Role.DIRECTOR)
   @Post()
   async create(@Body() createCategoryDto: CreateCategoryDto) {
     try {
@@ -128,7 +132,8 @@ export class CategoriesController {
   @ApiResponse({ status: 401, description: "Unauthorized" })
   @ApiResponse({ status: 404, description: "Category not found" })
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MANAGER, Role.DIRECTOR)
   @Put(":id")
   async update(
     @Param("id", ParseIntPipe) id: number,
@@ -141,7 +146,7 @@ export class CategoriesController {
         throw error;
       }
       throw new HttpException(
-        'Ошибка при обновлении категории',
+        "Ошибка при обновлении категории",
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -152,12 +157,13 @@ export class CategoriesController {
   @ApiResponse({ status: 401, description: "Unauthorized" })
   @ApiResponse({ status: 404, description: "Category not found" })
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.DIRECTOR)
   @Delete(":id")
   async remove(@Param("id", ParseIntPipe) id: number) {
     try {
       await this.categoriesService.remove(id);
-      return { message: 'Категория успешно удалена' };
+      return { message: "Категория успешно удалена" };
     } catch (error) {
       throw new HttpException(
         `Ошибка при удалении категории: ${error}`,

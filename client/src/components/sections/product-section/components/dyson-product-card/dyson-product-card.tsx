@@ -24,6 +24,7 @@ import { AddToCartButtonVariant } from '@/features/cart/add-to-cart-button/add-t
 interface DysonProductCardProps {
   product: ProductWithDetails;
   index?: number;
+  variant?: 'primary' | 'outline';
 }
 
 export const DysonProductCard: React.FC<DysonProductCardProps> = ({ product, index = 0 }) => {

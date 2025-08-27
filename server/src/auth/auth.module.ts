@@ -5,9 +5,10 @@ import { PassportModule } from "@nestjs/passport";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
-import { SmsService } from "./sms.service";
+import { SmsModule } from "../sms/sms.module";
 import { JwtStrategy } from "./jwt.strategy";
 import { UsersModule } from "../users/users.module";
+import { OtpModule } from "../otp/otp.module";
 
 @Module({
   imports: [
@@ -23,13 +24,11 @@ import { UsersModule } from "../users/users.module";
       inject: [ConfigService],
     }),
     UsersModule,
+    SmsModule,
+    OtpModule,
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    SmsService,
-    JwtStrategy,
-  ],
+  providers: [AuthService, JwtStrategy],
   exports: [AuthService],
 })
 export class AuthModule {}

@@ -24,6 +24,12 @@ export class RolesGuard implements CanActivate {
       return false;
     }
 
+    // Директор имеет полный доступ
+    if (user.role === Role.DIRECTOR) {
+      return true;
+    }
+
+    // Для остальных — должен совпадать хотя бы с одной требуемой ролью
     return requiredRoles.some((role) => user.role === role);
   }
 }

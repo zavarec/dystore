@@ -3,17 +3,20 @@ import {
   BadRequestException,
   UnauthorizedException,
   Logger,
-} from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import Redis from 'ioredis';
-import { UsersService } from '../users/users.service';
-import { SmsService } from './sms.service';
-import { SendCodeDto } from './dto/send-code.dto';
-import { VerifyCodeDto } from './dto/verify-code.dto';
-import { RegisterDto } from './dto/register.dto';
-import { LoginDto } from './dto/login.dto';
-import { JwtPayload } from './jwt.strategy';
+} from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { ConfigService } from "@nestjs/config";
+import Redis from "ioredis";
+import { UsersService } from "../users/users.service";
+import { SmsService } from "../sms/sms.service";
+import { OtpService } from "../otp/otp.service";
+import { generateOtp } from "../common/utils/otp.util";
+import { SendCodeDto } from "./dto/send-code.dto";
+import { VerifyCodeDto } from "./dto/verify-code.dto";
+import { RegisterDto } from "./dto/register.dto";
+import { Role } from "@prisma/client";
+import { LoginDto } from "./dto/login.dto";
+import { JwtPayload } from "./jwt.strategy";
 
 @Injectable()
 export class AuthService {
@@ -25,11 +28,12 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly usersService: UsersService,
     private readonly smsService: SmsService,
+    private readonly otpService: OtpService,
   ) {
     this.redis = new Redis({
-      host: this.configService.get<string>('REDIS_HOST', 'localhost'),
-      port: this.configService.get<number>('REDIS_PORT', 6379),
-      password: this.configService.get<string>('REDIS_PASSWORD'),
+      host: this.configService.get<string>("REDIS_HOST", "localhost"),
+      port: this.configService.get<number>("REDIS_PORT", 6379),
+      password: this.configService.get<string>("REDIS_PASSWORD"),
       maxRetriesPerRequest: 3,
     });
   }
@@ -39,67 +43,61 @@ export class AuthService {
   ): Promise<{ message: string }> {
     const { phone } = sendCodeDto;
 
-    // Проверяем rate limiting
-    const rateLimitKey = `rate_limit:${phone}`;
-    const lastRequest = await this.redis.get(rateLimitKey);
-
-    if (lastRequest) {
+    // Rate limit через Redis lock: 1 SMS / 30 сек
+    const allowed = await this.otpService.setRateLimitLock(phone, 30);
+    if (!allowed) {
       throw new BadRequestException(
-        'Код можно запросить не чаще одного раза в минуту',
+        "Слишком частые запросы. Повторите попытку через 30 секунд",
       );
     }
 
     // Генерируем 6-значный код
-    const code = this.generateVerificationCode();
+    const code = generateOtp(6);
 
     // Сохраняем код в Redis с TTL 5 минут
-    const codeKey = `verification_code:${phone}`;
-    await this.redis.setex(codeKey, 300, code); // 300 секунд = 5 минут
+    await this.otpService.setCode(phone, code);
 
-    // Устанавливаем rate limit на 1 минуту
-    await this.redis.setex(rateLimitKey, 60, '1');
-
-    // Отправляем SMS
-    await this.smsService.sendVerificationCode(phone, code);
+    // Отправляем SMS через sms.ru
+    await this.smsService.sendCode(phone, code);
 
     this.logger.log(`Код подтверждения отправлен на номер ${phone}`);
 
-    return { message: 'Код отправлен' };
+    return { message: "Код отправлен" };
   }
 
   async verifyCode(
     verifyCodeDto: VerifyCodeDto,
-  ): Promise<{ access_token: string }> {
+  ): Promise<{
+    accessToken: string;
+    refreshToken: string;
+    access_token: string;
+  }> {
     const { phone, code } = verifyCodeDto;
 
-    // Получаем код из Redis
-    const codeKey = `verification_code:${phone}`;
-    const storedCode = await this.redis.get(codeKey);
+    // Получаем и удаляем код из Redis атомарно
+    const storedCode = await this.otpService.getAndDel(phone);
 
     if (!storedCode) {
-      throw new BadRequestException('Код истёк или не найден');
+      throw new BadRequestException("Код истёк или не найден");
     }
 
     if (storedCode !== code) {
-      throw new UnauthorizedException('Неверный код подтверждения');
+      throw new UnauthorizedException("Неверный код подтверждения");
     }
 
-    // Удаляем использованный код
-    await this.redis.del(codeKey);
-
     // Находим или создаём пользователя
-    const user = await this.usersService.findOrCreateByPhone(phone);
+    const user = await this.upsertUserByPhone(phone);
 
-    // Генерируем JWT токен
-    const payload: JwtPayload = {
-      sub: user.id,
-      phone: user.phone || undefined,
-    };
-    const access_token = this.jwtService.sign(payload);
+    // Выдаём пару токенов
+    const { accessToken, refreshToken } = await this.issueTokens(
+      user.id,
+      user.role,
+    );
 
     this.logger.log(`Пользователь ${phone} успешно авторизован`);
 
-    return { access_token };
+    // Совместимость с клиентом: возвращаем и новое, и старое поле
+    return { accessToken, refreshToken, access_token: accessToken };
   }
 
   // Регистрация по email и паролю
@@ -112,6 +110,7 @@ export class AuthService {
       email,
       password,
       name,
+      Role.CUSTOMER,
     );
 
     const payload: JwtPayload = {
@@ -142,7 +141,7 @@ export class AuthService {
     const user = await this.usersService.findByEmail(email);
 
     if (!user) {
-      throw new UnauthorizedException('Неверный email или пароль');
+      throw new UnauthorizedException("Неверный email или пароль");
     }
 
     const isPasswordValid = await this.usersService.validatePassword(
@@ -151,7 +150,7 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Неверный email или пароль');
+      throw new UnauthorizedException("Неверный email или пароль");
     }
 
     const payload: JwtPayload = {
@@ -175,6 +174,31 @@ export class AuthService {
 
   private generateVerificationCode(): string {
     return Math.floor(100000 + Math.random() * 900000).toString();
+  }
+
+  // Создание/поиск пользователя по телефону (upsert)
+  async upsertUserByPhone(phone: string) {
+    return this.usersService.findOrCreateByPhone(phone);
+  }
+
+  // Выпуск access/refresh токенов
+  async issueTokens(userId: string, role: Role) {
+    const payload: JwtPayload = { sub: userId };
+
+    const accessToken = this.jwtService.sign(payload, {
+      secret: this.configService.get<string>("JWT_SECRET", "default-secret"),
+      expiresIn: "15m",
+    });
+
+    const refreshToken = this.jwtService.sign(payload, {
+      secret: this.configService.get<string>(
+        "JWT_REFRESH_SECRET",
+        "default-refresh-secret",
+      ),
+      expiresIn: this.configService.get<string>("JWT_REFRESH_EXPIRES_IN", "7d"),
+    });
+
+    return { accessToken, refreshToken };
   }
 
   async onModuleDestroy() {

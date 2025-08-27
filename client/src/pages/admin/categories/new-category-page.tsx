@@ -42,4 +42,5 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   };
 };
 
-export default NewCategoryPage;
+import { withAdmin } from '@/features/auth/with-admin';
+export default withAdmin(NewCategoryPage);

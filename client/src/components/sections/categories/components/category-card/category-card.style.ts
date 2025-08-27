@@ -18,7 +18,7 @@ export const CategoryCardWrapper = styled(motion.div)`
   &:hover {
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
     border-color: rgb(74, 74, 74);
-    transform: translateY(-4px);
+    transform: none;
   }
 
   @media (max-width: 768px) {

@@ -2,11 +2,11 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
-} from '@nestjs/common';
-import { PrismaService } from '../database/prisma.service';
-import { Order, OrderStatus, OrderItem } from '@prisma/client';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { CartService } from '../cart/cart.service';
+} from "@nestjs/common";
+import { PrismaService } from "../database/prisma.service";
+import { Order, OrderStatus, OrderItem } from "@prisma/client";
+import { CreateOrderDto } from "./dto/create-order.dto";
+import { CartService } from "../cart/cart.service";
 
 type OrderWithItems = Order & {
   items: (OrderItem & {
@@ -30,7 +30,7 @@ export class OrdersService {
     const cart = await this.cartService.getCartWithItems(userId);
 
     if (!cart.items || cart.items.length === 0) {
-      throw new BadRequestException('Корзина пуста');
+      throw new BadRequestException("Корзина пуста");
     }
 
     // Вычисляем общую стоимость на основе актуальных цен
@@ -96,7 +96,19 @@ export class OrdersService {
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
+    });
+  }
+
+  async findAll(): Promise<OrderWithItems[]> {
+    return this.prisma.order.findMany({
+      include: {
+        items: {
+          include: { product: true },
+        },
+        user: true,
+      },
+      orderBy: { createdAt: "desc" },
     });
   }
 
@@ -114,7 +126,7 @@ export class OrdersService {
     });
 
     if (!order) {
-      throw new NotFoundException('Заказ не найден');
+      throw new NotFoundException("Заказ не найден");
     }
 
     return order;
@@ -136,7 +148,7 @@ export class OrdersService {
     });
 
     if (!order) {
-      throw new NotFoundException('Заказ не найден');
+      throw new NotFoundException("Заказ не найден");
     }
 
     return order;

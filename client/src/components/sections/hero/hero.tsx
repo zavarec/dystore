@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/atoms/button';
 import { Carousel, CarouselSlide } from '@/components/atoms/carousel';
 import { HeroContainer, Container, SlideWrapper } from './hero.style';
+import { ButtonVariant } from '@/components/atoms/button/button.style';
 
 interface HeroProps {
   onCatalogClick: () => void;
@@ -13,7 +14,8 @@ const heroSlides: CarouselSlide[] = [
     id: '1',
     title: 'Добро пожаловать в DyStore',
     subtitle: 'Откройте для себя мир качественных товаров по доступным ценам',
-    background: '/images/hero/1.webp',
+    video:
+      'https://video-eu.assetsadobe.com/dyson/_renditions_/526/5261034a-d1bc-40a2-a45c-9125ef7c693a/avs/Dyson_EMEA_Summer%20Promo_Social_1280x600_6s_XCAT_DEALPAGE-BANNER.mp4_master-0x540-2000k.mp4?',
   },
   {
     id: '2',
@@ -31,7 +33,7 @@ const heroSlides: CarouselSlide[] = [
     id: '4',
     title: 'Гарантия качества',
     subtitle: 'Мы гарантируем высокое качество всех представленных товаров',
-    background: '/images/hero/3.webp',
+    background: '/images/hero/1.webp',
   },
 ];
 
@@ -68,7 +70,12 @@ export const Hero: React.FC<HeroProps> = ({ onCatalogClick }) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
               >
-                <Button size="large" onClick={onCatalogClick}>
+                <Button
+                  size="large"
+                  onClick={onCatalogClick}
+                  variant={ButtonVariant.GREEN}
+                  style={{ borderRadius: 6 }} 
+                >
                   Смотреть каталог
                 </Button>
               </motion.div>

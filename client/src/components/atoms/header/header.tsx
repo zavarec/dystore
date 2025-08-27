@@ -23,6 +23,8 @@ import {
   UserInfo,
   UserName,
   LogoutButton,
+  HeaderLeft,
+  HeaderRight,
 } from './header.style';
 
 import { selectIsAuthenticated, selectUser } from '@/store/slices/auth-slice/auth.selectors';
@@ -60,6 +62,7 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
+    console.log(user, 'user');
 
     const handleCartUpdate = () => {
       // Обновление произойдет автоматически через useLocalStorage
@@ -115,69 +118,76 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
       transition={{ duration: 0.5, ease: 'easeOut' }}
     >
       <HeaderContent>
-        <Logo href="/">DyStore</Logo>
+        <HeaderLeft>
+          <Logo href="/">DyStore</Logo>
 
-        <Navigation $isOpen={isMobileMenuOpen}>
-          {categoriesLoading ? (
-            <div style={{ color: '#ffffff', padding: '8px 0' }}>Загрузка категорий...</div>
-          ) : (
-            categoryTree.map(category => {
-              const isActive = router.asPath.startsWith(`/category/${category.slug}`);
-              return (
-                <CategoryDropdown
-                  key={category.id}
-                  category={category}
-                  isActive={isActive}
-                  loading={categoriesLoading}
-                />
-              );
-            })
-          )}
-        </Navigation>
-
-        <SearchContainer>
-          <form onSubmit={handleSearch}>
-            <SearchInput
-              type="text"
-              placeholder="Поиск товаров..."
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-            />
-          </form>
-
-          {/* ✅ ИСПРАВЛЕНИЕ: Информация о пользователе безопасно рендерится */}
-          <NoSSR
-            fallback={
-              <AuthButton onClick={handleAuthClick} aria-label="Войти в аккаунт">
-                Войти
-              </AuthButton>
-            }
-          >
-            {isAuthenticated && user ? (
-              <UserInfo>
-                <UserName>{user.username}</UserName>
-                <LogoutButton onClick={handleLogout} aria-label="Выйти из аккаунта">
-                  Выйти
-                </LogoutButton>
-              </UserInfo>
+          <Navigation $isOpen={isMobileMenuOpen}>
+            {categoriesLoading ? (
+              <div style={{ color: '#ffffff', padding: '8px 0' }}>Загрузка категорий...</div>
             ) : (
-              <AuthButton onClick={handleAuthClick} aria-label="Войти в аккаунт">
-                Войти
-              </AuthButton>
+              categoryTree.map(category => {
+                const isActive = router.asPath.startsWith(`/category/${category.slug}`);
+                return (
+                  <CategoryDropdown
+                    key={category.id}
+                    category={category}
+                    isActive={isActive}
+                    loading={categoriesLoading}
+                  />
+                );
+              })
             )}
-          </NoSSR>
+          </Navigation>
+        </HeaderLeft>
 
-          {/* ✅ ИСПРАВЛЕНИЕ: Корзина с безопасным отображением счетчика */}
-          <Link href="/cart" passHref legacyBehavior>
-            <CartButton count={isCartHydrated ? cartItemsCount : 0} />
-          </Link>
-        </SearchContainer>
+        <HeaderRight>
+          <SearchContainer>
+            <form onSubmit={handleSearch}>
+              <SearchInput
+                type="text"
+                placeholder="Поиск товаров..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+              />
+            </form>
 
-        <MobileMenuButton onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} aria-label="Меню">
-          {[0, 1, 2].map(index => (
-            <MenuLine key={index} $isOpen={isMobileMenuOpen} $index={index} />
-          ))}
-        </MobileMenuButton>
+            {/* ✅ ИСПРАВЛЕНИЕ: Информация о пользователе безопасно рендерится */}
+            <NoSSR
+              fallback={
+                <AuthButton onClick={handleAuthClick} aria-label="Войти в аккаунт">
+                  Войти
+                </AuthButton>
+              }
+            >
+              {isAuthenticated && user ? (
+                <UserInfo>
+                  <UserName>{user.username}</UserName>
+                  <LogoutButton onClick={handleLogout} aria-label="Выйти из аккаунта">
+                    Выйти
+                  </LogoutButton>
+                </UserInfo>
+              ) : (
+                <AuthButton onClick={handleAuthClick} aria-label="Войти в аккаунт">
+                  Войти
+                </AuthButton>
+              )}
+            </NoSSR>
+
+            {/* ✅ ИСПРАВЛЕНИЕ: Корзина с безопасным отображением счетчика */}
+            <Link href="/cart" passHref legacyBehavior>
+              <CartButton count={isCartHydrated ? cartItemsCount : 0} />
+            </Link>
+          </SearchContainer>
+
+          <MobileMenuButton
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Меню"
+          >
+            {[0, 1, 2].map(index => (
+              <MenuLine key={index} $isOpen={isMobileMenuOpen} $index={index} />
+            ))}
+          </MobileMenuButton>
+        </HeaderRight>
       </HeaderContent>
     </MotionHeaderContainer>
   );

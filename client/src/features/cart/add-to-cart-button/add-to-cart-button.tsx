@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { Product, ProductWithDetails } from '@/types/models/product.model';
@@ -59,16 +59,16 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
 
     setIsLoading(true);
     try {
-      let updatedCart = [...cartItems];
+      const updatedCart = [...cartItems];
       const existingItemIndex = updatedCart.findIndex(item => item.productId === product.id);
 
       if (existingItemIndex >= 0) {
-        updatedCart[existingItemIndex].quantity += 1;
+        updatedCart[existingItemIndex].quantity += quantity;
       } else {
         const newItem = {
           id: Date.now(),
           productId: product.id,
-          quantity: 1,
+          quantity: quantity,
           name: product.name,
           price: product.price,
           imageUrl: product.imageUrl ?? '/images/placeholder.webp',
@@ -98,7 +98,7 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
         variant={variant}
         size={size}
         onClick={handleAddToCart}
-        disabled={!product.stock || isLoading || !isHydrated} // Блокируем до hydration
+        disabled={disabled || !product.stock || isLoading || !isHydrated} // Блокируем до hydration
         fullWidth={true}
       >
         {!isHydrated

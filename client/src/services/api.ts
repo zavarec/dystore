@@ -2,7 +2,7 @@ import axios from 'axios';
 import { isServer, safeLocalStorage } from '@/utils/ssr';
 
 // Базовый URL API
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
 // Создаем экземпляр axios
 export const apiClient = axios.create({
@@ -29,5 +29,17 @@ apiClient.interceptors.request.use(
   },
 );
 
-// ✅ ИСПРАВЛЕНИЕ: Интерцептор для обработки ошибок авторизации с SSR проверками
-apiClient.interceptors
+// // ✅ ИСПРАВЛЕНИЕ: Интерцептор для обработки ошибок авторизации с SSR проверками
+apiClient.interceptors.response.use(
+  response => response,
+  error => {
+    try {
+      const status = error?.response?.status;
+      if (!isServer && status === 401) {
+        // Токен протух — очищаем и даём возможность переавторизоваться
+        safeLocalStorage.setItem('access_token', '');
+      }
+    } catch {}
+    return Promise.reject(error);
+  },
+);
