@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-// import { PhoneAuthForm } from '@/features/auth/forms/phone-auth-form';
-import { UsernameAuthForm } from '@/features/auth/forms/username-auth-form';
-import { AuthModeButton, AuthModeContainer, AuthModeSelector } from './auth-modal-content.style';
+// import { PhoneAuthForm } from '@/components/atoms/phone-auth-form';
+import { UsernameAuthForm } from '@/components/atoms/username-auth-form';
+import { AuthModeContainer, AuthModeSelector, AuthModeButton } from './auth-modal-content.style';
 
 interface AuthModalContentProps {
   onClose: () => void;

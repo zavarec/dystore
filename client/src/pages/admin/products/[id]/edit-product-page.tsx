@@ -33,4 +33,5 @@ export const getServerSideProps: GetServerSideProps = async ({ locale, params })
   };
 };
 
-export default EditProductPage;
+import { withManager } from '@/features/auth/with-manager';
+export default withManager<EditProductPageProps>(EditProductPage);

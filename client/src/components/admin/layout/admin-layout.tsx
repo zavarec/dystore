@@ -1,7 +1,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { House, Package, FolderOpen, SignOut, Plus, List } from '@phosphor-icons/react';
+
+import { House, FolderOpen, SignOut, Plus, List, Megaphone } from '@phosphor-icons/react';
 import {
   Header,
   LayoutContainer,
@@ -44,11 +45,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => 
         { href: '/admin/products/new', label: 'Добавить продукт', icon: Plus },
         { href: '/admin/categories', label: 'Категории', icon: FolderOpen },
         { href: '/admin/categories/new-category-page', label: 'Добавить категорию', icon: Plus },
+        { href: '/admin/users', label: 'Пользователи', icon: List },
+        { href: '/admin/promotions', label: 'Промо', icon: Megaphone },
       ],
     },
   ];
 
-  return (
+  return (    
     <LayoutContainer>
       <Sidebar>
         <Logo>DyStore Admin</Logo>

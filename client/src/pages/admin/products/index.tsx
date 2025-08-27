@@ -205,4 +205,5 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   };
 };
 
-export default AdminProductsPage;
+import { withManager } from '@/features/auth/with-manager';
+export default withManager(AdminProductsPage);

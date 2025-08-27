@@ -7,6 +7,7 @@ import authSlice from './slices/auth-slice/auth.slice';
 import cartSlice from './slices/cart-slice/cart.slice';
 import categoriesSlice from './slices/categories-slice/categories.slice';
 import ordersSlice from './slices/orders-slice/orders.slice';
+import promotionsSlice from './slices/promotion-slice/promotion.slice';
 
 // Store factory для SSR
 const makeStore = () =>
@@ -19,6 +20,7 @@ const makeStore = () =>
       uiSlice,
       authSlice,
       cartSlice,
+      promotionsSlice,
     },
     middleware: getDefaultMiddleware =>
       getDefaultMiddleware({

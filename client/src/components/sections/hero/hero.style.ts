@@ -68,3 +68,43 @@ export const SlideWrapper = styled.div<{ background: string | undefined }>`
     }
   }
 `;
+
+export const VideoWrapper = styled.div`
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;
+
+export const VideoControls = styled.div`
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 2;
+`;
+
+export const VideoToggleBtn = styled.button`
+  position: absolute;
+  right: 20px;
+  bottom: 20px;
+  z-index: 2;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    display: block;
+  }
+`;

@@ -86,4 +86,5 @@ export const getServerSideProps: GetServerSideProps = async ({ params, locale })
   };
 };
 
-export default EditCategoryPage;
+import { withManager } from '@/features/auth/with-manager';
+export default withManager<EditCategoryPageProps>(EditCategoryPage);

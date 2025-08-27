@@ -13,12 +13,6 @@ import {
   selectRootCategories,
 } from '@/store/slices/categories-slice/categories.selectors';
 
-import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/css';
-import 'swiper/css/navigation';
-
-import { Navigation } from 'swiper/modules';
-
 export const Categories: React.FC = () => {
   const dispatch = useAppDispatch();
 

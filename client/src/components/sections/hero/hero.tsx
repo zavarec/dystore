@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/atoms/button';
 import { Carousel, CarouselSlide } from '@/components/atoms/carousel';
-import { HeroContainer, Container, SlideWrapper } from './hero.style';
+import { HeroContainer, Container, SlideWrapper, VideoWrapper, VideoToggleBtn } from './hero.style';
+import { ButtonVariant } from '@/components/atoms/button/button.style';
 
 interface HeroProps {
   onCatalogClick: () => void;
@@ -35,16 +36,53 @@ const heroSlides: CarouselSlide[] = [
   },
 ];
 
+export const PauseIcon = (
+  <svg viewBox="0 0 32 32" width="32" height="32">
+    <circle cx="16" cy="16" r="16" fill="black" fillOpacity="0.5" />
+    <path fill="#fff" d="M12 10h3v12h-3zM17 10h3v12h-3z" />
+  </svg>
+);
+
+export const PlayIcon = (
+  <svg viewBox="0 0 32 32" width="32" height="32">
+    <circle cx="16" cy="16" r="16" fill="black" fillOpacity="0.5" />
+    <path fill="#fff" d="M12 10l10 6-10 6z" />
+  </svg>
+);
+
 export const Hero: React.FC<HeroProps> = ({ onCatalogClick }) => {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+
+  const togglePlay = () => {
+    if (!videoRef.current) return;
+    if (isPlaying) {
+      videoRef.current.pause();
+    } else {
+      videoRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
   return (
     <HeroContainer>
-      <Carousel
-        slides={heroSlides}
-        // autoplayInterval={6000}
-        showIndicators={true}
-      >
+      <Carousel slides={heroSlides} showIndicators={true}>
         {(slide, index) => (
           <SlideWrapper background={slide.background}>
+            {slide.video && (
+              <VideoWrapper>
+                <video ref={videoRef} autoPlay muted loop playsInline>
+                  <source src={slide.video} />
+                </video>
+                <VideoToggleBtn
+                  onClick={togglePlay}
+                  aria-label={isPlaying ? 'Пауза видео' : 'Воспроизвести видео'}
+                >
+                  {isPlaying ? PauseIcon : PlayIcon}
+                </VideoToggleBtn>
+              </VideoWrapper>
+            )}
+
             <Container>
               <motion.h1
                 key={`title-${index}`}
@@ -68,7 +106,12 @@ export const Hero: React.FC<HeroProps> = ({ onCatalogClick }) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
               >
-                <Button size="large" onClick={onCatalogClick}>
+                <Button
+                  size="large"
+                  onClick={onCatalogClick}
+                  variant={ButtonVariant.GREEN}
+                  style={{ borderRadius: 6 }}
+                >
                   Смотреть каталог
                 </Button>
               </motion.div>

@@ -11,6 +11,7 @@ import { loadUserProfile } from '@/store/slices/auth-slice/auth.thunks';
 import { initializeAuth } from '@/store/slices/auth-slice/auth.slice';
 import { fetchCart } from '@/store/slices/cart-slice/cart.thunks';
 import { safeLocalStorage } from '@/utils/ssr';
+import { inter, roboto, montserrat, poppins } from '@/styles/fonts/fonts';
 
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -150,21 +151,25 @@ function MyApp({ Component, ...rest }: AppProps) {
     <Provider store={store}>
       <Global styles={globalStyles} />
       <AuthInitializer>
-        <Layout>
-          <Component {...props.pageProps} />
-        </Layout>
-        <ToastContainer
-          position="bottom-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
+        <div
+          className={`${inter.variable} ${roboto.variable} ${montserrat.variable} ${poppins.variable}`}
+        >
+          <Layout>
+            <Component {...props.pageProps} />
+          </Layout>
+          <ToastContainer
+            position="bottom-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+          />
+        </div>
       </AuthInitializer>
     </Provider>
   );

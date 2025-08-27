@@ -16,6 +16,7 @@ import { Benefits } from '@/components/sections/benefits';
 import { Categories } from '@/components/sections/categories';
 import { StorePanorama } from '@/components/sections/store-panorama';
 import { SEOHead } from '@/components/atoms/seo-head/seo-head';
+import HomeSections from '@/features/promotions/home-sections';
 
 const HomePage: NextPage = () => {
   const { products, loading, error } = useProducts();
@@ -81,12 +82,17 @@ const HomePage: NextPage = () => {
 
       <HeaderWithBenefitsWrapper>
         <Hero onCatalogClick={handleCatalogClick} />
-        <Benefits />
       </HeaderWithBenefitsWrapper>
 
       <Categories />
 
       <StorePanorama />
+
+      <Benefits />
+
+      <div style={{ padding: '0px' }}>
+        <HomeSections />
+      </div>
 
       <Container>
         {loading ? (

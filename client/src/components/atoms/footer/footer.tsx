@@ -44,21 +44,22 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
             <FooterLink href="/category/accessories">Аксессуары</FooterLink>
           </FooterSection>
 
-          <FooterSection>
-            <h3>Покупателям</h3>
-            <FooterLink href="/delivery">Доставка</FooterLink>
-            <FooterLink href="/payment">Оплата</FooterLink>
-            <FooterLink href="/warranty">Гарантия</FooterLink>
-            <FooterLink href="/returns">Возврат</FooterLink>
-            <FooterLink href="/service">Сервис</FooterLink>
-          </FooterSection>
+          {/* <FooterSection> */}
+          {/* <h3>Покупателям</h3> */}
+          {/* Неактивные ссылки закомментированы до появления страниц */}
+          {/* <FooterLink href="/delivery">Доставка</FooterLink> */}
+          {/* <FooterLink href="/payment">Оплата</FooterLink> */}
+          {/* <FooterLink href="/warranty">Гарантия</FooterLink> */}
+          {/* <FooterLink href="/returns">Возврат</FooterLink> */}
+          {/* <FooterLink href="/service">Сервис</FooterLink> */}
+          {/* </FooterSection> */}
 
           <FooterSection>
             <h3>О компании</h3>
             <FooterLink href="/about">О нас</FooterLink>
             <FooterLink href="/contacts">Контакты</FooterLink>
-            <FooterLink href="/news">Новости</FooterLink>
-            <FooterLink href="/reviews">Отзывы</FooterLink>
+            {/* <FooterLink href="/news">Новости</FooterLink> */}
+            {/* <FooterLink href="/reviews">Отзывы</FooterLink> */}
           </FooterSection>
         </FooterGrid>
 

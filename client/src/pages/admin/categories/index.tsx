@@ -137,4 +137,5 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   };
 };
 
-export default AdminCategoriesPage;
+import { withManager } from '@/features/auth/with-manager';
+export default withManager(AdminCategoriesPage);
