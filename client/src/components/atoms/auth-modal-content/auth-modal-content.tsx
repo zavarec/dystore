@@ -31,4 +31,3 @@ export const AuthModalContent: React.FC<AuthModalContentProps> = ({ onClose }) =
     </div>
   );
 };
-
