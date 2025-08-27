@@ -32,7 +32,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: "Code sent successfully" })
   @ApiResponse({ status: 429, description: "Too many requests" })
   @UseGuards(ThrottlerGuard)
-  @Throttle({ default: { ttl: 60000, limit: 1 } })
+  @Throttle({ default: { ttl: 30000, limit: 1 } })
   @Post("send-code")
   @HttpCode(HttpStatus.OK)
   async sendCode(@Body() sendCodeDto: SendCodeDto) {
