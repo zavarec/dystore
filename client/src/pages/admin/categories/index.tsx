@@ -20,7 +20,7 @@ import {
   ActionButtons,
   ActionButton,
   EmptyState,
-} from './admin-categories-page.style';
+} from '@/styles/pages/admin/admin-categories-page.style';
 
 const AdminCategoriesPage: NextPage = () => {
   const [categories, setCategories] = useState<Category[]>([]);

@@ -1,3 +1,4 @@
+// src/products/products.controller.ts
 import {
   Controller,
   Get,
@@ -6,56 +7,53 @@ import {
   Param,
   Put,
   Delete,
-  ValidationPipe,
   ParseIntPipe,
   UseGuards,
   HttpException,
   HttpStatus,
-} from '@nestjs/common';
-import { ProductsService } from './products.service';
-import { Product } from '@prisma/client';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+} from "@nestjs/common";
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from "@nestjs/swagger";
+import { ProductsService } from "./products.service";
+import { CreateProductDto } from "./dto/create-product.dto";
+import { UpdateProductDto } from "./dto/update-product.dto";
+import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
+import { RolesGuard } from "../common/guards/role.guard";
+import { Roles } from "../common/decorators/role.decorator";
+import { Role } from "@prisma/client";
 
-@Controller('products')
+@ApiTags("Products")
+@Controller("products")
 export class ProductsController {
-  constructor(private readonly service: ProductsService) {}
+  constructor(private readonly productsService: ProductsService) {}
 
+  @ApiOperation({ summary: "Get all products" })
+  @ApiResponse({ status: 200, description: "List of products" })
   @Get()
-  async findAll(): Promise<Product[]> {
+  async findAll() {
     try {
-      return await this.service.findAll();
+      return await this.productsService.findAll();
     } catch (error) {
-      console.log(`Ошибка: ${error} при получении списка товаров`);
       throw new HttpException(
-        'Ошибка при получении списка товаров',
+        "Ошибка при получении списка товаров",
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
-  @Get('category/:categoryId')
-  async findByCategory(
-    @Param('categoryId', ParseIntPipe) categoryId: number,
-  ): Promise<Product[]> {
+  @ApiOperation({ summary: "Get product by ID" })
+  @ApiResponse({ status: 200, description: "Product details" })
+  @ApiResponse({ status: 404, description: "Product not found" })
+  @Get(":id")
+  async findOne(@Param("id", ParseIntPipe) id: number) {
     try {
-      return await this.service.findByCategory(categoryId);
-    } catch (error) {
-      console.log(`Ошибка: ${error} при получении товаров категории`);
-      throw new HttpException(
-        'Ошибка при получении товаров категории',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
-
-  @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Product> {
-    try {
-      const product = await this.service.findOne(id);
+      const product = await this.productsService.findOne(id);
       if (!product) {
-        throw new HttpException('Товар не найден', HttpStatus.NOT_FOUND);
+        throw new HttpException("Товар не найден", HttpStatus.NOT_FOUND);
       }
       return product;
     } catch (error) {
@@ -63,79 +61,109 @@ export class ProductsController {
         throw error;
       }
       throw new HttpException(
-        'Ошибка при получении товара',
+        "Ошибка при получении товара",
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Post()
-  async create(
-    @Body(ValidationPipe) createProductDto: CreateProductDto,
-  ): Promise<Product> {
+  @ApiOperation({ summary: "Get products by category" })
+  @ApiResponse({ status: 200, description: "Products in category" })
+  @Get("category/:categoryId")
+  async findByCategory(@Param("categoryId", ParseIntPipe) categoryId: number) {
     try {
-      return await this.service.create(createProductDto);
+      return await this.productsService.findByCategory(categoryId);
     } catch (error) {
-      console.log(`Ошибка: ${error} при создании товара`);
       throw new HttpException(
-        'Ошибка при создании товара',
-        HttpStatus.BAD_REQUEST,
+        "Ошибка при получении товаров категории",
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Put(':id')
-  async update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body(ValidationPipe) updateProductDto: UpdateProductDto,
-  ): Promise<Product> {
-    try {
-      await this.service.update(id, updateProductDto);
-      const product = await this.service.findOne(id);
-      if (!product) {
-        throw new HttpException('Товар не найден', HttpStatus.NOT_FOUND);
-      }
-      return product;
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      throw new HttpException(
-        'Ошибка при обновлении товара',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-  }
-
-  @Get('category/:categoryId/with-descendants')
+  @ApiOperation({ summary: "Get products by category including descendants" })
+  @ApiResponse({ status: 200, description: "Products with subcategories" })
+  @Get("category/:categoryId/with-descendants")
   async findByCategoryIncludingDescendants(
-    @Param('categoryId', ParseIntPipe) categoryId: number,
-  ): Promise<Product[]> {
+    @Param("categoryId", ParseIntPipe) categoryId: number,
+  ) {
     try {
-      return await this.service.findByCategoryIncludingDescendants(categoryId);
+      return await this.productsService.findByCategoryIncludingDescendants(
+        categoryId,
+      );
     } catch (error) {
-      console.error(`Ошибка: ${error} при получении товаров с подкатегориями`);
       throw new HttpException(
-        'Ошибка при получении товаров с подкатегориями',
+        "Ошибка при получении товаров с подкатегориями",
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  async remove(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<{ message: string }> {
+  @ApiOperation({ summary: "Create new product (requires authentication)" })
+  @ApiResponse({ status: 201, description: "Product created" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MANAGER, Role.DIRECTOR)
+  @Post()
+  async create(@Body() createProductDto: CreateProductDto) {
     try {
-      await this.service.remove(id);
-      return { message: 'Товар успешно удален' };
+      return await this.productsService.create(createProductDto);
     } catch (error) {
-      console.log(`Ошибка: ${error} при удалении товара`);
       throw new HttpException(
-        'Ошибка при удалении товара',
+        "Ошибка при создании товара",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @ApiOperation({ summary: "Update product (requires authentication)" })
+  @ApiResponse({ status: 200, description: "Product updated" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  @ApiResponse({ status: 404, description: "Product not found" })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MANAGER, Role.DIRECTOR)
+  @Put(":id")
+  async update(
+    @Param("id", ParseIntPipe) id: number,
+    @Body() updateProductDto: UpdateProductDto,
+  ) {
+    try {
+      const updatedProduct = await this.productsService.update(
+        id,
+        updateProductDto,
+      );
+      if (!updatedProduct) {
+        throw new HttpException("Товар не найден", HttpStatus.NOT_FOUND);
+      }
+      return updatedProduct;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        "Ошибка при обновлении товара",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  @ApiOperation({ summary: "Delete product (requires authentication)" })
+  @ApiResponse({ status: 200, description: "Product deleted" })
+  @ApiResponse({ status: 401, description: "Unauthorized" })
+  @ApiResponse({ status: 404, description: "Product not found" })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.DIRECTOR)
+  @Delete(":id")
+  async remove(@Param("id", ParseIntPipe) id: number) {
+    try {
+      await this.productsService.remove(id);
+      return { message: "Товар успешно удален" };
+    } catch (error) {
+      throw new HttpException(
+        "Ошибка при удалении товара",
         HttpStatus.BAD_REQUEST,
       );
     }

@@ -1,18 +1,25 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
-
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+// Шрифты для промо
+enum PromoFont {
+  INTER
+  ROBOTO
+  MONTSERRAT
+  POPPINS
+}
+
+// Роли пользователей
+enum Role {
+  DIRECTOR
+  MANAGER
+  CUSTOMER
 }
 
 // Пользователи
@@ -22,27 +29,41 @@ model User {
   email     String?   @unique
   password  String?
   name      String?
+  role      Role      @default(CUSTOMER)
+  isActive  Boolean   @default(true)
   createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   
   // Связи
   carts     Cart[]
   orders    Order[]
+  createdPromotions Promotion[]
+  createdPageSections PageSection[]
   
   @@map("users")
+  @@index([email])
+  @@index([phone])
 }
 
 // Категории
 model Category {
-  id       Int       @id @default(autoincrement())
-  name     String
-  slug     String    @unique
-  image    String?   // URL изображения категории
-  parentId Int?      // Родительская категория (null для корневых)
+  id          Int       @id @default(autoincrement())
+  name        String
+  slug        String    @unique
+  image       String?
+  description String?
+  parentId    Int?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   
   // Связи
   parent     Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children   Category[] @relation("CategoryHierarchy")
   products   Product[]
+  
+  @@index([slug])
+  @@index([parentId])
 }
 
 // Продукты
@@ -55,14 +76,21 @@ model Product {
   stock            Int      @default(0)
   imageUrl         String?
   categoryId       Int
+  isFeatured       Boolean  @default(false)
+  popularity       Int      @default(0)
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
   
   // Связи
   category    Category    @relation(fields: [categoryId], references: [id])
   cartItems   CartItem[]
   orderItems  OrderItem[]
-
-  isFeatured  Boolean  @default(false)
-  popularity  Int      @default(0)
+  promotions  Promotion[]
+  
+  @@index([categoryId])
+  @@index([isFeatured])
+  @@index([popularity])
 }
 
 // Корзины
@@ -70,12 +98,14 @@ model Cart {
   id        Int       @id @default(autoincrement())
   userId    String
   createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   
   // Связи
   user  User       @relation(fields: [userId], references: [id])
   items CartItem[]
   
   @@map("carts")
+  @@index([userId])
 }
 
 // Элементы корзины
@@ -89,22 +119,28 @@ model CartItem {
   cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id])
   
+  @@unique([cartId, productId])
   @@map("cart_items")
 }
 
 // Заказы
 model Order {
-  id         Int         @id @default(autoincrement())
-  userId     String
-  totalPrice Float
-  status     OrderStatus @default(PENDING)
-  createdAt  DateTime    @default(now())
+  id              Int         @id @default(autoincrement())
+  userId          String
+  totalPrice      Float
+  status          OrderStatus @default(PENDING)
+  deliveryAddress String?
+  comment         String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
   
   // Связи
   user  User        @relation(fields: [userId], references: [id])
   items OrderItem[]
   
   @@map("orders")
+  @@index([userId])
+  @@index([status])
 }
 
 // Элементы заказа
@@ -125,7 +161,79 @@ model OrderItem {
 // Enum для статуса заказа
 enum OrderStatus {
   PENDING
+  CONFIRMED
   PAID
+  PROCESSING
   SHIPPED
   DELIVERED
+  CANCELLED
+}
+
+// Промо-слоты
+enum PromotionSlot {
+  HERO
+  PRODUCT_OF_DAY
+  FEATURED
+  CUSTOM
+}
+
+// Промо
+model Promotion {
+  id           Int            @id @default(autoincrement())
+  slot         PromotionSlot
+  productId    Int?
+  product      Product?       @relation(fields: [productId], references: [id])
+  title        String?
+  subtitle     String?
+  ctaText      String?
+  ctaLink      String?
+  bgImageUrl   String?
+  bgVideoUrl   String?
+  isPublished  Boolean        @default(false)
+  startAt      DateTime
+  endAt        DateTime
+  position     Int            @default(0)
+  createdById  String
+  createdBy    User           @relation(fields: [createdById], references: [id])
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  // Стили
+  font         PromoFont?
+  titleColor   String?
+  textColor    String?
+  ctaBg        String?
+  ctaColor     String?
+
+  @@index([slot, isPublished, startAt, endAt])
+  @@index([slot, position])
+}
+
+// Ключи страниц и секций для конфигурирования главной
+enum PageKey {
+  HOME
+}
+
+enum SectionKey {
+  PRODUCT_OF_DAY
+  FEATURED
+  CUSTOM
+  HITS
+}
+
+model PageSection {
+  id          Int       @id @default(autoincrement())
+  page        PageKey
+  key         SectionKey
+  title       String?
+  isEnabled   Boolean   @default(true)
+  position    Int       @default(0)
+  settings    Json?
+  createdById String
+  createdBy   User      @relation(fields: [createdById], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([page, key])
+  @@index([page, isEnabled, position])
 }

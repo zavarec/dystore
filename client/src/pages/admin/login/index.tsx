@@ -6,13 +6,15 @@ import { useRouter } from 'next/router';
 import { useAppSelector } from '@/hooks/redux';
 import { selectIsAuthenticated } from '@/store/slices/auth-slice/auth.selectors';
 import { UsernameAuthForm } from '@/features/auth/forms/username-auth-form';
+
+// Перенос стилей из pages в styles
 import {
-  LoginContainer,
-  LoginCard,
-  LoginHeader,
-  LoginTitle,
-  LoginSubtitle,
-} from './admin-login-page.style';
+  LoginContainer as SLoginContainer,
+  LoginCard as SLoginCard,
+  LoginHeader as SLoginHeader,
+  LoginTitle as SLoginTitle,
+  LoginSubtitle as SLoginSubtitle,
+} from '@/styles/pages/admin/admin-login-page.style';
 
 const AdminLoginPage: NextPage = () => {
   const router = useRouter();
@@ -25,15 +27,15 @@ const AdminLoginPage: NextPage = () => {
   }, [isAuthenticated, router]);
 
   return (
-    <LoginContainer>
-      <LoginCard>
-        <LoginHeader>
-          <LoginTitle>DyStore Admin</LoginTitle>
-          <LoginSubtitle>Войдите для управления магазином</LoginSubtitle>
-        </LoginHeader>
+    <SLoginContainer>
+      <SLoginCard>
+        <SLoginHeader>
+          <SLoginTitle>DyStore Admin</SLoginTitle>
+          <SLoginSubtitle>Войдите для управления магазином</SLoginSubtitle>
+        </SLoginHeader>
         <UsernameAuthForm />
-      </LoginCard>
-    </LoginContainer>
+      </SLoginCard>
+    </SLoginContainer>
   );
 };
 

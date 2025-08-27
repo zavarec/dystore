@@ -47,12 +47,9 @@ export const useCategory = (id: number) => {
     setLoading(true);
     setError(null);
     try {
-      console.log('Fetching categories...'); // ← Добавьте для отладки
-      const data = await CategoriesService.getAllCategories();
-      console.log('Categories received:', data); // ← Добавьте для отладки
-      // setCategories(data);
+      const data = await CategoriesService.getCategoryById(id);
+      setCategory(data);
     } catch (err: any) {
-      console.error('Categories error:', err); // ← Добавьте для отладки
       setError(err.message || 'Ошибка загрузки категории');
     } finally {
       setLoading(false);

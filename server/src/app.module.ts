@@ -13,6 +13,8 @@ import { CartModule } from "./cart/cart.module";
 import { OrdersModule } from "./orders/orders.module";
 import { DatabaseModule } from "./database/database.module";
 import { GlobalExceptionFilter } from "./common/filters/global-exception.filter";
+import { PromotionsModule } from "./promotions/promotions.module";
+import { LayoutModule } from "./layout/layout.module";
 
 @Module({
   imports: [
@@ -33,6 +35,8 @@ import { GlobalExceptionFilter } from "./common/filters/global-exception.filter"
     CategoriesModule,
     CartModule,
     OrdersModule,
+    PromotionsModule,
+    LayoutModule,
   ],
   controllers: [AppController],
   providers: [

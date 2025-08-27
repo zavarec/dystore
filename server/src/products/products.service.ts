@@ -1,9 +1,9 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../database/prisma.service';
-import { Product } from '@prisma/client';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
-import { CategoriesService } from '../categories/categories.service';
+import { Injectable, BadRequestException } from "@nestjs/common";
+import { PrismaService } from "../database/prisma.service";
+import { Product } from "@prisma/client";
+import { CreateProductDto } from "./dto/create-product.dto";
+import { UpdateProductDto } from "./dto/update-product.dto";
+import { CategoriesService } from "../categories/categories.service";
 
 @Injectable()
 export class ProductsService {
@@ -38,7 +38,7 @@ export class ProductsService {
       createProductDto.categoryId,
     );
     if (!category) {
-      throw new BadRequestException('Категория не найдена');
+      throw new BadRequestException("Категория не найдена");
     }
 
     return this.prisma.product.create({
@@ -53,7 +53,7 @@ export class ProductsService {
         updateProductDto.categoryId,
       );
       if (!category) {
-        throw new BadRequestException('Категория не найдена');
+        throw new BadRequestException("Категория не найдена");
       }
     }
 

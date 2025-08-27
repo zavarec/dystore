@@ -5,9 +5,10 @@ import {
   CategoriesContainer,
   CategoriesHeader,
   CategoriesTitle,
+  ScrollContainer,
 } from './categories.style';
 import { fetchRootCategories } from '@/store/slices/categories-slice/categories.thunks';
-import {  CategoriesSkeleton, CategoryCard } from './components';
+import { CategoriesSkeleton, CategoryCard } from './components';
 import {
   selectIsRootCategoriesLoading,
   selectRootCategories,
@@ -21,7 +22,6 @@ export const Categories: React.FC = () => {
 
   useEffect(() => {
     dispatch(fetchRootCategories());
-    console.log(categories, 'categories');
   }, [dispatch]);
 
   const handleCategoryClick = (categorySlug: string) => {
@@ -49,26 +49,20 @@ export const Categories: React.FC = () => {
           <CategoriesTitle>Категории товаров</CategoriesTitle>
         </CategoriesHeader>
 
-        <Swiper
-          modules={[Navigation]}
-          spaceBetween={55}
-          slidesPerView={2}
-          navigation
-          breakpoints={{
-            640: { slidesPerView: 2 },
-            768: { slidesPerView: 3 },
-            1024: { slidesPerView: 4 },
-            1280: { slidesPerView: 5 },
-          }}
-        >
+        <ScrollContainer>
           {categories.map(category => (
-            <SwiperSlide key={category.id} style={{ height: 'auto' }}>
-              <div style={{ height: '100%' }}>
-                <CategoryCard category={category} onClick={handleCategoryClick} />
-              </div>
-            </SwiperSlide>
+            <div
+              key={category.id}
+              style={{
+                flex: '0 0 auto',
+                scrollSnapAlign: 'start',
+                minWidth: '220px',
+              }}
+            >
+              <CategoryCard category={category} onClick={handleCategoryClick} />
+            </div>
           ))}
-        </Swiper>
+        </ScrollContainer>
       </CategoriesContainer>
     </CategoriesSection>
   );

@@ -19,7 +19,9 @@ const EditProductPage: NextPage<EditProductPageProps> = ({ productId }) => {
 
   return (
     <AdminLayout title="Редактирование продукта">
-      {product && <ProductForm onSubmit={handleSubmit} loading={loading} initialValues={product} />}
+      {product && (
+        <ProductForm onSubmit={handleSubmit} loading={loading} initialValues={product} isEdit />
+      )}
     </AdminLayout>
   );
 };

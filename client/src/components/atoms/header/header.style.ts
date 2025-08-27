@@ -19,12 +19,9 @@ const HeaderContainer = styled.header<{ $isScrolled: boolean }>`
 export const MotionHeaderContainer = motion(HeaderContainer);
 
 export const HeaderContent = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
   padding: 0 20px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   height: 70px;
   margin-top: 8px;
   gap: 24px;
@@ -60,13 +57,18 @@ export const Navigation = styled.nav<{ $isOpen: boolean }>`
   gap: 32px;
   position: static;
 
+  flex: 1;
+  justify-content: flex-start;
+
+  /* небольшой отступ от логотипа */
+  margin-left: 8px;
+
   @media (max-width: 1100px) {
     position: fixed;
     top: 60px;
     left: 0;
     right: 0;
     background: rgba(0, 0, 0, 0.98);
-    background: red;
     backdrop-filter: blur(10px);
     flex-direction: column;
     padding: 20px;
@@ -80,6 +82,21 @@ export const Navigation = styled.nav<{ $isOpen: boolean }>`
   }
 `;
 
+export const HeaderRight = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+`;
+
+export const HeaderLeft = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex: 1; /* тянем левую часть */
+  min-width: 0;
+`;
+
 export const StyledNavLink = styled.a<{ $isActive: boolean }>`
   color: ${props => (props.$isActive ? '#007bff' : '#ffffff')};
   text-decoration: none;
@@ -88,7 +105,6 @@ export const StyledNavLink = styled.a<{ $isActive: boolean }>`
   position: relative;
   padding: 8px 0;
   transition: color 0.3s ease;
-  background-color: red;
 
   &:hover {
     color: rgb(143, 145, 148);
@@ -171,7 +187,7 @@ export const SearchContainer = styled.div`
 export const SearchInput = styled.input`
   padding: 8px 16px;
   border: 1px solid #e0e0e0;
-  border-radius: 24px;
+  border-radius: 4px;
   background: #f8f9fa;
   font-size: 14px;
   width: 200px;

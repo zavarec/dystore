@@ -23,20 +23,20 @@ interface CategoryTreeProps {
 
 interface TreeNodeProps {
   node: CategoryTreeNode;
-  onCategoryClick?: (category: CategoryTreeNode) => void;
-  showProductCount?: boolean;
-  collapsible?: boolean;
-  defaultCollapsed?: boolean;
-  level?: number;
+  onCategoryClick: (category: CategoryTreeNode) => void;
+  showProductCount: boolean;
+  collapsible: boolean;
+  defaultCollapsed: boolean;
+  level: number;
 }
 
 const TreeNodeComponent: React.FC<TreeNodeProps> = ({
   node,
   onCategoryClick,
-  showProductCount = true,
-  collapsible = true,
-  defaultCollapsed = false,
-  level = 0,
+  showProductCount,
+  collapsible,
+  defaultCollapsed,
+  level,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
   const hasChildren = node.children && node.children.length > 0;
@@ -104,10 +104,11 @@ export const CategoryTree: React.FC<CategoryTreeProps> = ({
         <TreeNodeComponent
           key={category.id}
           node={category}
-          onCategoryClick={onCategoryClick}
-          showProductCount={showProductCount}
-          collapsible={collapsible}
-          defaultCollapsed={defaultCollapsed}
+          onCategoryClick={onCategoryClick ?? (() => {})}
+          showProductCount={Boolean(showProductCount)}
+          collapsible={Boolean(collapsible)}
+          defaultCollapsed={Boolean(defaultCollapsed)}
+          level={0}
         />
       ))}
     </TreeContainer>
