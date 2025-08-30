@@ -13,6 +13,7 @@ enum PromoFont {
   ROBOTO
   MONTSERRAT
   POPPINS
+  NUNITO_SANS
 }
 
 // Роли пользователей
@@ -24,44 +25,46 @@ enum Role {
 
 // Пользователи
 model User {
-  id        String    @id @default(uuid())
-  phone     String?   @unique
-  email     String?   @unique
+  id        String   @id @default(uuid())
+  phone     String?  @unique
+  email     String?  @unique
   password  String?
   name      String?
-  role      Role      @default(CUSTOMER)
-  isActive  Boolean   @default(true)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  
+  role      Role     @default(CUSTOMER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Связи
-  carts     Cart[]
-  orders    Order[]
-  createdPromotions Promotion[]
-  createdPageSections PageSection[]
-  
-  @@map("users")
+  carts                Cart[]
+  orders               Order[]
+  createdPromotions    Promotion[]
+  createdPageSections  PageSection[]
+  CategoryPromoSection CategoryPromoSection[]
+
   @@index([email])
   @@index([phone])
+  @@map("users")
 }
 
 // Категории
 model Category {
-  id          Int       @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   name        String
-  slug        String    @unique
+  slug        String   @unique
   image       String?
   description String?
   parentId    Int?
-  isActive    Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
   // Связи
-  parent     Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])
-  children   Category[] @relation("CategoryHierarchy")
-  products   Product[]
-  
+  parent        Category?              @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children      Category[]             @relation("CategoryHierarchy")
+  products      Product[]
+  promoSections CategoryPromoSection[]
+
   @@index([slug])
   @@index([parentId])
 }
@@ -81,13 +84,13 @@ model Product {
   isActive         Boolean  @default(true)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-  
+
   // Связи
-  category    Category    @relation(fields: [categoryId], references: [id])
-  cartItems   CartItem[]
-  orderItems  OrderItem[]
-  promotions  Promotion[]
-  
+  category   Category    @relation(fields: [categoryId], references: [id])
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+  promotions Promotion[]
+
   @@index([categoryId])
   @@index([isFeatured])
   @@index([popularity])
@@ -95,17 +98,17 @@ model Product {
 
 // Корзины
 model Cart {
-  id        Int       @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   userId    String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   // Связи
   user  User       @relation(fields: [userId], references: [id])
   items CartItem[]
-  
-  @@map("carts")
+
   @@index([userId])
+  @@map("carts")
 }
 
 // Элементы корзины
@@ -114,11 +117,11 @@ model CartItem {
   cartId    Int
   productId Int
   quantity  Int @default(1)
-  
+
   // Связи
   cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id])
-  
+
   @@unique([cartId, productId])
   @@map("cart_items")
 }
@@ -133,28 +136,28 @@ model Order {
   comment         String?
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
-  
+
   // Связи
   user  User        @relation(fields: [userId], references: [id])
   items OrderItem[]
-  
-  @@map("orders")
+
   @@index([userId])
   @@index([status])
+  @@map("orders")
 }
 
 // Элементы заказа
 model OrderItem {
-  id              Int     @id @default(autoincrement())
+  id              Int   @id @default(autoincrement())
   orderId         Int
   productId       Int
   quantity        Int
   priceAtPurchase Float
-  
+
   // Связи
   order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id])
-  
+
   @@map("order_items")
 }
 
@@ -179,31 +182,31 @@ enum PromotionSlot {
 
 // Промо
 model Promotion {
-  id           Int            @id @default(autoincrement())
-  slot         PromotionSlot
-  productId    Int?
-  product      Product?       @relation(fields: [productId], references: [id])
-  title        String?
-  subtitle     String?
-  ctaText      String?
-  ctaLink      String?
-  bgImageUrl   String?
-  bgVideoUrl   String?
-  isPublished  Boolean        @default(false)
-  startAt      DateTime
-  endAt        DateTime
-  position     Int            @default(0)
-  createdById  String
-  createdBy    User           @relation(fields: [createdById], references: [id])
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+  id          Int           @id @default(autoincrement())
+  slot        PromotionSlot
+  productId   Int?
+  product     Product?      @relation(fields: [productId], references: [id])
+  title       String?
+  subtitle    String?
+  ctaText     String?
+  ctaLink     String?
+  bgImageUrl  String?
+  bgVideoUrl  String?
+  isPublished Boolean       @default(false)
+  startAt     DateTime
+  endAt       DateTime
+  position    Int           @default(0)
+  createdById String
+  createdBy   User          @relation(fields: [createdById], references: [id])
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
   // Стили
-  font         PromoFont?
-  titleColor   String?
-  textColor    String?
-  ctaBg        String?
-  ctaColor     String?
+  font       PromoFont?     @default(NUNITO_SANS)
+  titleColor String?
+  textColor  String?
+  ctaBg      String?
+  ctaColor   String?
 
   @@index([slot, isPublished, startAt, endAt])
   @@index([slot, position])
@@ -222,18 +225,90 @@ enum SectionKey {
 }
 
 model PageSection {
-  id          Int       @id @default(autoincrement())
+  id          Int        @id @default(autoincrement())
   page        PageKey
   key         SectionKey
   title       String?
-  isEnabled   Boolean   @default(true)
-  position    Int       @default(0)
+  isEnabled   Boolean    @default(true)
+  position    Int        @default(0)
   settings    Json?
   createdById String
-  createdBy   User      @relation(fields: [createdById], references: [id])
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdBy   User       @relation(fields: [createdById], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
   @@unique([page, key])
   @@index([page, isEnabled, position])
+}
+
+// promo секции для категорий
+enum CategoryPromoVariant {
+  BANNER
+  TEXT_STRIP
+  TEXT_QUOTE
+  GRID
+  STRIP_USP
+  IMAGE_PAIR
+  HEADLINE_STRIP
+}
+
+enum CategoryPromoPlacement {
+  ABOVE_HERO
+  BELOW_HERO
+  ABOVE_SUBCATEGORIES
+  BELOW_SUBCATEGORIES
+  ABOVE_FILTERS
+  BELOW_FILTERS
+  ABOVE_PRODUCTS
+  BETWEEN_PRODUCTS
+  BELOW_PRODUCTS
+}
+
+// Положение контента в секции
+enum ContentSide {
+  LEFT
+  RIGHT
+  CENTER
+}
+
+model CategoryPromoSection {
+  id         Int      @id @default(autoincrement())
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  variant   CategoryPromoVariant
+  placement CategoryPromoPlacement
+  order     Int                    @default(0)
+  isActive  Boolean                @default(true)
+
+  // контент
+  title    String?
+  subtitle String?
+  imageUrl String?
+  videoUrl String?
+  ctaText  String?
+  ctaLink  String?
+
+  // стили
+  font       PromoFont?     @default(NUNITO_SANS)
+  titleColor String?
+  textColor  String?
+  ctaBg      String?
+  ctaColor   String?
+  bgColor    String?
+  contentSide ContentSide?
+  heightPx   Int?
+
+  // тайминг
+  startsAt DateTime?
+  endsAt   DateTime?
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categoryId, isActive])
+  @@index([placement, order])
 }

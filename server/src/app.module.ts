@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
+import { validationSchema } from "./config/validation.schema";
 import { ThrottlerModule } from "@nestjs/throttler";
 import { APP_FILTER, APP_PIPE } from "@nestjs/core";
 import { ValidationPipe } from "@nestjs/common";
@@ -15,12 +16,14 @@ import { DatabaseModule } from "./database/database.module";
 import { GlobalExceptionFilter } from "./common/filters/global-exception.filter";
 import { PromotionsModule } from "./promotions/promotions.module";
 import { LayoutModule } from "./layout/layout.module";
+import { CategoryPromoSectionsModule } from "./category-promo-sections/category-promo-sections.module";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ".env",
+      // validationSchema,
     }),
     ThrottlerModule.forRoot([
       {
@@ -37,6 +40,7 @@ import { LayoutModule } from "./layout/layout.module";
     OrdersModule,
     PromotionsModule,
     LayoutModule,
+    CategoryPromoSectionsModule,
   ],
   controllers: [AppController],
   providers: [

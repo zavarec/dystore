@@ -1,50 +1,105 @@
-import { HttpException, HttpStatus, Injectable, Logger } from "@nestjs/common";
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  Logger,
+  Inject,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { SMS_RU_CLIENT } from "./sms.provider";
 
 @Injectable()
 export class SmsService {
   private readonly logger = new Logger(SmsService.name);
   private readonly apiKey: string;
+  private readonly from?: string; // альфа-имя (необяз.)
+  private readonly testMode: boolean;
 
-  constructor(private readonly configService: ConfigService) {
+  constructor(
+    private readonly configService: ConfigService,
+    @Inject(SMS_RU_CLIENT) private readonly smsRuClient: any | null,
+  ) {
     this.apiKey = this.configService.get<string>("SMS_RU_API_KEY", "");
+    this.from = this.configService.get<string>("SMS_RU_FROM") || undefined;
+    this.testMode = this.configService.get<string>("SMS_RU_TEST") === "1"; // включаем test-режим
   }
 
   async sendCode(phone: string, code: string): Promise<void> {
     try {
-      if (!this.apiKey) {
+      // DEV-режим: если нет ключа или клиента
+      if (!this.apiKey || !this.smsRuClient) {
+        this.logger.warn("SMS_RU_API_KEY не задан — dev-логирование кода.");
         this.logger.warn(
-          "SMS_RU_API_KEY не задан. Переходим в dev-логирование кода.",
-        );
-        this.logger.warn(
-          `DEV MODE - SMS code for ${this.maskPhone(phone)}: ${code}`,
+          `DEV MODE — SMS code for ${this.maskPhone(phone)}: ${code}`,
         );
         return;
       }
 
-      const url = new URL("https://sms.ru/sms/send");
-      url.searchParams.set("api_id", this.apiKey);
-      url.searchParams.set("to", phone);
-      url.searchParams.set("msg", `Ваш код подтверждения: ${code}`);
-      url.searchParams.set("json", "1");
+      const params: any = {
+        to: phone,
+        text: `Ваш код подтверждения: ${code}`,
+      };
 
-      const response = await fetch(url.toString(), { method: "GET" });
-      const data = (await response.json()) as any;
+      if (this.from) params.from = this.from;
+      if (this.testMode) params.test = 1; // включаем test=1
 
-      if (!response.ok || data.status !== "OK") {
-        const errorText = `SMS sending failed: ${JSON.stringify(data)}`;
-        this.logger.error(errorText);
+      const result = await this.sendViaSmsRu(params);
+
+      // Проверяем общий статус
+      if (result?.status !== "OK") {
+        this.logger.error(`SMS API error: ${JSON.stringify(result)}`);
         throw new HttpException(
-          "Не удалось отправить SMS",
+          "Сервис SMS вернул ошибку",
           HttpStatus.BAD_GATEWAY,
         );
       }
 
-      this.logger.log(`SMS sent to ${this.maskPhone(phone)}`);
-    } catch (error: any) {
-      this.logger.error(`Ошибка при отправке SMS: ${error?.message || error}`);
+      // Проверяем конкретный номер
+      const phoneResult = result.sms?.[phone];
+      if (!phoneResult || phoneResult.status !== "OK") {
+        this.logger.error(
+          `SMS not accepted for ${phone}: ${JSON.stringify(phoneResult)}`,
+        );
+        throw new HttpException(
+          "SMS не было принято оператором",
+          HttpStatus.BAD_GATEWAY,
+        );
+      }
+
+      // Лог с деталями
+      this.logger.log(
+        `SMS ${this.testMode ? "(TEST MODE)" : ""} sent to ${this.maskPhone(
+          phone,
+        )}, sms_id=${phoneResult.sms_id}, balance=${result.balance}`,
+      );
+    } catch (e: any) {
+      this.logger.error(`Ошибка при отправке SMS: ${e?.message || e}`);
       throw new HttpException("Ошибка отправки SMS", HttpStatus.BAD_GATEWAY);
     }
+  }
+
+  private sendViaSmsRu(params: any): Promise<any> {
+    return new Promise((resolve) => {
+      this.smsRuClient.sms_send(params, (res: any) => {
+        // если пакет вернул уже вложенный объект (code/description) — оборачиваем его
+        if (res && res.code && !res.status) {
+          resolve({
+            status: "OK",
+            sms: {
+              [params.to]: {
+                status: "OK",
+                status_code: Number(res.code),
+                status_text: res.description,
+                sms_id: res.ids,
+              },
+            },
+            balance: res.balance,
+          });
+        } else {
+          resolve(res);
+        }
+      });
+    });
   }
 
   private maskPhone(phone: string): string {

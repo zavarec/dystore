@@ -1,8 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../database/prisma.service';
-import { Category } from '@prisma/client';
-import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { Injectable, BadRequestException } from "@nestjs/common";
+import { PrismaService } from "../database/prisma.service";
+import { Category } from "@prisma/client";
+import { CreateCategoryDto } from "./dto/create-category.dto";
+import { UpdateCategoryDto } from "./dto/update-category.dto";
 
 type CategoryWithRelations = Category & {
   parent?: Category | null;
@@ -141,7 +141,7 @@ export class CategoriesService {
       });
 
       if (!parentExists) {
-        throw new BadRequestException('Родительская категория не найдена');
+        throw new BadRequestException("Родительская категория не найдена");
       }
     }
 
@@ -164,7 +164,7 @@ export class CategoriesService {
     // Проверяем, что категория не пытается стать своим собственным родителем
     if (updateCategoryDto.parentId === id) {
       throw new BadRequestException(
-        'Категория не может быть своим собственным родителем',
+        "Категория не может быть своим собственным родителем",
       );
     }
 
@@ -178,14 +178,14 @@ export class CategoriesService {
       });
 
       if (!parentExists) {
-        throw new BadRequestException('Родительская категория не найдена');
+        throw new BadRequestException("Родительская категория не найдена");
       }
 
       // Проверяем, что мы не создаем циклическую зависимость
       const descendants = await this.findDescendants(id);
       if (descendants.some((desc) => desc.id === updateCategoryDto.parentId!)) {
         throw new BadRequestException(
-          'Нельзя переместить категорию в её собственную дочернюю категорию',
+          "Нельзя переместить категорию в её собственную дочернюю категорию",
         );
       }
     }
@@ -212,7 +212,7 @@ export class CategoriesService {
 
     if (children.length > 0) {
       throw new BadRequestException(
-        'Нельзя удалить категорию, у которой есть дочерние категории',
+        "Нельзя удалить категорию, у которой есть дочерние категории",
       );
     }
 

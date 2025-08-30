@@ -17,7 +17,8 @@ export class PromotionsService {
       ctaLink: dto.ctaLink ?? null,
       bgImageUrl: dto.bgImageUrl ?? null,
       bgVideoUrl: dto.bgVideoUrl ?? null,
-      font: dto.font ?? null,
+      // Если шрифт не передан — пусть сработает дефолт в БД
+      font: dto.font ?? undefined,
       titleColor: dto.titleColor ?? null,
       textColor: dto.textColor ?? null,
       ctaBg: dto.ctaBg ?? null,

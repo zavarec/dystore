@@ -2,7 +2,7 @@
   "name": "dystore-backend",
   "version": "1.0.0",
   "description": "DyStore E-commerce Backend",
-  "author": "Your Name",
+  "author": "Magomedhan Abdulaev",
   "private": true,
   "license": "MIT",
   "scripts": {
@@ -47,8 +47,10 @@
     "joi": "^17.13.3",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
+    "react-input-mask": "^2.0.4",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
+    "sms_ru": "^0.0.1",
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0"
   },

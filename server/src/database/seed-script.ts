@@ -77,29 +77,112 @@ async function main() {
 
   // Подкатегории
   console.log("📁 Создаю подкатегории...");
-  const subcategoriesMap: Record<number, string[]> = {
+  const subcategoriesMap: Record<
+    number,
+    { name: string; image: string | null }[]
+  > = {
     [vacuums.id]: [
-      "Беспроводные пылесосы",
-      "Роботы-пылесосы",
-      "Проводные пылесосы",
-      "Моющие пылесосы",
+      {
+        name: "Беспроводные пылесосы",
+        image:
+          "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/adobetarget/plp-2024/fc-cat-tiles/new-cat-card-1-cordless.jpg",
+      },
+      {
+        name: "Роботы-пылесосы",
+        image:
+          "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/adobetarget/plp-2024/fc-cat-tiles/new-cat-card-2-robot.jpg",
+      },
+      {
+        name: "Вертикальные пылесосы",
+        image:
+          "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/adobetarget/plp-2024/fc-cat-tiles/new-cat-card-4-upright.jpg",
+      },
+      {
+        name: "Моющие пылесосы",
+        image:
+          "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/adobetarget/plp-2024/fc-cat-tiles/new-cat-card-3-wet.jpg",
+      },
+      {
+        name: "Аксессуары",
+        image:
+          "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/adobetarget/plp-2024/fc-cat-tiles/new-cat-card-5-accessories.jpg",
+      },
+      {
+        name: "Запчасти",
+        image:
+          "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/adobetarget/plp-2024/fc-cat-tiles/Range-cards-Parts.jpg",
+      },
     ],
     [hairCare.id]: [
-      "Фены Dyson Supersonic",
-      "Мультистайлеры Dyson Airwrap",
-      "Выпрямители Dyson Corrale",
-      "Аксессуары для волос",
+      {
+        name: "Фены Dyson Supersonic",
+        image:
+          "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/products/hair-care/2025/category/505d/features/WEB_505_Category_Bento_Box_Hair_Dryer.jpg",
+      },
+      {
+        name: "Мультистайлеры Dyson Airwrap",
+        image:
+          "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/products/hair-care/2025/590/category/Web-590-Category-page-Tiles-Shop-all-hair-stylers.jpg",
+      },
+      {
+        name: "Выпрямители Dyson Corrale",
+        image:
+          "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/products/hair-care/708/category/Corrale-category-page-Shop-the-range-card.jpg",
+      },
+      {
+        name: "Аксессуары для волос",
+        image:
+          "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/products/hair-care/308fh-708/image-carousel/708-723-308FH-category-page-Shop-the-range-card-6.jpg",
+      },
     ],
-    [climate.id]: ["Очистители воздуха", "Увлажнители воздуха", "Вентиляторы"],
-    [headphones.id]: ["Наушники с ANC", "Премиум-наушники"],
-    [lighting.id]: ["Настольные лампы", "Напольные лампы"],
+    [climate.id]: [
+      {
+        name: "Очистители воздуха",
+        image:
+          "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/products/direct-new-journey/category/environmental-care/ec-cat-page-card-1-purifiers.jpg",
+      },
+      {
+        name: "Очистители-увлажнители",
+        image:
+          "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/products/air-treatment/dec-2024/category-page/us-bp04-cat-card.png",
+      },
+      {
+        name: "Вентиляторы и обогреватели",
+        image:
+          "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/products/air-treatment/dec-2024/category-page/categoryCard_FansAndHeaters.jpg",
+      },
+    ],
+    [headphones.id]: [
+      {
+        name: "Наушники с ANC",
+        image:
+          "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/home-page/571H_Nav_Image_Aluminium.jpg",
+      },
+      {
+        name: "Премиум-наушники",
+        image:
+          "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/home-page/571H_Nav_Image_Copper.jpg",
+      },
+    ],
+    [lighting.id]: [
+      {
+        name: "Настольные лампы",
+        image:
+          "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/products/lighting/category/creative-lighting/CD06_BLKBS-008_qq-RGB_3QRight-Perspective_LightOn-A4_REFW.jpg",
+      },
+      {
+        name: "Напольные лампы",
+        image:
+          "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/products/lighting/category/creative-lighting/CF06-BLKBS_008-qq_RGB-3QRight_Orthographic-LightOn_A4-REFW.jpg",
+      },
+    ],
   };
 
   const createdSubcategories: Category[] = [];
 
-  for (const [parentIdStr, subNames] of Object.entries(subcategoriesMap)) {
+  for (const [parentIdStr, subcategories] of Object.entries(subcategoriesMap)) {
     const parentId = Number(parentIdStr);
-    for (const subName of subNames) {
+    for (const { name: subName, image } of subcategories) {
       // Транслитерация для slug
       const cyrillicMap: Record<string, string> = {
         а: "a",
@@ -152,7 +235,7 @@ async function main() {
           name: subName,
           slug: slug,
           parentId,
-          image: null,
+          image: image || null,
         },
       });
       createdSubcategories.push(sub);
