@@ -6,3 +6,6 @@ export const SLOT_LABEL: Record<PromotionSlot, string> = {
   PRODUCT_OF_DAY: 'Товар дня',
   CUSTOM: 'Кастомные',
 };
+
+
+

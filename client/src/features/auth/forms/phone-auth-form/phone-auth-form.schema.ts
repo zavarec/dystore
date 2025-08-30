@@ -2,8 +2,12 @@ import { object, string } from 'yup';
 
 export const phoneValidationSchema = object({
   phone: string()
-    .required('Номер телефона обязателен')
-    .matches(/^\+7\d{10}$/, 'Введите номер в формате +7XXXXXXXXXX'),
+    .required('Введите номер телефона')
+    .test(
+      'filled',
+      'Номер заполнен не полностью',
+      value => (value?.replace(/\D/g, '').length ?? 0) === 11,
+    ),
 });
 
 export const codeValidationSchema = object({

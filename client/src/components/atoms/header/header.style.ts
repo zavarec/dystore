@@ -19,7 +19,7 @@ const HeaderContainer = styled.header<{ $isScrolled: boolean }>`
 export const MotionHeaderContainer = motion(HeaderContainer);
 
 export const HeaderContent = styled.div`
-  padding: 0 20px;
+  padding: 0 var(--page-gutter);
   display: flex;
   align-items: center;
   height: 70px;
@@ -54,7 +54,6 @@ export const Logo = styled(Link)`
 export const Navigation = styled.nav<{ $isOpen: boolean }>`
   display: flex;
   align-items: center;
-  gap: 32px;
   position: static;
 
   flex: 1;

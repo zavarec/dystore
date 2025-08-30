@@ -13,9 +13,9 @@ export const DropdownTrigger = styled.button<{
   color: ${props => (props.$isActive ? '#007bff' : '#ffffff')};
   text-decoration: none;
   font-weight: ${props => (props.$isActive ? '600' : '400')};
-  font-size: 14px;
+  font-size: 16px;
   position: relative;
-  padding: 32px 16px 24px 8px;
+  padding: 32px 22px 24px 22px;
   background: none;
   border: none;
   cursor: pointer;
@@ -23,6 +23,9 @@ export const DropdownTrigger = styled.button<{
   display: flex;
   align-items: center;
   gap: 4px;
+  cursor: pointer;
+
+  font-family: var(--font-nunito-sans);
 
   &:hover {
     background: rgba(255, 255, 255, 0.1);
@@ -43,6 +46,7 @@ export const DropdownContent = styled(motion.div)`
   border: 1px solid rgba(0, 0, 0, 0.1);
   padding: 16px 0;
   z-index: 1000;
+  font-family: var(--font-nunito-sans);
 
   overflow: hidden;
 
@@ -84,8 +88,8 @@ export const MainCategoryItem = styled.a`
 
   &:hover {
     background: rgba(255, 255, 255, 0.1);
-    border-left-color: #007bff;
-    color: #007bff;
+    /* border-left-color: #007bff; */
+    /* color: #007bff; */
   }
 `;
 
@@ -124,7 +128,7 @@ export const SubcategoryItem = styled.a`
     color: #ffffff;
 
     &::before {
-      background: #007bff;
+      /* background: #007bff; */
     }
   }
 `;

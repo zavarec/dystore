@@ -11,9 +11,12 @@ import { loadUserProfile } from '@/store/slices/auth-slice/auth.thunks';
 import { initializeAuth } from '@/store/slices/auth-slice/auth.slice';
 import { fetchCart } from '@/store/slices/cart-slice/cart.thunks';
 import { safeLocalStorage } from '@/utils/ssr';
-import { inter, roboto, montserrat, poppins } from '@/styles/fonts/fonts';
+import '../styles/fonts/fonts.css';
 
 import 'react-toastify/dist/ReactToastify.css';
+import { GlobalGutters } from '@/styles/global-gutters';
+
+import { Nunito_Sans } from 'next/font/google';
 
 // Глобальные стили - чистые как после уборки Dyson
 const globalStyles = css`
@@ -29,9 +32,9 @@ const globalStyles = css`
   }
 
   body {
-    font-family:
+    /* font-family:
       -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
-      'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif; */
     line-height: 1.6;
     color: #333;
     background-color: #ffffff;
@@ -75,7 +78,7 @@ const globalStyles = css`
 
   /* Focus styles */
   *:focus {
-    outline: 2px solid #007bff;
+    /* outline: 2px solid #007bff; */
     outline-offset: 2px;
   }
 
@@ -115,6 +118,14 @@ const globalStyles = css`
   }
 `;
 
+export const nunitoSans = Nunito_Sans({
+  subsets: ['latin', 'cyrillic'], // кириллица
+  weight: ['400', '600', '700'], // какие нужны веса
+  variable: '--font-nunito-sans',
+  display: 'swap',
+  fallback: ['system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Arial', 'sans-serif'],
+});
+
 // ✅ ИСПРАВЛЕНИЕ: Компонент для инициализации аутентификации с SSR поддержкой
 const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const dispatch = useAppDispatch();
@@ -149,11 +160,12 @@ function MyApp({ Component, ...rest }: AppProps) {
 
   return (
     <Provider store={store}>
-      <Global styles={globalStyles} />
-      <AuthInitializer>
-        <div
-          className={`${inter.variable} ${roboto.variable} ${montserrat.variable} ${poppins.variable}`}
-        >
+      <div className={nunitoSans.variable}>
+        <Global styles={globalStyles} />
+
+        <GlobalGutters />
+
+        <AuthInitializer>
           <Layout>
             <Component {...props.pageProps} />
           </Layout>
@@ -169,8 +181,8 @@ function MyApp({ Component, ...rest }: AppProps) {
             pauseOnHover
             theme="light"
           />
-        </div>
-      </AuthInitializer>
+        </AuthInitializer>
+      </div>
     </Provider>
   );
 }

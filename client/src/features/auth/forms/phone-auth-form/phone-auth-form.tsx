@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useRouter } from 'next/router';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
@@ -27,6 +27,7 @@ import {
   selectIsAuthenticated,
   selectIsLoading,
 } from '@/store/slices/auth-slice/auth.selectors';
+import { PhoneInput } from '@/components/atoms/phone-input/phone-input';
 
 interface PhoneFormData {
   phone: string;
@@ -113,7 +114,10 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({
 
   const onPhoneSubmit = async (data: PhoneFormData) => {
     try {
-      await dispatch(sendCode({ phone: data.phone })).unwrap();
+      const digits = (data.phone || '').replace(/\D/g, ''); // «7999…» или «8999…»
+      const phoneWithPrefix = '+7' + digits.slice(-10);
+
+      await dispatch(sendCode({ phone: phoneWithPrefix })).unwrap();
     } catch (error) {
       console.error('Ошибка отправки кода:', error);
     }
@@ -165,15 +169,20 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({
         <form onSubmit={phoneForm.handleSubmit(onPhoneSubmit)} noValidate>
           <FormGroup>
             <Label htmlFor="phone">Номер телефона</Label>
-            <Input
-              id="phone"
-              type="tel"
-              {...phoneForm.register('phone')}
-              placeholder="+7XXXXXXXXXX"
-              error={!!phoneForm.formState.errors.phone}
-              aria-invalid={!!phoneForm.formState.errors.phone}
-              aria-describedby={phoneForm.formState.errors.phone ? 'phone-error' : undefined}
-              autoComplete="tel"
+            <Controller
+              control={phoneForm.control}
+              defaultValue=""
+              name="phone"
+              render={({ field, fieldState }) => (
+                <PhoneInput
+                  ref={field.ref as unknown as React.RefObject<HTMLInputElement>}
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  errorText={fieldState.error?.message ?? ''}
+                  fullWidth
+                />
+              )}
             />
             {phoneForm.formState.errors.phone && (
               <ErrorMessage id="phone-error" role="alert">

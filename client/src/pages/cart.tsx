@@ -10,6 +10,8 @@ import { useRouter } from 'next/router';
 import { Button } from '@/components/atoms/button';
 import { ButtonVariant } from '@/components/atoms/button/button.style';
 import { useLocalStorage } from '@/utils/ssr';
+import { safeLocalStorage } from '@/utils/ssr';
+import { CartService, OrdersService } from '@/services';
 
 import {
   CartPageContainer,
@@ -59,6 +61,8 @@ const CartContent: React.FC = () => {
   const router = useRouter();
   const [isLoading] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [comment, setComment] = useState('');
 
   // ✅ ИСПРАВЛЕНИЕ: Безопасная работа с корзиной
   const [items, setItems, isHydrated] = useLocalStorage('simpleCart', []);
@@ -127,8 +131,30 @@ const CartContent: React.FC = () => {
     setIsCheckingOut(true);
 
     try {
-      // Имитация отправки заказа
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Проверка авторизации
+      const token = safeLocalStorage.getItem('access_token');
+      if (!token) {
+        toast.error('Авторизуйтесь, чтобы оформить заказ');
+        router.push('/login/login');
+        return;
+      }
+
+      // Синхронизируем локальную корзину с серверной
+      await Promise.all(
+        cartItems.map(item =>
+          CartService.addToCart({ productId: item.productId, quantity: item.quantity }),
+        ),
+      );
+
+      // Создаем заказ
+      const payload: { deliveryAddress: string; comment?: string } = {
+        deliveryAddress: deliveryAddress || 'Адрес не указан',
+      };
+      const trimmedComment = comment.trim();
+      if (trimmedComment) {
+        payload.comment = trimmedComment;
+      }
+      await OrdersService.createOrder(payload);
 
       toast.success('Заказ успешно оформлен! Мы свяжемся с вами в ближайшее время.', {
         position: 'top-center',
@@ -261,6 +287,35 @@ const CartContent: React.FC = () => {
 
           <CartSummary>
             <h3>Итого</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 16 }}>
+              <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <span>Адрес доставки</span>
+                <input
+                  type="text"
+                  placeholder="Город, улица, дом, квартира"
+                  value={deliveryAddress}
+                  onChange={e => setDeliveryAddress(e.target.value)}
+                  disabled={isCheckingOut || isLoading}
+                  style={{ padding: 10, border: '1px solid #e5e7eb', borderRadius: 8 }}
+                />
+              </label>
+              <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <span>Комментарий к заказу (необязательно)</span>
+                <textarea
+                  placeholder="Например: позвоните за 30 минут до доставки"
+                  value={comment}
+                  onChange={e => setComment(e.target.value)}
+                  disabled={isCheckingOut || isLoading}
+                  rows={3}
+                  style={{
+                    padding: 10,
+                    border: '1px solid #e5e7eb',
+                    borderRadius: 8,
+                    resize: 'vertical',
+                  }}
+                />
+              </label>
+            </div>
             <SummaryRow>
               <span>Товары ({totalItems})</span>
               <span>{totalPrice.toLocaleString('ru-RU')} ₽</span>

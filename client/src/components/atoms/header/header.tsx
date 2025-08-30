@@ -119,7 +119,14 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
     >
       <HeaderContent>
         <HeaderLeft>
-          <Logo href="/">DyStore</Logo>
+          <Logo href="/">
+            <img
+              src="https://www.dyson.com/etc.clientlibs/dyson/clientlibs/clientlib-main/resources/images/dyson-logo.svg"
+              alt="DyStore"
+              width={100}
+              height={100}
+            />
+          </Logo>
 
           <Navigation $isOpen={isMobileMenuOpen}>
             {categoriesLoading ? (

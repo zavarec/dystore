@@ -61,11 +61,6 @@ export const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
           aria-controls={`dropdown-${category.id}`}
         >
           {category.name}
-          {hasSubcategories && (
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M7 10l5 5 5-5z" />
-            </svg>
-          )}
         </DropdownTrigger>
       </DropdownContainer>
 

@@ -46,6 +46,8 @@ export const ModalContent = styled.div`
   box-sizing: border-box;
   overflow-y: auto;
   max-height: 90vh;
+  font-family: var(--font-nunito-sans);
+
 `;
 
 export const ModalCloseButton = styled.button`

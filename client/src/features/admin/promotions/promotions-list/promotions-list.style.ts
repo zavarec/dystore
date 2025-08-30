@@ -1,6 +1,13 @@
 import styled from '@emotion/styled';
+import { css } from '@emotion/react';
+
+export interface PromotionsCardProps {
+  dragging?: boolean;
+  sortable?: boolean;
+}
 
 export const Wrapper = styled.div`
+  padding: 20px 70px;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -90,7 +97,7 @@ export const Grid = styled.div`
   gap: 16px;
 `;
 
-export const Card = styled.div`
+export const PromotionsCard = styled.div<PromotionsCardProps>`
   display: flex;
   flex-direction: column;
   background: #fff;
@@ -106,6 +113,27 @@ export const Card = styled.div`
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(16, 24, 40, 0.08);
   }
+
+  ${({ sortable }) =>
+    sortable &&
+    css`
+      cursor: grab;
+      &:active {
+        cursor: grabbing;
+      }
+      /* Чуть «живости» в режиме сортировки */
+      &:hover {
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+      }
+    `}
+
+  ${({ dragging }) =>
+    dragging &&
+    css`
+      /* Плейсхолдер: оставляем место, но прячем содержимое */
+      opacity: 0;
+      pointer-events: none;
+    `}
 `;
 
 export const Thumb = styled.div`
@@ -172,4 +200,44 @@ export const Actions = styled.div`
   margin-top: 8px;
   display: flex;
   gap: 8px;
+`;
+
+export const CategoryPromoCreateCard = styled.div<{ sortable?: boolean; dragging?: boolean }>`
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  will-change: transform;
+  transition:
+    transform 200ms ease,
+    box-shadow 200ms ease,
+    opacity 120ms ease;
+
+  ${({ sortable }) =>
+    sortable &&
+    css`
+      cursor: grab;
+      &:active {
+        cursor: grabbing;
+      }
+      &:hover {
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+      }
+    `}
+
+  ${({ dragging }) =>
+    dragging &&
+    css`
+      opacity: 0; /* плейсхолдер */
+      pointer-events: none;
+    `}
+`;
+
+export const CategoryPromoGrid = styled.div`
+  display: grid;
+  gap: 10px;
+  align-items: start;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  /* помогает сгладить микродёрганья трансформаций */
+  transform: translateZ(0);
+  backface-visibility: hidden;
 `;

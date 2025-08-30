@@ -15,6 +15,7 @@ export enum PromoFont {
   ROBOTO = 'ROBOTO',
   MONTSERRAT = 'MONTSERRAT',
   POPPINS = 'POPPINS',
+  NUNITO_SANS = 'NUNITO_SANS',
 }
 
 /**

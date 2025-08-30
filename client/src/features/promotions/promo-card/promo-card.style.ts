@@ -29,7 +29,7 @@ export const Section = styled.section<PromoStyleProps>`
 export const Content = styled.div<PromoStyleProps>`
   position: relative;
   z-index: 1;
-  padding: 48px 56px;
+  padding: 48px var(--page-gutter);
   background: transparent;
 
   max-width: 720px;

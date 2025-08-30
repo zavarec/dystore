@@ -85,3 +85,6 @@ export function usePromotionsListState() {
     reloadPromotions,
   };
 }
+
+
+

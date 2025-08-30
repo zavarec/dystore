@@ -10,8 +10,8 @@ export const FooterContainer = styled.footer`
 
 export const FooterContent = styled.div`
   max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+
+  padding: 0 var(--page-gutter);
 `;
 
 export const FooterGrid = styled.div`

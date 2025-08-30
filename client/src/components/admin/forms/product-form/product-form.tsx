@@ -32,7 +32,6 @@ interface ProductFormProps {
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({
-  product,
   onSubmit,
   loading,
   initialValues,

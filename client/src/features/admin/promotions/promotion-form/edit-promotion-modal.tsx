@@ -91,6 +91,7 @@ export const EditPromotionModal: React.FC<EditPromotionModalProps> = ({
               <option value={PromoFont.ROBOTO}>Roboto</option>
               <option value={PromoFont.MONTSERRAT}>Montserrat</option>
               <option value={PromoFont.POPPINS}>Poppins</option>
+              <option value={PromoFont.NUNITO_SANS}>Nunito Sans</option>
             </select>
           </label>
 

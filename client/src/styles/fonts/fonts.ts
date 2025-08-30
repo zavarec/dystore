@@ -1,4 +1,4 @@
-import { Inter, Roboto, Montserrat, Poppins } from 'next/font/google';
+import { Inter, Roboto, Montserrat, Poppins, Nunito_Sans } from 'next/font/google';
 
 export const inter = Inter({
   subsets: ['latin', 'cyrillic'],
@@ -15,6 +15,7 @@ export const roboto = Roboto({
 
 export const montserrat = Montserrat({
   subsets: ['latin', 'cyrillic'],
+  weight: ['400', '700'],
   variable: '--font-montserrat',
   display: 'swap',
 });
@@ -24,5 +25,12 @@ export const poppins = Poppins({
   subsets: ['latin', 'latin-ext'],
   weight: ['400', '700'],
   variable: '--font-poppins',
+  display: 'swap',
+});
+
+export const nunitoSans = Nunito_Sans({
+  subsets: ['latin', 'cyrillic'],
+  weight: ['400', '600', '700'],
+  variable: '--font-nunito-sans',
   display: 'swap',
 });

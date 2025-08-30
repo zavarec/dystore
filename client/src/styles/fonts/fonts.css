@@ -6,5 +6,5 @@
 }
 
 body {
-  font-family: 'DysonFutura', sans-serif;
+  font-family: var(--font-montserrat), 'DysonFutura', sans-serif;
 }

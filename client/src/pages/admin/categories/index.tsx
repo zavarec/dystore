@@ -114,6 +114,9 @@ const AdminCategoriesPage: NextPage = () => {
             Добавить категорию
           </AddButton>
         </Link>
+        <Link href="/admin/categories/promo-sections" passHref legacyBehavior>
+          <AddButton>Управление промо-секциями</AddButton>
+        </Link>
       </ActionsBar>
 
       <CategoriesContainer>

@@ -3,7 +3,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { Button } from '@/components/atoms/button';
 import { Promotion } from '@/types/models/promotion.model';
 import {
-  Card,
+  PromotionsCard,
   Thumb,
   VideoBadge,
   Row,
@@ -39,7 +39,7 @@ export function SortablePromoCard({
 
   return (
     <div ref={setNodeRef} style={style} {...(sortMode ? { ...attributes, ...listeners } : {})}>
-      <Card>
+      <PromotionsCard>
         <Thumb
           style={{
             backgroundImage: promo?.bgImageUrl ? `url(${promo.bgImageUrl})` : undefined,
@@ -76,7 +76,7 @@ export function SortablePromoCard({
             </Button>
           </Actions>
         </CardBody>
-      </Card>
+      </PromotionsCard>
     </div>
   );
 }

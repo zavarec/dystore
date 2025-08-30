@@ -2,7 +2,7 @@ import axios from 'axios';
 import { isServer, safeLocalStorage } from '@/utils/ssr';
 
 // Базовый URL API
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = 'http://localhost:3001/api';
 
 // Создаем экземпляр axios
 export const apiClient = axios.create({
