@@ -1,0 +1,56 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    container_name: dystore_db
+    environment:
+      POSTGRES_USER: dystore
+      POSTGRES_PASSWORD: dystore_pwd
+      POSTGRES_DB: dystore
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: always
+    ports:
+      - "5432:5432"   # чтобы подключаться с Mac-клиентов (TablePlus/psql)
+
+  redis:
+    image: redis:7-alpine
+    container_name: dystore_redis
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+    restart: always
+    ports:
+      - "6379:6379"
+
+  api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: dystore_api
+    env_file:
+      - ./server/.env.docker
+    depends_on:
+      - db
+      - redis
+    restart: always
+    ports:
+      - "3001:3001"   # http://localhost:3001
+
+  web:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: dystore_web
+    env_file:
+      - ./client/.env.local
+    depends_on:
+      - api
+    restart: always
+    ports:
+      - "3000:3000"   # http://localhost:3000
+
+volumes:
+  pgdata:
+  redisdata:

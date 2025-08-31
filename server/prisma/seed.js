@@ -1,12 +1,12 @@
-import {
+const {
   Category,
   PrismaClient,
   Product,
   Role,
   PageKey,
   SectionKey,
-} from "@prisma/client";
-import * as bcrypt from "bcrypt";
+} = require("@prisma/client");
+const bcrypt = require("bcrypt");
 
 const prisma = new PrismaClient();
 
@@ -77,10 +77,7 @@ async function main() {
 
   // Подкатегории
   console.log("📁 Создаю подкатегории...");
-  const subcategoriesMap: Record<
-    number,
-    { name: string; image: string | null }[]
-  > = {
+  const subcategoriesMap = {
     [vacuums.id]: [
       {
         name: "Беспроводные пылесосы",
@@ -178,13 +175,13 @@ async function main() {
     ],
   };
 
-  const createdSubcategories: Category[] = [];
+  const createdSubcategories = [];
 
   for (const [parentIdStr, subcategories] of Object.entries(subcategoriesMap)) {
     const parentId = Number(parentIdStr);
     for (const { name: subName, image } of subcategories) {
       // Транслитерация для slug
-      const cyrillicMap: Record<string, string> = {
+      const cyrillicMap = {
         а: "a",
         б: "b",
         в: "v",
@@ -246,9 +243,9 @@ async function main() {
 
   // Генерация товаров
   console.log("🛍️ Создаю товары...");
-  const allProducts: Product[] = [];
+  const allProducts = [];
 
-  const imageMap: Record<number, string> = {
+  const imageMap = {
     [vacuums.id]:
       "http://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/images/products/hero/448799-01.png?$responsive$&cropPathE=desktop&fit=stretch,1&wid=1920",
     [hairCare.id]:
@@ -305,9 +302,12 @@ async function main() {
     allProducts.push(...unique, ...copies);
   }
 
-  const adminEmail = "director@dystore.local";
+  const adminEmail = process.env.TEST_DIRECTOR_EMAIL;
 
-  const hashedPassword = await bcrypt.hash("SuperSecret123!", 10);
+  const hashedPassword = await bcrypt.hash(
+    process.env.TEST_DIRECTOR_PASSWORD,
+    10,
+  );
   await prisma.user.upsert({
     where: { email: adminEmail },
     update: {
@@ -329,8 +329,11 @@ async function main() {
   );
 
   // Создаём MANAGER
-  const managerEmail = "manager@dystore.local";
-  const managerPassword = await bcrypt.hash("ManagerSecret123!", 10);
+  const managerEmail = process.env.TEST_MANAGER_EMAIL;
+  const managerPassword = await bcrypt.hash(
+    process.env.TEST_MANAGER_PASSWORD,
+    10,
+  );
   const manager = await prisma.user.upsert({
     where: { email: managerEmail },
     update: {

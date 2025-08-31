@@ -16,7 +16,7 @@ import { makeSelectCategoryPromoSectionsBySlug } from '@/store/slices/category-p
 import { VideoBanner } from '@/components/atoms/video-banner';
 import { Button } from '@/components/atoms/button';
 import { ButtonVariant } from '@/components/atoms/button/button.style';
-import { categoryVideoMap } from './category-video-map';
+
 import {
   Container,
   Header,
@@ -36,6 +36,7 @@ import {
 import { HorizontalScroller } from '@/components/atoms/horizontal-scroller/horizontal-scroller';
 import { CategoryCard } from '@/components/sections/categories/components';
 import { PromoBlock } from '@/features/promo-block/promo-block';
+import { categoryVideoMap } from '@/constants/category-video-map';
 
 interface CategoryPageProps {
   slug: string;
@@ -181,9 +182,12 @@ const CategoryPage: NextPage<CategoryPageProps> = ({ slug }) => {
       )}
 
       {hasChildren && (
-        <section id="subcategories" style={{
-          padding:'40px 0'
-        }}>
+        <section
+          id="subcategories"
+          style={{
+            padding: '40px 0',
+          }}
+        >
           <HorizontalScroller
             items={category?.children || []}
             renderItem={cat => (

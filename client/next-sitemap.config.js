@@ -1,6 +1,6 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-  siteUrl: process.env.SITE_URL || 'https://dystore.ru',
+  siteUrl: process.env.SITE_URL || 'http://localhost:3000',
   generateRobotsTxt: false, // У нас уже есть кастомный robots.txt
   sitemapSize: 7000,
   changefreq: 'daily',

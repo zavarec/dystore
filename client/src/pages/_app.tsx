@@ -17,6 +17,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { GlobalGutters } from '@/styles/global-gutters';
 
 import { Nunito_Sans } from 'next/font/google';
+import { nunitoSans } from '@/styles/fonts/fonts';
 
 // Глобальные стили - чистые как после уборки Dyson
 const globalStyles = css`
@@ -117,14 +118,6 @@ const globalStyles = css`
     background: #a8a8a8;
   }
 `;
-
-export const nunitoSans = Nunito_Sans({
-  subsets: ['latin', 'cyrillic'], // кириллица
-  weight: ['400', '600', '700'], // какие нужны веса
-  variable: '--font-nunito-sans',
-  display: 'swap',
-  fallback: ['system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Arial', 'sans-serif'],
-});
 
 // ✅ ИСПРАВЛЕНИЕ: Компонент для инициализации аутентификации с SSR поддержкой
 const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {

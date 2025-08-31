@@ -1,6 +1,6 @@
 'use client';
+import { PhoneAuthForm } from '@/features/auth/forms/phone-auth-form';
 import React from 'react';
-import { PhoneAuthForm } from '@/components/atoms/phone-auth-form/phone-auth-form';
 
 export default function LoginPage() {
   return (

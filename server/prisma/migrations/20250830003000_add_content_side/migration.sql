@@ -7,3 +7,4 @@ ALTER TABLE "public"."CategoryPromoSection" ADD COLUMN "contentSide" "public"."C
 
 
 
+
