@@ -12,7 +12,7 @@ export interface VerifyCodeRequest {
 }
 
 export interface VerifyCodeResponse {
-  access_token: string;
+  access_token: string; // оставлено для обратной совместимости, но на клиенте не используется
 }
 
 // Новые интерфейсы для email/password авторизации
@@ -28,5 +28,5 @@ export interface RegisterRequest {
 }
 
 export interface AuthResponse {
-  access_token: string;
+  access_token: string; // оставлено для обратной совместимости, но на клиенте не используется
 }

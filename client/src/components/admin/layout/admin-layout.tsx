@@ -27,9 +27,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => 
   const router = useRouter();
   const currentPath = router.pathname;
 
-  const handleLogout = () => {
-    // Implement logout logic
-    localStorage.removeItem('access_token');
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
     router.push('/');
   };
 
@@ -51,7 +50,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => 
     },
   ];
 
-  return (    
+  return (
     <LayoutContainer>
       <Sidebar>
         <Logo>DyStore Admin</Logo>

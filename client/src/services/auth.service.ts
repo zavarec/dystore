@@ -9,7 +9,7 @@ import {
 } from '@/types/models/auth.model';
 import { apiClient } from './api';
 import { User } from '@/types/models/user.model';
-import { isServer, safeLocalStorage } from '@/utils/ssr';
+import { isServer } from '@/utils/ssr';
 
 export class AuthService {
   // Отправка кода подтверждения
@@ -20,14 +20,32 @@ export class AuthService {
 
   // Проверка кода и получение токена
   static async verifyCode(data: VerifyCodeRequest): Promise<VerifyCodeResponse> {
-    const response = await apiClient.post<VerifyCodeResponse>('/auth/verify-code', data);
-    return response.data;
+    const res = await fetch('/api/auth/verify-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+      credentials: 'include',
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.message || 'Ошибка подтверждения кода');
+    }
+    return { access_token: '' } as any;
   }
 
-  // Логин по username/password
-  static async login(data: LoginRequest): Promise<AuthResponse> {
-    const response = await apiClient.post<AuthResponse>('/auth/login', data);
-    return response.data;
+  // Логин по username/password через внутренний API (установит httpOnly cookie)
+  static async login(data: LoginRequest): Promise<{ success: boolean }> {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+      credentials: 'include',
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.message || 'Ошибка входа');
+    }
+    return { success: true };
   }
 
   // Регистрация по username/password
@@ -36,38 +54,29 @@ export class AuthService {
     return response.data;
   }
 
-  // Получение профиля пользователя
+  // Получение профиля пользователя (кука добавится автоматически сервером)
   static async getProfile(): Promise<User> {
-    const response = await apiClient.get<User>('/auth/profile');
+    const response = await apiClient.get<User>('/auth/profile', { withCredentials: true });
     return response.data;
   }
 
-  // ✅ ИСПРАВЛЕНИЕ: Безопасное сохранение токена
-  static saveToken(token: string): void {
-    safeLocalStorage.setItem('access_token', token);
-  }
+  // Методы работы с токеном больше не используются на клиенте (куки httpOnly)
+  static saveToken(_token: string): void {}
 
-  // ✅ ИСПРАВЛЕНИЕ: Безопасное получение токена
   static getToken(): string | null {
-    return safeLocalStorage.getItem('access_token');
+    return null;
   }
 
-  // ✅ ИСПРАВЛЕНИЕ: Безопасное удаление токена
-  static removeToken(): void {
+  static async removeToken(): Promise<void> {
     if (isServer) return;
-    
-    try {
-      localStorage.removeItem('access_token');
-    } catch (error) {
-      // Игнорируем ошибки (например, если localStorage недоступен)
-      console.warn('Не удалось удалить токен из localStorage:', error);
-    }
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
   }
 
-  // ✅ ИСПРАВЛЕНИЕ: Безопасная проверка авторизации
+  // Проверка авторизации через попытку получить профиль (или через куку на сервере в middleware)
   static isAuthenticated(): boolean {
     if (isServer) return false;
-    return !!this.getToken();
+    // Нет доступа к httpOnly cookie из JS — считаем неизвестным, полагаться на middleware/SSR
+    return false;
   }
 }
 

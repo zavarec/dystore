@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import { Button } from '@/components/atoms/button';
 import { ButtonVariant } from '@/components/atoms/button/button.style';
 import { useLocalStorage } from '@/utils/ssr';
-import { safeLocalStorage } from '@/utils/ssr';
+// import { safeLocalStorage } from '@/utils/ssr';
 import { CartService, OrdersService } from '@/services';
 
 import {
@@ -131,13 +131,7 @@ const CartContent: React.FC = () => {
     setIsCheckingOut(true);
 
     try {
-      // Проверка авторизации
-      const token = safeLocalStorage.getItem('access_token');
-      if (!token) {
-        toast.error('Авторизуйтесь, чтобы оформить заказ');
-        router.push('/login/login');
-        return;
-      }
+      // Проверка авторизации: пробуем создать заказ, сервер вернет 401 при отсутствии куки
 
       // Синхронизируем локальную корзину с серверной
       await Promise.all(

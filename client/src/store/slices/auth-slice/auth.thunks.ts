@@ -24,14 +24,9 @@ export const verifyCode = createAsyncThunk(
   'auth/verifyCode',
   async (data: VerifyCodeRequest, { rejectWithValue }) => {
     try {
-      const response = await AuthService.verifyCode(data);
-      // Сохраняем токен
-      AuthService.saveToken(response.access_token);
-
-      // Получаем профиль пользователя
+      await AuthService.verifyCode(data);
       const user = await AuthService.getProfile();
-
-      return { user, token: response.access_token };
+      return { user, token: null };
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Ошибка при проверке кода');
     }
@@ -42,10 +37,6 @@ export const loadUserProfile = createAsyncThunk(
   'auth/loadUserProfile',
   async (_, { rejectWithValue }) => {
     try {
-      if (!AuthService.isAuthenticated()) {
-        throw new Error('Пользователь не авторизован');
-      }
-
       const user = await AuthService.getProfile();
       return user;
     } catch (error: any) {
@@ -55,7 +46,7 @@ export const loadUserProfile = createAsyncThunk(
 );
 
 export const logout = createAsyncThunk('auth/logout', async () => {
-  AuthService.removeToken();
+  await AuthService.removeToken();
   return true;
 });
 
@@ -64,14 +55,9 @@ export const loginWithPassword = createAsyncThunk(
   'auth/loginWithPassword',
   async (data: LoginRequest, { rejectWithValue }) => {
     try {
-      const response = await AuthService.login(data);
-      // Сохраняем токен
-      AuthService.saveToken(response.access_token);
-
-      // Получаем профиль пользователя
+      await AuthService.login(data);
       const user = await AuthService.getProfile();
-
-      return { user, token: response.access_token };
+      return { user, token: null };
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Ошибка при входе');
     }
@@ -83,13 +69,10 @@ export const registerWithPassword = createAsyncThunk(
   async (data: RegisterRequest, { rejectWithValue }) => {
     try {
       const response = await AuthService.register(data);
-      // Сохраняем токен
-      AuthService.saveToken(response.access_token);
-
-      // Получаем профиль пользователя
+      // После регистрации сразу авторизуем через внутренний login (если сервер сразу не ставит куку)
+      await AuthService.login({ email: data.email, password: data.password });
       const user = await AuthService.getProfile();
-
-      return { user, token: response.access_token };
+      return { user, token: null };
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Ошибка при регистрации');
     }

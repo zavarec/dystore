@@ -37,9 +37,8 @@ const authSlice = createSlice({
       state.canResendCodeAt = action.payload;
     },
     initializeAuth: state => {
-      // Проверяем авторизацию при инициализации
-      const isAuthenticated = AuthService.isAuthenticated();
-      state.isAuthenticated = isAuthenticated;
+      // При httpOnly куках флаг авторизации определяем после запроса профиля
+      state.isAuthenticated = false;
     },
   },
   extraReducers: builder => {
@@ -98,10 +97,6 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.user = null;
         state.error = action.payload as string;
-        // Удаляем недействительный токен
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('access_token');
-        }
       });
 
     // Logout

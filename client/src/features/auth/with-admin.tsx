@@ -25,27 +25,30 @@ export function withAdmin<P extends object>(Component: NextPage<P>) {
 
     useEffect(() => {
       if (!ready) return;
+      // 1) Пока грузится профиль — ничего не делаем
+      if (isLoading) return;
 
-      // Если не авторизован — отправляем на логин
+      // 2) Нет авторизации — на страницу логина
       if (!isAuthenticated) {
         void router.replace('/admin/login');
         return;
       }
 
-      // Пока профиль загружается — ничего не делаем (избегаем ложного редиректа)
-      if (isLoading) return;
+      // 3) Профиль ещё не подгружен — ждём без редиректа
+      if (!user) return;
 
-      // Авторизован, но не директор — отправляем на главную
-      if (!user || user.role !== UserRole.DIRECTOR) {
+      // 4) Есть пользователь, но роль не директор — домой
+      if (user.role !== UserRole.DIRECTOR) {
         void router.replace('/');
       }
     }, [ready, isAuthenticated, isLoading, user, router]);
 
     // Пока проверяем или редиректим — ничего не рендерим
     if (!ready) return null;
-    if (!isAuthenticated) return null;
     if (isLoading) return null;
-    if (!user || user.role !== UserRole.DIRECTOR) return null;
+    if (!isAuthenticated) return null;
+    if (!user) return null;
+    if (user.role !== UserRole.DIRECTOR) return null;
 
     return <Component {...(props as P)} />;
   };

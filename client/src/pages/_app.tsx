@@ -132,11 +132,8 @@ const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) 
     dispatch(initializeAuth());
     dispatch(fetchCart());
 
-    // ✅ ИСПРАВЛЕНИЕ: Безопасная проверка токена только после hydration
-    const token = safeLocalStorage.getItem('access_token');
-    if (token) {
-      dispatch(loadUserProfile());
-    }
+    // С httpOnly куками нельзя прочитать токен — пробуем загрузить профиль сразу
+    dispatch(loadUserProfile());
   }, [dispatch]);
 
   // ✅ ИСПРАВЛЕНИЕ: Предотвращаем hydration mismatch

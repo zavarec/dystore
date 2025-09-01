@@ -65,7 +65,7 @@ const ProductPage: NextPage<ProductPageProps> = ({ productId }) => {
   }, [products, productId]);
 
   useEffect(() => {
-    // Загружаем корзину из localStorage при монтировании
+    // Загружаем корзину при монтировании
     dispatch(fetchCart());
   }, [dispatch]);
 

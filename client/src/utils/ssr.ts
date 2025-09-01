@@ -4,23 +4,10 @@ import { useEffect, useState } from 'react';
 export const isServer = typeof window === 'undefined';
 export const isClient = typeof window !== 'undefined';
 
+// Для безопасности токены больше не храним в localStorage
 export const safeLocalStorage = {
-  getItem: (key: string): string | null => {
-    if (isServer) return null;
-    try {
-      return localStorage.getItem(key);
-    } catch {
-      return null;
-    }
-  },
-  setItem: (key: string, value: string): void => {
-    if (isServer) return;
-    try {
-      localStorage.setItem(key, value);
-    } catch {
-      // Handle quota exceeded
-    }
-  },
+  getItem: (_key: string): string | null => null,
+  setItem: (_key: string, _value: string): void => {},
 };
 
 // Хук для безопасной работы с localStorage
@@ -30,7 +17,7 @@ export const useLocalStorage = (key: string, initialValue: any) => {
 
   useEffect(() => {
     setIsHydrated(true);
-    const item = safeLocalStorage.getItem(key);
+    const item = isClient ? window.localStorage.getItem(key) : null;
     if (item) {
       setStoredValue(JSON.parse(item));
     }
@@ -38,7 +25,11 @@ export const useLocalStorage = (key: string, initialValue: any) => {
 
   const setValue = (value: any) => {
     setStoredValue(value);
-    safeLocalStorage.setItem(key, JSON.stringify(value));
+    if (isClient) {
+      try {
+        window.localStorage.setItem(key, JSON.stringify(value));
+      } catch {}
+    }
   };
 
   return [isHydrated ? storedValue : initialValue, setValue, isHydrated];

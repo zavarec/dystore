@@ -8,15 +8,15 @@ interface AuthModalContentProps {
 }
 
 export const AuthModalContent: React.FC<AuthModalContentProps> = ({ onClose }) => {
-  const [authMode, setAuthMode] = useState<'phone' | 'username'>('username');
+  const [authMode, setAuthMode] = useState<'phone' | 'username'>('phone');
 
   return (
     <div>
       <AuthModeContainer>
         <AuthModeSelector>
-          {/* <AuthModeButton onClick={() => setAuthMode('phone')} active={authMode === 'phone'}>
+          <AuthModeButton onClick={() => setAuthMode('phone')} active={authMode === 'phone'}>
             По телефону
-          </AuthModeButton> */}
+          </AuthModeButton>
           <AuthModeButton onClick={() => setAuthMode('username')} active={authMode === 'username'}>
             По логину
           </AuthModeButton>
@@ -24,8 +24,7 @@ export const AuthModalContent: React.FC<AuthModalContentProps> = ({ onClose }) =
       </AuthModeContainer>
 
       {authMode === 'phone' ? (
-        // <PhoneAuthForm onClose={onClose} />
-        null
+        <PhoneAuthForm onClose={onClose} />
       ) : (
         <UsernameAuthForm onClose={onClose} />
       )}
