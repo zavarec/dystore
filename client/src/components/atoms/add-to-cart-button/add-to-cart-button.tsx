@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 import { Product, ProductWithDetails } from '@/types/models/product.model';
@@ -39,6 +39,11 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   style,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // ✅ ИСПРАВЛЕНИЕ: Используем безопасный хук
   const [cartItems, setCartItems, isHydrated] = useLocalStorage('simpleCart', []);
@@ -98,10 +103,10 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
         variant={variant}
         size={size}
         onClick={handleAddToCart}
-        disabled={disabled || !product.stock || isLoading || !isHydrated} // Блокируем до hydration
+        disabled={disabled || !product.stock || isLoading || !isHydrated || !mounted} // Блокируем до hydration/mount
         fullWidth={true}
       >
-        {!isHydrated
+        {!mounted || !isHydrated
           ? 'Загрузка...'
           : !product.stock
             ? 'Нет в наличии'
@@ -110,8 +115,8 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
               : 'В корзину'}
       </Button>
 
-      {showQuantity && isHydrated && quantityInCart > 0 && (
-        <QuantityBadge>{quantityInCart}</QuantityBadge>
+      {showQuantity && isHydrated && mounted && quantityInCart > 0 && (
+        <QuantityBadge suppressHydrationWarning>{quantityInCart}</QuantityBadge>
       )}
     </AddToCartButtonWrapper>
   );

@@ -1,8 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { requireCsrf } from '@/lib/csrf';
 
 const BACKEND_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method || '')) {
+    if (!requireCsrf(req, res)) return;
+  }
   const { path = [] } = req.query as { path: string[] };
   const targetUrl = `${BACKEND_API_URL}/${path.join('/')}${req.url?.includes('?') ? req.url?.substring(req.url.indexOf('?')) : ''}`;
 

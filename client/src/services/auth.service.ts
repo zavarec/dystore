@@ -10,6 +10,7 @@ import {
 import { apiClient } from './api';
 import { User } from '@/types/models/user.model';
 import { isServer } from '@/utils/ssr';
+import Cookies from 'js-cookie';
 
 export class AuthService {
   // Отправка кода подтверждения
@@ -20,9 +21,13 @@ export class AuthService {
 
   // Проверка кода и получение токена
   static async verifyCode(data: VerifyCodeRequest): Promise<VerifyCodeResponse> {
+    const token = Cookies.get('XSRF-TOKEN');
     const res = await fetch('/api/auth/verify-code', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'X-CSRF-Token': token } : {}),
+      },
       body: JSON.stringify(data),
       credentials: 'include',
     });
@@ -35,9 +40,13 @@ export class AuthService {
 
   // Логин по username/password через внутренний API (установит httpOnly cookie)
   static async login(data: LoginRequest): Promise<{ success: boolean }> {
+    const token = Cookies.get('XSRF-TOKEN');
     const res = await fetch('/api/auth/login', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'X-CSRF-Token': token } : {}),
+      },
       body: JSON.stringify(data),
       credentials: 'include',
     });
@@ -69,7 +78,14 @@ export class AuthService {
 
   static async removeToken(): Promise<void> {
     if (isServer) return;
-    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    const token = Cookies.get('XSRF-TOKEN');
+    await fetch('/api/auth/logout', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        ...(token ? { 'X-CSRF-Token': token } : {}),
+      },
+    });
   }
 
   // Проверка авторизации через попытку получить профиль (или через куку на сервере в middleware)

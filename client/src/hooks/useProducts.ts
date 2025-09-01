@@ -1,109 +1,66 @@
-import { useState, useEffect } from 'react';
+import useSWR from 'swr';
 import { ProductsService } from '@/services/products.service';
 import { Product } from '@/types/models/product.model';
 
 export const useProducts = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { data, error, isLoading, mutate } = useSWR<Product[]>(
+    '/products',
+    () => ProductsService.getAllProducts(),
+    {
+      revalidateOnFocus: false,
+      refreshInterval: 5 * 60 * 1000, // 5 минут
+      dedupingInterval: 60 * 1000, // 1 минута
+    },
+  );
 
-  const fetchProducts = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await ProductsService.getAllProducts();
-      setProducts(data);
-    } catch (err: any) {
-      setError(err.message || 'Ошибка загрузки продуктов');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const refetch = () => {
-    fetchProducts();
-  };
+  const refetch = () => mutate();
 
   return {
-    products,
-    loading,
+    products: data || [],
+    loading: isLoading,
     error,
     refetch,
   };
 };
 
 export const useProduct = (id: number) => {
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const shouldFetch = Boolean(id);
+  const { data, error, isLoading, mutate } = useSWR<Product>(
+    shouldFetch ? ['/products', id] : null,
+    () => ProductsService.getProductById(id),
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 2 * 60 * 1000, // 2 минуты
+    },
+  );
 
-  const fetchProduct = async () => {
-    if (!id) return;
-
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await ProductsService.getProductById(id);
-      setProduct(data);
-    } catch (err: any) {
-      setError(err.message || 'Ошибка загрузки продукта');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProduct();
-  }, [id]);
-
-  const refetch = () => {
-    fetchProduct();
-  };
+  const refetch = () => mutate();
 
   return {
-    product,
-    loading,
+    product: data || null,
+    loading: isLoading,
     error,
     refetch,
   };
 };
 
 export const useProductsByCategory = (categoryId: number) => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const shouldFetch = Boolean(categoryId);
+  const { data, error, isLoading, mutate } = useSWR<Product[]>(
+    shouldFetch ? ['/categories', categoryId, 'products-with-descendants'] : null,
+    () => ProductsService.getProductsByCategoryIncludingDescendants(categoryId),
+    {
+      revalidateOnFocus: false,
+      refreshInterval: 3 * 60 * 1000, // 3 минуты
+      dedupingInterval: 60 * 1000, // 1 минута
+    },
+  );
 
-  const fetchProductsByCategory = async () => {
-    if (!categoryId) return;
-
-    setLoading(true);
-    setError(null);
-    try {
-      // Серверная фильтрация: быстрее и экономит трафик
-      const data = await ProductsService.getProductsByCategoryIncludingDescendants(categoryId);
-      setProducts(data);
-    } catch (err: any) {
-      setError(err.message || 'Ошибка загрузки продуктов');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProductsByCategory();
-  }, [categoryId]);
-
-  const refetch = () => {
-    fetchProductsByCategory();
-  };
+  const refetch = () => mutate();
 
   return {
-    products,
-    loading,
+    products: data || [],
+    loading: isLoading,
     error,
     refetch,
   };

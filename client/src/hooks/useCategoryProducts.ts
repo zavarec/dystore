@@ -1,53 +1,24 @@
-import { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from './redux';
-import {
-  fetchProductsByCategory,
-  fetchProductsByCategoryIncludingDescendants,
-} from '@/store/slices/products-slice/products.thunks';
-import {
-  selectCategoryProductsError,
-  selectCategoryProductsIncludingDescendants,
-  selectCategoryProductsIncludingDescendantsLoading,
-} from '@/store/slices/products-slice/products.selectors';
-import {
-  clearCategoryProducts,
-  clearCategoryError,
-} from '@/store/slices/products-slice/products.slice';
+import useSWR from 'swr';
+import { ProductsService } from '@/services/products.service';
+import { Product } from '@/types/models/product.model';
 
 export const useCategoryProducts = (categoryId?: number) => {
-  const dispatch = useAppDispatch();
+  const shouldFetch = Boolean(categoryId);
+  const { data, error, isLoading, mutate } = useSWR<Product[]>(
+    shouldFetch ? ['/categories', categoryId, 'products-with-descendants'] : null,
+    () => ProductsService.getProductsByCategoryIncludingDescendants(categoryId as number),
+    {
+      revalidateOnFocus: false,
+      refreshInterval: 3 * 60 * 1000,
+      dedupingInterval: 60 * 1000,
+    },
+  );
 
-  const products = useAppSelector(selectCategoryProductsIncludingDescendants);
-  const loading = useAppSelector(selectCategoryProductsIncludingDescendantsLoading);
-  const error = useAppSelector(selectCategoryProductsError);
-
-  // Фетчить продукты при изменении categoryId
-  useEffect(() => {
-    if (categoryId) {
-      dispatch(fetchProductsByCategoryIncludingDescendants(categoryId));
-    } else {
-      // Очищаем продукты если categoryId не задан
-      dispatch(clearCategoryProducts());
-    }
-  }, [dispatch, categoryId]);
-
-  // Очищаем ошибки при размонтировании
-  useEffect(() => {
-    return () => {
-      dispatch(clearCategoryError());
-    };
-  }, [dispatch]);
-
-  // Функция для рефетча
-  const refetch = () => {
-    if (categoryId) {
-      dispatch(fetchProductsByCategory(categoryId));
-    }
-  };
+  const refetch = () => mutate();
 
   return {
-    products,
-    loading,
+    products: data || [],
+    loading: isLoading,
     error,
     refetch,
   };

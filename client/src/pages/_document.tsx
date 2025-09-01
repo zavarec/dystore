@@ -48,7 +48,7 @@ export default class MyDocument extends Document<MyDocumentProps> {
     return (
       <Html lang="ru">
         <Head>
-          {/* Предзагрузка шрифтов */}
+          {/* Preconnect только к сервисам шрифтов */}
           <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
 
@@ -59,7 +59,6 @@ export default class MyDocument extends Document<MyDocumentProps> {
           <link rel="dns-prefetch" href="//fonts.googleapis.com" />
           <link rel="dns-prefetch" href="//fonts.gstatic.com" />
           <link rel="icon" href="/favicon.ico?v=2" />
-
         </Head>
         <body>
           <Main />

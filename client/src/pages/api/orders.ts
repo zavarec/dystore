@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { requireCsrf } from '@/lib/csrf';
 
 interface OrderItem {
   productId: string;
@@ -21,6 +22,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
+
+  if (!requireCsrf(req, res)) return;
 
   try {
     const orderData: OrderData = req.body;

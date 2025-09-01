@@ -10,14 +10,12 @@ import { useAppDispatch } from '@/hooks/redux';
 import { loadUserProfile } from '@/store/slices/auth-slice/auth.thunks';
 import { initializeAuth } from '@/store/slices/auth-slice/auth.slice';
 import { fetchCart } from '@/store/slices/cart-slice/cart.thunks';
-import { safeLocalStorage } from '@/utils/ssr';
-import '../styles/fonts/fonts.css';
+
+// Централизованные шрифты
+import { fontClassNames } from '@/styles/fonts';
 
 import 'react-toastify/dist/ReactToastify.css';
 import { GlobalGutters } from '@/styles/global-gutters';
-
-import { Nunito_Sans } from 'next/font/google';
-import { nunitoSans } from '@/styles/fonts/fonts';
 
 // Глобальные стили - чистые как после уборки Dyson
 const globalStyles = css`
@@ -150,7 +148,7 @@ function MyApp({ Component, ...rest }: AppProps) {
 
   return (
     <Provider store={store}>
-      <div className={nunitoSans.variable}>
+      <div className={fontClassNames}>
         <Global styles={globalStyles} />
 
         <GlobalGutters />

@@ -1,13 +1,14 @@
-import React, { useEffect, useMemo } from 'react';
-import { GetServerSideProps, NextPage } from 'next';
+import React, { useEffect } from 'react';
+import { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useAppDispatch } from '@/hooks/redux';
 
 import { ProductWithDetails } from '@/types/models/product.model';
-import { useProducts } from '@/hooks/useProducts';
-import { adaptProductsForUI } from '@/utils/product-adapters';
+import { Product } from '@/types/models/product.model';
+import { adaptProductForUI } from '@/utils/product-adapters';
+import { ServerProductsService } from '@/services';
 import { AddToCartButton } from '@/features/cart/add-to-cart-button';
 import { ButtonVariant } from '@/components/atoms/button/button.style';
 import {
@@ -29,7 +30,7 @@ import { fetchCart } from '@/store/slices/cart-slice/cart.thunks';
 import { AddToCartButtonVariant } from '@/features/cart/add-to-cart-button/add-to-cart-button';
 
 interface ProductPageProps {
-  productId: string;
+  product: ProductWithDetails;
 }
 
 // // Утилиты для работы с продуктом
@@ -54,28 +55,13 @@ const getCategorySlug = (category: any): string => {
   return 'products';
 };
 
-const ProductPage: NextPage<ProductPageProps> = ({ productId }) => {
+const ProductPage: NextPage<ProductPageProps> = ({ product }) => {
   const dispatch = useAppDispatch();
-  const { products, loading } = useProducts();
-
-  const product = useMemo(() => {
-    if (!products.length) return null;
-    const adaptedProducts = adaptProductsForUI(products);
-    return adaptedProducts.find(p => p.id.toString() === productId) || null;
-  }, [products, productId]);
 
   useEffect(() => {
     // Загружаем корзину при монтировании
     dispatch(fetchCart());
   }, [dispatch]);
-
-  if (loading) {
-    return (
-      <ProductPageContainer>
-        <div style={{ textAlign: 'center', padding: '40px' }}>Загрузка продукта...</div>
-      </ProductPageContainer>
-    );
-  }
 
   if (!product) {
     return (
@@ -297,15 +283,39 @@ function getCategoryName(category: any): string {
   return 'Товары';
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ params, locale }) => {
-  const productId = params?.slug as string;
+export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
+  try {
+    const products = await ServerProductsService.getAllProducts();
+    const ids = Array.isArray(products) ? products.map(p => String(p.id)) : [];
+    const paths = ids.flatMap(slug =>
+      (locales || ['ru']).map(locale => ({ params: { slug }, locale })),
+    );
+    return { paths, fallback: 'blocking' };
+  } catch {
+    return { paths: [], fallback: 'blocking' };
+  }
+};
 
-  return {
-    props: {
-      ...(await serverSideTranslations(locale ?? 'ru', ['common'])),
-      productId,
-    },
-  };
+export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
+  try {
+    const productId = params?.slug as string;
+    const productRaw: Product = await ServerProductsService.getProductById(Number(productId));
+    if (!productRaw?.id) {
+      return { notFound: true, revalidate: 60 };
+    }
+
+    const product = adaptProductForUI(productRaw);
+
+    return {
+      props: {
+        ...(await serverSideTranslations(locale ?? 'ru', ['common'])),
+        product,
+      },
+      revalidate: 3600,
+    };
+  } catch {
+    return { notFound: true, revalidate: 60 };
+  }
 };
 
 export default ProductPage;

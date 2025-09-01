@@ -21,6 +21,26 @@ export const useLocalStorage = (key: string, initialValue: any) => {
     if (item) {
       setStoredValue(JSON.parse(item));
     }
+
+    if (!isClient) return;
+    const handleExternalChange = () => {
+      try {
+        const current = window.localStorage.getItem(key);
+        setStoredValue(current ? JSON.parse(current) : initialValue);
+      } catch {}
+    };
+
+    const storageListener = (e: StorageEvent) => {
+      if (e.key === key) handleExternalChange();
+    };
+
+    window.addEventListener('storage', storageListener);
+    window.addEventListener('cartUpdated', handleExternalChange as EventListener);
+
+    return () => {
+      window.removeEventListener('storage', storageListener);
+      window.removeEventListener('cartUpdated', handleExternalChange as EventListener);
+    };
   }, [key]);
 
   const setValue = (value: any) => {
@@ -28,6 +48,8 @@ export const useLocalStorage = (key: string, initialValue: any) => {
     if (isClient) {
       try {
         window.localStorage.setItem(key, JSON.stringify(value));
+        // Уведомляем другие участки UI об изменениях корзины
+        window.dispatchEvent(new Event('cartUpdated'));
       } catch {}
     }
   };

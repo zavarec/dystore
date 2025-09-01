@@ -1,10 +1,2 @@
-@font-face {
-  font-family: 'DysonFutura';
-  src: url('/fonts/DysonFutura.woff') format('woff');
-  font-weight: 400;
-  font-style: normal;
-}
-
-body {
-  font-family: var(--font-montserrat), 'DysonFutura', sans-serif;
-}
+/* Подключение локального DysonFutura переведено на next/font/local в styles/fonts.ts */
+/* Оставляем файл пустым, чтобы не дублировать загрузку */

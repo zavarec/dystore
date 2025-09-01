@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { requireCsrf } from '@/lib/csrf';
 
 function clearCookie(name: string) {
   const isProd = process.env.NODE_ENV === 'production';
@@ -12,6 +13,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
+
+  if (!requireCsrf(req, res)) return;
 
   res.setHeader('Set-Cookie', [clearCookie('access_token')]);
   return res.status(200).json({ success: true });

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NextPage } from 'next';
 import { GetStaticProps } from 'next';
 import Head from 'next/head';
@@ -60,6 +60,11 @@ const CartLoading = () => (
 const CartContent: React.FC = () => {
   const router = useRouter();
   const [isLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [comment, setComment] = useState('');
@@ -175,6 +180,11 @@ const CartContent: React.FC = () => {
     }
   };
 
+  // Пока не смонтировано — показываем безопасный прелоадер
+  if (!mounted) {
+    return <div suppressHydrationWarning>Загрузка...</div>;
+  }
+
   // Показываем пустую корзину
   if (isHydrated && cartItems.length === 0) {
     return (
@@ -218,7 +228,9 @@ const CartContent: React.FC = () => {
 
       <CartPageContainer>
         <CartHeader>
-          <CartTitle>Корзина ({totalItems} товаров)</CartTitle>
+          <CartTitle suppressHydrationWarning>
+            Корзина ({mounted ? totalItems : 0} товаров)
+          </CartTitle>
         </CartHeader>
 
         <div

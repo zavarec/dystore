@@ -1,109 +1,69 @@
-import { useState, useEffect } from 'react';
+import useSWR from 'swr';
 import { CategoriesService } from '@/services/categories.service';
 import { Category } from '@/types/models/category.model';
 
 export const useCategories = () => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { data, error, isLoading, mutate } = useSWR<Category[]>(
+    '/categories',
+    () => CategoriesService.getAllCategories(),
+    {
+      revalidateOnFocus: false,
+      refreshInterval: 10 * 60 * 1000, // 10 минут
+      dedupingInterval: 2 * 60 * 1000, // 2 минуты
+    },
+  );
 
-  const fetchCategories = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await CategoriesService.getAllCategories();
-      setCategories(data);
-    } catch (err: any) {
-      setError(err.message || 'Ошибка загрузки категорий');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
-
-  const refetch = () => {
-    fetchCategories();
-  };
+  const refetch = () => mutate();
 
   return {
-    categories,
-    loading,
+    categories: data || [],
+    loading: isLoading,
     error,
     refetch,
   };
 };
 
 export const useCategory = (id: number) => {
-  const [category, setCategory] = useState<Category | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const shouldFetch = Boolean(id);
+  const { data, error, isLoading, mutate } = useSWR<Category>(
+    shouldFetch ? ['/categories', id] : null,
+    () => CategoriesService.getCategoryById(id),
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 2 * 60 * 1000,
+    },
+  );
 
-  const fetchCategory = async () => {
-    if (!id) return;
-
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await CategoriesService.getCategoryById(id);
-      setCategory(data);
-    } catch (err: any) {
-      setError(err.message || 'Ошибка загрузки категории');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCategory();
-  }, [id]);
-
-  const refetch = () => {
-    fetchCategory();
-  };
+  const refetch = () => mutate();
 
   return {
-    category,
-    loading,
+    category: data || null,
+    loading: isLoading,
     error,
     refetch,
   };
 };
 
 export const useCategoryBySlug = (slug: string) => {
-  const [category, setCategory] = useState<Category | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const shouldFetch = Boolean(slug);
+  const { data, error, isLoading, mutate } = useSWR<Category | null>(
+    shouldFetch ? ['/categories/by-slug', slug] : null,
+    async () => {
+      const all = await CategoriesService.getAllCategories();
+      return all.find(cat => cat.slug === slug) || null;
+    },
+    {
+      revalidateOnFocus: false,
+      refreshInterval: 10 * 60 * 1000,
+      dedupingInterval: 2 * 60 * 1000,
+    },
+  );
 
-  const fetchCategoryBySlug = async () => {
-    if (!slug) return;
-
-    setLoading(true);
-    setError(null);
-    try {
-      const allCategories = await CategoriesService.getAllCategories();
-      const foundCategory = allCategories.find(cat => cat.slug === slug);
-      setCategory(foundCategory || null);
-    } catch (err: any) {
-      setError(err.message || 'Ошибка загрузки категории');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCategoryBySlug();
-  }, [slug]);
-
-  const refetch = () => {
-    fetchCategoryBySlug();
-  };
+  const refetch = () => mutate();
 
   return {
-    category,
-    loading,
+    category: data || null,
+    loading: isLoading,
     error,
     refetch,
   };
