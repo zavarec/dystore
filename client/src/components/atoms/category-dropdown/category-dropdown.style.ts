@@ -149,3 +149,73 @@ export const LoadingSpinner = styled.div`
   max-width: 1200px;
   margin: 0 auto;
 `;
+
+// =====================
+// Mobile-only components
+// =====================
+
+export const MobileCategoryRow = styled.div<{ $hasSubcategories: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 16px;
+  color: #ffffff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+`;
+
+export const MobileCategoryTitle = styled.span<{ $isActive: boolean }>`
+  flex: 1;
+  display: block;
+  text-align: left;
+  color: ${props => (props.$isActive ? '#007bff' : '#ffffff')};
+  font-size: 14px;
+  padding: 8px 0;
+  cursor: pointer;
+
+  @media (max-width: 1100px) {
+    width: auto;
+    flex: 0 0 auto;
+  }
+`;
+
+export const MobileCategoryIcon = styled.div`
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+`;
+
+export const Caret = styled.span<{ $open: boolean }>`
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #ffffff;
+  border-bottom: 2px solid #ffffff;
+  transform: ${props => (props.$open ? 'rotate(45deg)' : 'rotate(-45deg)')};
+  transition: transform 0.2s ease;
+`;
+
+export const MobileSubcategoryRow = styled.div`
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 6px 16px 6px 32px;
+`;
+
+export const MobileSubcategoryLink = styled.a`
+  display: block;
+  width: 100%;
+  color: #cccccc;
+  text-decoration: none;
+  font-size: 13px;
+  padding: 8px 0;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #ffffff;
+  }
+`;

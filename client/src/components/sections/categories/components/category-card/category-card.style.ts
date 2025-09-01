@@ -24,7 +24,7 @@ export const CategoryCardWrapper = styled(motion.div)<{ variant?: 'tall' | 'squa
     min-width: 240px;
     border-radius: 16px;
   `
-      : `
+      : `a
     min-width: 260px;
     width: 280px;
     height: 350px;
@@ -65,14 +65,14 @@ export const CategoryCardWrapper = styled(motion.div)<{ variant?: 'tall' | 'squa
     ${props =>
       props.variant === 'square'
         ? `
-      width: 200px;
-      height: 200px;
-      min-width: 180px;
+      width: 100%;
+      height: 280px;
+      min-width: unset;
     `
         : `
-      min-width: 200px;
-      width: 200px;
-      height: 260px;
+      width: 100%;
+      height: auto;
+      min-width: unset;
     `}
   }
 `;
@@ -87,7 +87,8 @@ export const CategoryImage = styled.img<{ variant?: 'tall' | 'square' }>`
   }
 
   @media (max-width: 480px) {
-    ${props => (props.variant === 'square' ? `height: 100%;` : `height: 200px;`)}
+    ${props =>
+      props.variant === 'square' ? `height: auto; width: 100%;` : `height: 100%; width: 100%;`}
   }
 `;
 

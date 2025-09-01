@@ -4,7 +4,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { Promotion, PromoFont } from '@/types/models/promotion.model';
-import { Section, Content } from './promo-card.style';
+import { Section, Content, ButtonsRow } from './promo-card.style';
 import { inter, roboto, montserrat, poppins, nunitoSans } from '@/styles/fonts/fonts';
 import { Button } from '@/components/atoms/button';
 import { ButtonVariant } from '@/components/atoms/button/button.style';
@@ -61,7 +61,7 @@ export const PromoCard: React.FC<PromoCardProps> = ({ promo, label }) => {
         {label && <p>{label}</p>}
         <h2>{promo.title ?? promo.product?.name}</h2>
         {promo.subtitle && <p>{promo.subtitle}</p>}
-        <div style={{ display: 'flex', gap: 12 }}>
+        <ButtonsRow>
           <Button
             variant={ButtonVariant.GREEN}
             size="medium"
@@ -75,7 +75,7 @@ export const PromoCard: React.FC<PromoCardProps> = ({ promo, label }) => {
               Подробнее
             </Link>
           )}
-        </div>
+        </ButtonsRow>
       </Content>
     </Section>
   );

@@ -1,41 +1,27 @@
 # ---------- builder ----------
-    FROM node:20-alpine AS builder
+    FROM node:20-bookworm-slim AS builder
     WORKDIR /app
     
-    # 1) deps для сборки
     COPY package*.json ./
-    RUN npm ci
+    RUN npm i -g npm@10.8.2 && npm ci --no-audit --no-fund
     
-    # 2) исходники
     COPY . .
-    
-    # 3) генерим prisma client и собираем nest в dist/
     RUN npx prisma generate
     RUN npm run build
     
     # ---------- runner ----------
-    FROM node:20-alpine
+    FROM node:20-bookworm-slim
     WORKDIR /app
     ENV NODE_ENV=production
     
-    # tini (аккуратный shutdown)
-    RUN apk add --no-cache tini
-    ENTRYPOINT ["/sbin/tini","--"]
-    
-    # 1) только прод-зависимости
     COPY --from=builder /app/package*.json ./
-    RUN npm ci --omit=dev
+    RUN npm ci --omit=dev --no-audit --no-fund
     
-    # 2) перенести сгенерированный prisma client из builder
-    COPY --from=builder /app/node_modules/@prisma /app/node_modules/@prisma
-    COPY --from=builder /app/node_modules/.prisma /app/node_modules/.prisma
-    
-    # 3) билд и схема
-    COPY --from=builder /app/dist ./dist
     COPY --from=builder /app/prisma ./prisma
+    COPY --from=builder /app/dist ./dist
+    COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+    COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
     
     EXPOSE 3001
-    
-    # применяем миграции и стартуем API
-    CMD sh -c "npx prisma migrate deploy && node dist/main.js"
+    CMD ["sh","-lc","npx prisma migrate deploy && node dist/main.js"]
     

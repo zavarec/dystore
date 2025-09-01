@@ -3,19 +3,16 @@ import { motion } from 'framer-motion';
 
 export const BenefitsSection = styled.section`
   flex: none;
-  height: 150px;
-  min-height: 80px;
+  padding: 24px 0;
   border-top: 1px solid #e0e0e0;
   border-bottom: 2px solid #e0e0e0;
 
   @media (max-width: 768px) {
-    height: 70px;
-    min-height: 70px;
+    padding: 16px 0;
   }
 
   @media (max-width: 480px) {
-    height: 60px;
-    min-height: 60px;
+    padding: 12px 0;
   }
 `;
 
@@ -23,7 +20,6 @@ export const BenefitsContainer = styled.div`
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
-  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -44,7 +40,7 @@ export const BenefitsList = styled.ul`
   }
 
   @media (max-width: 576px) {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
   }
 `;
@@ -52,6 +48,7 @@ export const BenefitsList = styled.ul`
 export const BenefitItem = styled(motion.li)`
   cursor: pointer;
   transition: all 0.3s ease;
+  height: 100%;
 
   &:hover {
     transform: translateY(-2px);
@@ -59,7 +56,7 @@ export const BenefitItem = styled(motion.li)`
 `;
 
 export const BenefitContent = styled.div`
-  border-radius: 18px;
+  border-radius: 4px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -67,15 +64,15 @@ export const BenefitContent = styled.div`
 
   gap: 1rem;
   padding: 0.75rem 1rem;
-  background: rgba(255, 255, 255, 0.8);
-
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  box-sizing: border-box;
+  height: 100%;
   transition: all 0.3s ease;
 
   &:hover {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    background: rgba(255, 255, 255, 0.95);
+    background: #ffffff;
   }
 
   @media (max-width: 768px) {
@@ -83,7 +80,10 @@ export const BenefitContent = styled.div`
   }
 
   @media (max-width: 480px) {
-    padding: 0.5rem;
+    padding: 0.75rem;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
   }
 `;
 
@@ -100,7 +100,8 @@ export const BenefitIcon = styled.div`
   }
 
   @media (max-width: 480px) {
-    margin-right: 0.5rem;
+    margin-right: 0;
+    margin-bottom: 0.5rem;
   }
 `;
 

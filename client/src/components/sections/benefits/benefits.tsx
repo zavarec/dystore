@@ -41,8 +41,7 @@ const benefits: Benefit[] = [
 
 export const Benefits: React.FC = () => {
   const handleBenefitClick = (benefit: Benefit) => {
-    console.log('Clicked benefit:', benefit.title);
-    // Здесь можно добавить логику обработки клика
+    console.log(benefit);
   };
 
   return (

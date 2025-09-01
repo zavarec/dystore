@@ -24,6 +24,16 @@ export const Section = styled.section<PromoStyleProps>`
   display: flex;
   align-items: center;
   font-family: ${p => p.fontFamily || 'inherit'};
+
+  @media (max-width: 992px) {
+    aspect-ratio: 16 / 9;
+  }
+
+  @media (max-width: 768px) {
+    aspect-ratio: 4 / 5;
+    border-radius: 8px;
+    margin: 12px 0;
+  }
 `;
 
 export const Content = styled.div<PromoStyleProps>`
@@ -45,5 +55,34 @@ export const Content = styled.div<PromoStyleProps>`
     font-size: 18px;
     margin-bottom: 20px;
     color: ${p => p.textColor || 'inherit'};
+  }
+
+  @media (max-width: 768px) {
+    padding: 16px;
+    max-width: 100%;
+    h2 {
+      font-size: 24px;
+    }
+    p {
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+  }
+`;
+
+export const ButtonsRow = styled.div`
+  display: flex;
+  gap: 12px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+
+    a,
+    button {
+      width: 100%;
+      text-align: center;
+    }
   }
 `;

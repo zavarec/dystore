@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 
 export const StorePanoramaContainer = styled.section`
   width: 100%;
-  height: 500px;
+  /* height: 500px; */
   background-color: #000;
   display: flex;
   align-items: center;
@@ -11,12 +11,12 @@ export const StorePanoramaContainer = styled.section`
 
   @media (max-width: 768px) {
     height: 200px;
-    margin: 60px 0;
+    /* margin: 60px 0; */
   }
 
   @media (max-width: 480px) {
     height: 150px;
-    margin: 40px 0;
+    /* margin: 40px 0; */
   }
 `;
 

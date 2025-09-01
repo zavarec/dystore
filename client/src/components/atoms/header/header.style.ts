@@ -55,14 +55,23 @@ export const Navigation = styled.nav<{ $isOpen: boolean }>`
   display: flex;
   align-items: center;
   position: static;
-
   flex: 1;
   justify-content: flex-start;
-
-  /* небольшой отступ от логотипа */
   margin-left: 8px;
 
+  /* Desktop defaults */
+  .desktop-nav {
+    display: flex;
+    gap: 12px;
+  }
+
+  .mobile-nav {
+    display: none;
+    width: 100%;
+  }
+
   @media (max-width: 1100px) {
+    margin-left: 0;
     position: fixed;
     top: 60px;
     left: 0;
@@ -70,14 +79,27 @@ export const Navigation = styled.nav<{ $isOpen: boolean }>`
     background: rgba(0, 0, 0, 0.98);
     backdrop-filter: blur(10px);
     flex-direction: column;
-    padding: 20px;
-    gap: 20px;
+    align-items: stretch; /* 👈 тянем элементы на всю ширину */
+    padding: 8px 0;
+    gap: 0; /* строка + вложенные подкатегории сами дадут отступы */
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     transform: translateY(${props => (props.$isOpen ? '0' : '-100%')});
     opacity: ${props => (props.$isOpen ? '1' : '0')};
     visibility: ${props => (props.$isOpen ? 'visible' : 'hidden')};
     transition: all 0.3s ease;
     z-index: 999;
+
+    overflow-y: auto; /* Добавляем скролл если контента много */
+
+    /* Hide horizontal navigation on mobile, show vertical list */
+    .desktop-nav {
+      display: none;
+    }
+
+    .mobile-nav {
+      display: block;
+      width: 100%;
+    }
   }
 `;
 

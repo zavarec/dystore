@@ -31,6 +31,7 @@ import { selectIsAuthenticated, selectUser } from '@/store/slices/auth-slice/aut
 import { NoSSR } from '@/components/atoms/no-ssr/no-ssr';
 import { CategoryDropdown } from '@/features/categories/category-dropdown';
 import { CartButton } from '@/features/cart/cart-button/cart-button';
+import { MobileCategoryList } from '@/components/atoms/mobile-category-list/mobile-category-list';
 
 interface HeaderProps {
   className?: string;
@@ -95,6 +96,22 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
     }
   };
 
+  // Закрывать мобильное меню при прокрутке вниз на небольшой порог
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const startY = window.scrollY;
+    const threshold = 70; // px
+    const handleScroll = () => {
+      if (window.scrollY > startY + threshold) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true } as AddEventListenerOptions);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [isMobileMenuOpen]);
+
   const handleLogout = async () => {
     await dispatch(logout());
     router.push('/');
@@ -132,17 +149,30 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
             {categoriesLoading ? (
               <div style={{ color: '#ffffff', padding: '8px 0' }}>Загрузка категорий...</div>
             ) : (
-              categoryTree.map(category => {
-                const isActive = router.asPath.startsWith(`/category/${category.slug}`);
-                return (
-                  <CategoryDropdown
-                    key={category.id}
-                    category={category}
-                    isActive={isActive}
+              <>
+                {/* Desktop: выпадающие меню по hover */}
+                <div className="desktop-nav">
+                  {categoryTree.map(category => {
+                    const isActive = router.asPath.startsWith(`/category/${category.slug}`);
+                    return (
+                      <CategoryDropdown
+                        key={category.id}
+                        category={category}
+                        isActive={isActive}
+                        loading={categoriesLoading}
+                      />
+                    );
+                  })}
+                </div>
+
+                {/* Mobile: вертикальный список с раскрытием подкатегорий */}
+                <div className="mobile-nav">
+                  <MobileCategoryList
+                    categories={categoryTree as any}
                     loading={categoriesLoading}
                   />
-                );
-              })
+                </div>
+              </>
             )}
           </Navigation>
         </HeaderLeft>
