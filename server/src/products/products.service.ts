@@ -25,11 +25,40 @@ export class ProductsService {
     });
   }
 
+  async findBySlug(slug: string): Promise<Product | null> {
+    return this.prisma.product.findUnique({
+      where: { slug },
+      include: { category: true },
+    });
+  }
+
   async findByCategory(categoryId: number): Promise<Product[]> {
     return this.prisma.product.findMany({
       where: { categoryId },
       include: { category: true },
     });
+  }
+
+  async findByCategoryIncludingDescendants(
+    categoryId: number,
+  ): Promise<Product[]> {
+    const allCategoryIds = await this.getAllDescendantCategoryIds(categoryId);
+    return this.prisma.product.findMany({
+      where: {
+        categoryId: { in: allCategoryIds },
+      },
+    });
+  }
+
+  private async getAllDescendantCategoryIds(
+    categoryId: number,
+  ): Promise<number[]> {
+    const categories = await this.prisma.category.findMany();
+    const collect = (id: number): number[] => {
+      const children = categories.filter((cat) => cat.parentId === id);
+      return [id, ...children.flatMap((child) => collect(child.id))];
+    };
+    return collect(categoryId);
   }
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
@@ -61,28 +90,6 @@ export class ProductsService {
       where: { id },
       data: updateProductDto,
     });
-  }
-
-  async findByCategoryIncludingDescendants(
-    categoryId: number,
-  ): Promise<Product[]> {
-    const allCategoryIds = await this.getAllDescendantCategoryIds(categoryId);
-    return this.prisma.product.findMany({
-      where: {
-        categoryId: { in: allCategoryIds },
-      },
-    });
-  }
-
-  private async getAllDescendantCategoryIds(
-    categoryId: number,
-  ): Promise<number[]> {
-    const categories = await this.prisma.category.findMany();
-    const collect = (id: number): number[] => {
-      const children = categories.filter((cat) => cat.parentId === id);
-      return [id, ...children.flatMap((child) => collect(child.id))];
-    };
-    return collect(categoryId);
   }
 
   async remove(id: number) {

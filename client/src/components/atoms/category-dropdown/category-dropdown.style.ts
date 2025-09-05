@@ -18,6 +18,7 @@ export const DropdownTrigger = styled.button<{
   padding: 32px 16px 24px 8px;
   background: none;
   border: none;
+  border-bottom: 1px solid transparent; /* фикс высоты и отсутствия скачка */
   cursor: pointer;
   transition: color 0.3s ease;
   display: flex;
@@ -26,7 +27,7 @@ export const DropdownTrigger = styled.button<{
 
   &:hover {
     background: rgba(255, 255, 255, 0.1);
-    border-bottom: 1px solid white;
+    border-bottom-color: rgba(255, 255, 255, 0.5);
   }
 `;
 

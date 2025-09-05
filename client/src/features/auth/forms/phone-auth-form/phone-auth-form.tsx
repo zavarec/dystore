@@ -15,7 +15,6 @@ import {
   FormActions,
   ResendButton,
   TimerText,
-  CloseButton,
 } from './phone-auth-form.style';
 import { codeValidationSchema, phoneValidationSchema } from './phone-auth-form.schema';
 import { sendCode, verifyCode } from '@/store/slices/auth-slice/auth.thunks';
@@ -42,10 +41,7 @@ interface PhoneAuthFormProps {
   showCloseButton?: boolean;
 }
 
-export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({
-  onClose,
-  showCloseButton = false,
-}) => {
+export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({ onClose }) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
@@ -157,12 +153,7 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({
   if (!codeSent) {
     // Форма ввода номера телефона
     return (
-      <div style={{ padding: '48px', position: 'relative' }}>
-        {showCloseButton && onClose && (
-          <CloseButton onClick={onClose} aria-label="Закрыть форму аутентификации" type="button">
-            ✕
-          </CloseButton>
-        )}
+      <div style={{ padding: '24px', position: 'relative' }}>
         <AuthFormTitle>Вход по номеру телефона</AuthFormTitle>
         <AuthFormSubtitle>Введите номер телефона для получения кода подтверждения</AuthFormSubtitle>
 
@@ -212,11 +203,6 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({
   // Форма ввода кода подтверждения
   return (
     <div style={{ padding: '48px', position: 'relative' }}>
-      {showCloseButton && onClose && (
-        <CloseButton onClick={onClose} aria-label="Закрыть форму аутентификации" type="button">
-          ✕
-        </CloseButton>
-      )}
       <AuthFormTitle>Введите код подтверждения</AuthFormTitle>
       <AuthFormSubtitle>Код отправлен на номер {codeSentTo}</AuthFormSubtitle>
 

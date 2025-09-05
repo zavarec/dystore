@@ -11,7 +11,7 @@ export class ProductsService {
 
   // Получить продукт по ID
   static async getProductById(id: number): Promise<Product> {
-    const response = await apiClient.get<Product>(`/products/${id}`);
+    const response = await apiClient.get<Product>(`/products/id/${id}`);
     return response.data;
   }
 

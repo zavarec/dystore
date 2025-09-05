@@ -29,9 +29,9 @@ export class OrdersService {
     createOrderDto: CreateOrderDto,
   ): Promise<OrderWithItems> {
     // Получаем корзину пользователя
-    const cart = await this.cartService.getCartWithItems(userId);
+    const cart = await this.cartService.getCartWithItems({ userId });
 
-    if (!cart.items || cart.items.length === 0) {
+    if (!cart || !cart.items || cart.items.length === 0) {
       throw new BadRequestException("Корзина пуста");
     }
 
@@ -85,7 +85,7 @@ export class OrdersService {
     });
 
     // Очищаем корзину
-    await this.cartService.clearCart(userId);
+    await this.cartService.clearCartByIdentity({ userId });
 
     // Отправляем Telegram-уведомление (best-effort, не ломаем поток заказа)
     const lines: string[] = [];

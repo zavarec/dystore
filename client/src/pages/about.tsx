@@ -14,7 +14,7 @@ const AboutPage = () => (
   >
     <h1 style={{ fontSize: 32, marginBottom: 16 }}>О нас</h1>
     <p style={{ fontSize: 18, lineHeight: 1.7 }}>
-      Добро пожаловать в DyStore!
+      Добро пожаловать в Dyson Group!
       <br />
       <br />
       Мы — команда, которая любит инновации и заботится о вашем комфорте. В нашем магазине вы

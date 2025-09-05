@@ -3,6 +3,8 @@ import { AdminLayout } from '@/components/admin/layout/admin-layout';
 import { PromotionForm } from '@/features/admin/promotions/promotion-form/promotion-form';
 import { PromotionsList } from '@/features/admin/promotions/promotions-list/promotions-list';
 import { withManager } from '@/features/auth/with-manager';
+import { withRoleServerGuard } from '@/lib/withRoleServerGuard';
+import { UserRole } from '@/types/models/user.model';
 
 const AdminPromotionsPage: React.FC = () => {
   return (
@@ -22,3 +24,5 @@ const AdminPromotionsPage: React.FC = () => {
 };
 
 export default withManager(AdminPromotionsPage);
+
+// export const getServerSideProps = withRoleServerGuard([UserRole.MANAGER, UserRole.DIRECTOR]);

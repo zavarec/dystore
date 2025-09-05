@@ -16,6 +16,15 @@ enum PromoFont {
   NUNITO_SANS
 }
 
+
+// Статус корзиныы
+enum CartStatus {
+  ACTIVE
+  MERGED
+  CHECKED_OUT
+  ABANDONED
+}
+
 // Роли пользователей
 enum Role {
   DIRECTOR
@@ -73,6 +82,7 @@ model Category {
 model Product {
   id               Int      @id @default(autoincrement())
   name             String
+  slug             String   @unique
   description      String?
   shortDescription String?
   price            Float
@@ -99,12 +109,15 @@ model Product {
 // Корзины
 model Cart {
   id        Int      @id @default(autoincrement())
-  userId    String
+  userId    String?
+  token     String     @unique @default(uuid())   // OK для чистой БД
+  status    CartStatus @default(ACTIVE)
+  expiresAt DateTime? 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Связи
-  user  User       @relation(fields: [userId], references: [id])
+  user  User?       @relation(fields: [userId], references: [id])
   items CartItem[]
 
   @@index([userId])
@@ -311,4 +324,44 @@ model CategoryPromoSection {
 
   @@index([categoryId, isActive])
   @@index([placement, order])
+}
+
+// SEO
+enum SeoPageType {
+  CATEGORY
+  PRODUCT
+  LANDING
+  STATIC
+}
+
+model SeoMeta {
+  id            Int         @id @default(autoincrement())
+  pageType      SeoPageType
+  entityId      String
+  locale        String      @default("ru")
+
+  // базовые мета
+  title         String?
+  description   String?
+  keywords      String?
+
+  // canonical/robots
+  canonical     String?
+  robots        String?
+
+  // Open Graph / Twitter
+  ogTitle       String?
+  ogDescription String?
+  ogImage       String?
+  twitterCard   String?
+
+  // расширенные
+  structuredData Json?
+  hreflang       Json?
+
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@unique([pageType, entityId, locale])
+  @@index([pageType, entityId, locale])
 }

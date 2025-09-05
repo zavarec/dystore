@@ -19,6 +19,7 @@ import {
   Td,
   Th,
 } from '@/styles/pages/admin/admin-dashboard.style';
+import { AdminDashboardSkeleton } from '@/components/atoms/skeleton';
 
 interface DashboardStats {
   totalProducts: number;
@@ -71,7 +72,7 @@ const AdminDashboard: NextPage = () => {
   if (loading) {
     return (
       <AdminLayout title="Дашборд">
-        <div>Загрузка...</div>
+        <AdminDashboardSkeleton />
       </AdminLayout>
     );
   }

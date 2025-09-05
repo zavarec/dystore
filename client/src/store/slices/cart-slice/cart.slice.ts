@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { LoadingState } from '@/types/common';
 import { fetchCart, addToCart, removeFromCart, fetchCartTotal, clearCart } from './cart.thunks';
@@ -77,5 +77,25 @@ const cartSlice = createSlice({
   },
 });
 
+// Доп. редьюсеры определяем отдельно для аккуратности типов
 export const { clearError } = cartSlice.actions;
-export default cartSlice.reducer;
+
+// Гидрация корзины из локального снапшота
+export const hydrateCart = (payload: Cart | null): PayloadAction<Cart | null> => ({
+  type: 'cart/hydrate',
+  payload,
+});
+
+// Расширяем редьюсером для действия hydrate
+const baseReducer = cartSlice.reducer;
+const enhancedReducer = (state: any, action: any) => {
+  if (action.type === 'cart/hydrate') {
+    return {
+      ...state,
+      cart: action.payload,
+    };
+  }
+  return baseReducer(state, action);
+};
+
+export default enhancedReducer;

@@ -1,38 +1,34 @@
 import { apiClient } from './api';
 import { Cart, CartTotal, AddToCartRequest } from '@/types/models/cart.model';
 
-export class CartService {
-  // Получить корзину (требует авторизации)
+class CartService {
+  // Получить корзину (гость или пользователь)
   static async getCart(): Promise<Cart> {
-    const response = await apiClient.get<Cart>('/cart');
-    return response.data;
+    const { data } = await apiClient.get<Cart>('/cart');
+    return data;
   }
 
-  // Добавить товар в корзину (требует авторизации)
+  // Добавить товар (гость или пользователь)
   static async addToCart(data: AddToCartRequest): Promise<Cart> {
-    const response = await apiClient.post<Cart>('/cart/add', data);
-    return response.data;
+    const { data: res } = await apiClient.post<Cart>('/cart/add', data);
+    return res;
   }
 
-  // Удалить товар из корзины (требует авторизации)
+  // Удалить товар (гость или пользователь)
   static async removeFromCart(productId: number): Promise<Cart> {
-    const response = await apiClient.delete<Cart>(`/cart/remove/${productId}`);
-    return response.data;
+    const { data } = await apiClient.delete<Cart>(`/cart/remove/${productId}`);
+    return data;
   }
 
-  // Получить общую стоимость корзины (требует авторизации)
   static async getCartTotal(): Promise<CartTotal> {
-    const response = await apiClient.get<CartTotal>('/cart/total');
-    return response.data;
+    const { data } = await apiClient.get<CartTotal>('/cart/total');
+    return data;
   }
 
-  // Очистить корзину (вспомогательный метод)
+  // Быстрее и безопаснее — отдельная ручка очистки на бэке (по желанию)
   static async clearCart(): Promise<void> {
     const cart = await this.getCart();
-    // Удаляем каждый товар по отдельности
-    for (const item of cart.items) {
-      await this.removeFromCart(item.productId);
-    }
+    await Promise.all(cart.items.map(i => this.removeFromCart(i.productId)));
   }
 }
 

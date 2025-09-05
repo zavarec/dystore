@@ -102,11 +102,11 @@ export const UsernameAuthForm: React.FC<UsernameAuthFormProps> = ({
 
   return (
     <div style={{ padding: '48px', position: 'relative' }}>
-      {showCloseButton && onClose && (
+      {/* {showCloseButton && onClose && (
         <CloseButton onClick={onClose} aria-label="Закрыть форму авторизации" type="button">
           ✕
         </CloseButton>
-      )}
+      )} */}
 
       <AuthFormTitle>{isLoginMode ? 'Вход в аккаунт' : 'Регистрация'}</AuthFormTitle>
       <AuthFormSubtitle>

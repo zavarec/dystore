@@ -2,17 +2,20 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
-} from '@nestjs/common';
-import { PrismaService } from '../database/prisma.service';
-import { Cart, CartItem } from '@prisma/client';
-import { AddToCartDto } from './dto/add-to-cart.dto';
-import { ProductsService } from '../products/products.service';
+} from "@nestjs/common";
+import { PrismaService } from "../database/prisma.service";
+import { Cart, CartItem } from "@prisma/client";
+import { AddToCartDto } from "./dto/add-to-cart.dto";
+import { ProductsService } from "../products/products.service";
+import { CartStatus } from "@prisma/client";
 
 type CartWithItems = Cart & {
   items: (CartItem & {
     product: any;
   })[];
 };
+
+type Identity = { userId?: string | null; token?: string | null };
 
 @Injectable()
 export class CartService {
@@ -21,141 +24,136 @@ export class CartService {
     private readonly productsService: ProductsService,
   ) {}
 
-  async getOrCreateCart(userId: string): Promise<CartWithItems> {
-    let cart = await this.prisma.cart.findFirst({
-      where: { userId },
-      include: {
-        items: {
-          include: {
-            product: true,
-          },
-        },
-      },
-    });
+  async getOrCreateCart(
+    opts: Identity,
+  ): Promise<{ cart: Cart; createdNew: boolean }> {
+    const { userId, token } = opts ?? {};
 
-    if (!cart) {
-      cart = await this.prisma.cart.create({
-        data: { userId },
-        include: {
-          items: {
-            include: {
-              product: true,
-            },
-          },
-        },
+    // 1) если есть userId — пробуем его активную корзину
+    if (userId) {
+      const userCart = await this.prisma.cart.findFirst({
+        where: { userId: userId, status: CartStatus.ACTIVE },
       });
+      if (userCart) return { cart: userCart, createdNew: false };
     }
-
-    return cart;
+    // 2) если есть токен гостя — вернуть
+    if (token) {
+      const guestCart = await this.prisma.cart.findFirst({
+        where: { token: token, status: CartStatus.ACTIVE },
+      });
+      if (guestCart) return { cart: guestCart, createdNew: false };
+    }
+    // 3) иначе создать новую (гостевую или юзерскую)
+    const newCart = await this.prisma.cart.create({
+      data: { userId: userId ?? null }, // token сгенерируется автоматически
+    });
+    return { cart: newCart, createdNew: true };
   }
 
-  async addToCart(
-    userId: string,
-    addToCartDto: AddToCartDto,
+  async getCartWithItems(where: {
+    id?: number;
+    token?: string;
+    userId?: string;
+  }): Promise<CartWithItems | null> {
+    return this.prisma.cart.findFirst({
+      where: { ...where, status: CartStatus.ACTIVE },
+      include: { items: { include: { product: true } } },
+    }) as any;
+  }
+
+  async addToCartByIdentity(
+    identity: Identity,
+    dto: AddToCartDto,
   ): Promise<CartWithItems> {
-    const { productId, quantity } = addToCartDto;
+    const { productId, quantity } = dto;
 
-    // Проверяем существование товара
     const product = await this.productsService.findOne(productId);
-    if (!product) {
-      throw new NotFoundException('Товар не найден');
-    }
+    if (!product) throw new NotFoundException("Товар не найден");
+    if (product.stock < quantity)
+      throw new BadRequestException("Недостаточно товара на складе");
 
-    // Проверяем наличие на складе
-    if (product.stock < quantity) {
-      throw new BadRequestException('Недостаточно товара на складе');
-    }
+    const { cart } = await this.getOrCreateCart(identity);
 
-    const cart = await this.getOrCreateCart(userId);
-
-    // Проверяем, есть ли уже такой товар в корзине
-    const existingItem = await this.prisma.cartItem.findFirst({
+    const existing = await this.prisma.cartItem.findFirst({
       where: { cartId: cart.id, productId },
     });
 
-    if (existingItem) {
-      // Обновляем количество
-      const newQuantity = existingItem.quantity + quantity;
-
-      if (product.stock < newQuantity) {
-        throw new BadRequestException('Недостаточно товара на складе');
-      }
-
+    if (existing) {
+      const newQty = existing.quantity + quantity;
+      if (product.stock < newQty)
+        throw new BadRequestException("Недостаточно товара на складе");
       await this.prisma.cartItem.update({
-        where: { id: existingItem.id },
-        data: { quantity: newQuantity },
+        where: { id: existing.id },
+        data: { quantity: newQty },
       });
     } else {
-      // Создаем новый элемент корзины
       await this.prisma.cartItem.create({
-        data: {
-          cartId: cart.id,
-          productId,
-          quantity,
-        },
+        data: { cartId: cart.id, productId, quantity },
       });
     }
 
-    return this.getCartWithItems(userId);
+    return (await this.getCartWithItems({ id: cart.id }))!;
   }
 
-  async getCartWithItems(userId: string): Promise<CartWithItems> {
-    const cart = await this.prisma.cart.findFirst({
-      where: { userId },
-      include: {
-        items: {
-          include: {
-            product: true,
-          },
-        },
-      },
-    });
-
-    if (!cart) {
-      return this.getOrCreateCart(userId);
-    }
-
-    return cart;
-  }
-
-  async removeFromCart(
-    userId: string,
+  async removeFromCartByIdentity(
+    identity: Identity,
     productId: number,
   ): Promise<CartWithItems> {
-    const cart = await this.getOrCreateCart(userId);
-
-    const cartItem = await this.prisma.cartItem.findFirst({
+    const { cart } = await this.getOrCreateCart(identity);
+    const row = await this.prisma.cartItem.findFirst({
       where: { cartId: cart.id, productId },
     });
-
-    if (!cartItem) {
-      throw new NotFoundException('Товар не найден в корзине');
-    }
-
-    await this.prisma.cartItem.delete({
-      where: { id: cartItem.id },
-    });
-
-    return this.getCartWithItems(userId);
+    if (!row) throw new NotFoundException("Товар не найден в корзине");
+    await this.prisma.cartItem.delete({ where: { id: row.id } });
+    return (await this.getCartWithItems({ id: cart.id }))!;
+  }
+  async clearCartByIdentity(identity: Identity): Promise<void> {
+    const { cart } = await this.getOrCreateCart(identity);
+    await this.prisma.cartItem.deleteMany({ where: { cartId: cart.id } });
   }
 
-  async clearCart(userId: string): Promise<void> {
-    const cart = await this.prisma.cart.findFirst({
-      where: { userId },
-    });
+  async calculateTotalByIdentity(identity: {
+    userId?: string;
+    token?: string;
+  }): Promise<number> {
+    const { cart } = await this.getOrCreateCart(identity);
+    const full = await this.getCartWithItems({ id: cart.id });
+    if (!full) return 0;
+    return full.items.reduce(
+      (s, it) => s + Number(it.product.price) * it.quantity,
+      0,
+    );
+  }
 
-    if (cart) {
-      await this.prisma.cartItem.deleteMany({
-        where: { cartId: cart.id },
+  async mergeGuestIntoUser(
+    guestToken: string,
+    userId: string,
+  ): Promise<CartWithItems> {
+    const guest = await this.prisma.cart.findFirst({
+      where: { token: guestToken, status: CartStatus.ACTIVE },
+      include: { items: true },
+    });
+    const { cart: userCart } = await this.getOrCreateCart({ userId });
+
+    if (guest && guest.id !== userCart.id) {
+      for (const it of guest.items) {
+        await this.prisma.cartItem.upsert({
+          where: {
+            cartId_productId: { cartId: userCart.id, productId: it.productId },
+          },
+          update: { quantity: { increment: it.quantity } },
+          create: {
+            cartId: userCart.id,
+            productId: it.productId,
+            quantity: it.quantity,
+          },
+        });
+      }
+      await this.prisma.cart.update({
+        where: { id: guest.id },
+        data: { status: CartStatus.MERGED },
       });
     }
-  }
-
-  async calculateTotal(userId: string): Promise<number> {
-    const cart = await this.getCartWithItems(userId);
-
-    return cart.items.reduce((total, item) => {
-      return total + Number(item.product.price) * item.quantity;
-    }, 0);
+    return (await this.getCartWithItems({ id: userCart.id }))!;
   }
 }

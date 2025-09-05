@@ -1,6 +1,6 @@
 import { apiClient } from './api';
 import {
-  Category,
+  type Category,
   CreateCategoryDto,
   UpdateCategoryDto,
   CategoryTreeNode,

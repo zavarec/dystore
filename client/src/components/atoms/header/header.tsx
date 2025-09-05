@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 
 import { useAppSelector, useAppDispatch } from '@/hooks/redux';
@@ -7,8 +8,6 @@ import { logout } from '@/store/slices/auth-slice/auth.thunks';
 import { setAuthModalOpen } from '@/store/slices/uiSlice';
 import { useCategories } from '@/hooks/useCategories';
 import { CategoryTreeUtils } from '@/types/models/category.model';
-
-import { useLocalStorage } from '@/utils/ssr';
 
 import {
   MotionHeaderContainer,
@@ -32,6 +31,7 @@ import { NoSSR } from '@/components/atoms/no-ssr/no-ssr';
 import { CategoryDropdown } from '@/features/categories/category-dropdown';
 import { CartButton } from '@/features/cart/cart-button/cart-button';
 import { MobileCategoryList } from '@/components/atoms/mobile-category-list/mobile-category-list';
+import { Skeleton } from '@/components/atoms/skeleton';
 
 interface HeaderProps {
   className?: string;
@@ -48,35 +48,8 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const user = useAppSelector(selectUser);
 
-  // ✅ ИСПРАВЛЕНИЕ: Безопасное получение данных корзины
-  const [cartItems, , isCartHydrated] = useLocalStorage('simpleCart', []);
-
   // Загружаем категории
   const { categories, loading: categoriesLoading } = useCategories();
-
-  // ✅ ИСПРАВЛЕНИЕ: Безопасное вычисление количества товаров в корзине
-  const cartItemsCount = isCartHydrated
-    ? (cartItems as any[]).reduce((sum: number, item: any) => sum + (item.quantity || 0), 0)
-    : 0;
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    console.log(user, 'user');
-
-    const handleCartUpdate = () => {
-      // Обновление произойдет автоматически через useLocalStorage
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    window.addEventListener('cartUpdated', handleCartUpdate);
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('cartUpdated', handleCartUpdate);
-    };
-  }, []);
 
   // Строим дерево категорий (только корневые категории для навигации)
   const categoryTree = React.useMemo(() => {
@@ -89,12 +62,18 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
     return tree;
   }, [categories]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-    }
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    console.log(user, 'user');
+
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   // Закрывать мобильное меню при прокрутке вниз на небольшой порог
   useEffect(() => {
@@ -111,6 +90,13 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, [isMobileMenuOpen]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
 
   const handleLogout = async () => {
     await dispatch(logout());
@@ -137,17 +123,23 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
       <HeaderContent>
         <HeaderLeft>
           <Logo href="/">
-            <img
+            <Image
               src="https://www.dyson.com/etc.clientlibs/dyson/clientlibs/clientlib-main/resources/images/dyson-logo.svg"
-              alt="DyStore"
+              alt="DysonGroup"
               width={100}
-              height={100}
+              height={24}
+              sizes="(max-width: 768px) 40vw, 20vw"
+              priority
             />
           </Logo>
 
           <Navigation $isOpen={isMobileMenuOpen}>
             {categoriesLoading ? (
-              <div style={{ color: '#ffffff', padding: '8px 0' }}>Загрузка категорий...</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0' }}>
+                {[1, 2, 3, 4, 5].map(i => (
+                  <Skeleton key={i} width={80} height={16} />
+                ))}
+              </div>
             ) : (
               <>
                 {/* Desktop: выпадающие меню по hover */}
@@ -210,9 +202,8 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
               )}
             </NoSSR>
 
-            {/* ✅ ИСПРАВЛЕНИЕ: Корзина с безопасным отображением счетчика */}
             <Link href="/cart" passHref legacyBehavior>
-              <CartButton count={isCartHydrated ? cartItemsCount : 0} />
+              <CartButton />
             </Link>
           </SearchContainer>
 

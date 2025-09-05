@@ -1,6 +1,6 @@
-# DyStore Backend
+# DysonGroup Backend
 
-Бэкенд для интернет-магазина DyStore, построенный на NestJS.
+Бэкенд для интернет-магазина DysonGroup, построенный на NestJS.
 
 ## Возможности
 

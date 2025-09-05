@@ -1,8 +1,8 @@
-# DyStore API Documentation
+# DysonGroup API Documentation
 
 ## Обзор
 
-REST API для интернет-магазина DyStore, построенный на NestJS.
+REST API для интернет-магазина DysonGroup, построенный на NestJS.
 
 ## Аутентификация
 

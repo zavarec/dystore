@@ -22,7 +22,7 @@ export const AuthModal: React.FC = () => {
   };
 
   return (
-    <Modal isOpen={isAuthModalOpen} onClose={handleClose}>
+    <Modal isOpen={isAuthModalOpen} onClose={handleClose} size="sm" variant="center" padding={20}>
       <AuthModalContent onClose={handleClose} />
     </Modal>
   );

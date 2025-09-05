@@ -10,6 +10,43 @@ const bcrypt = require("bcrypt");
 
 const prisma = new PrismaClient();
 
+// Транслитерация для slug
+const cyrillicMap = {
+  а: "a",
+  б: "b",
+  в: "v",
+  г: "g",
+  д: "d",
+  е: "e",
+  ё: "yo",
+  ж: "zh",
+  з: "z",
+  и: "i",
+  й: "y",
+  к: "k",
+  л: "l",
+  м: "m",
+  н: "n",
+  о: "o",
+  п: "p",
+  р: "r",
+  с: "s",
+  т: "t",
+  у: "u",
+  ф: "f",
+  х: "h",
+  ц: "ts",
+  ч: "ch",
+  ш: "sh",
+  щ: "sch",
+  ъ: "",
+  ы: "y",
+  ь: "",
+  э: "e",
+  ю: "yu",
+  я: "ya",
+};
+
 async function main() {
   console.log("🌱 Начинаю заполнение базы данных...");
 
@@ -180,43 +217,6 @@ async function main() {
   for (const [parentIdStr, subcategories] of Object.entries(subcategoriesMap)) {
     const parentId = Number(parentIdStr);
     for (const { name: subName, image } of subcategories) {
-      // Транслитерация для slug
-      const cyrillicMap = {
-        а: "a",
-        б: "b",
-        в: "v",
-        г: "g",
-        д: "d",
-        е: "e",
-        ё: "yo",
-        ж: "zh",
-        з: "z",
-        и: "i",
-        й: "y",
-        к: "k",
-        л: "l",
-        м: "m",
-        н: "n",
-        о: "o",
-        п: "p",
-        р: "r",
-        с: "s",
-        т: "t",
-        у: "u",
-        ф: "f",
-        х: "h",
-        ц: "ts",
-        ч: "ch",
-        ш: "sh",
-        щ: "sch",
-        ъ: "",
-        ы: "y",
-        ь: "",
-        э: "e",
-        ю: "yu",
-        я: "ya",
-      };
-
       const slug = subName
         .toLowerCase()
         .split("")
@@ -243,11 +243,23 @@ async function main() {
 
   // Генерация товаров
   console.log("🛍️ Создаю товары...");
+
+  function slugify(str) {
+    return str
+      .toLowerCase()
+      .split("")
+      .map((ch) => cyrillicMap[ch] ?? ch)
+      .join("")
+      .replace(/\s+/g, "-")
+      .replace(/[^\w-]/g, "")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+  }
   const allProducts = [];
 
   const imageMap = {
     [vacuums.id]:
-      "http://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/images/products/hero/448799-01.png?$responsive$&cropPathE=desktop&fit=stretch,1&wid=1920",
+      "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/images/products/hero/448799-01.png?$responsive$&cropPathE=desktop&fit=stretch,1&wid=1920",
     [hairCare.id]:
       "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/images/products/primary/598976-01.png?$responsive$&cropPathE=desktop&fit=stretch,1&wid=1920",
     [climate.id]:
@@ -268,6 +280,8 @@ async function main() {
         prisma.product.create({
           data: {
             name: `${baseName} Model ${i + 1}`,
+            slug: `${slugify(`${baseName} Model ${i + 1}`)}-p${sub.id}-m${i + 1}`,
+
             shortDescription: `${baseName} кратко: модель ${i + 1}`,
             description: `Описание ${baseName} — уникальная модель ${i + 1} с особыми функциями.`,
             price: 29990 + i * 2000,
@@ -282,10 +296,11 @@ async function main() {
     );
 
     const copies = await Promise.all(
-      unique.map((p) =>
+      unique.map((p, idx) =>
         prisma.product.create({
           data: {
             name: `${p.name} Copy`,
+            slug: `${p.slug}-copy${idx + 1}`,
             shortDescription: p.shortDescription,
             description: p.description,
             price: p.price,

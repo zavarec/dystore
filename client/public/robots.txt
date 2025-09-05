@@ -14,7 +14,7 @@ Disallow: /*utm_*
 Disallow: /*ref=*
 
 # Sitemap
-Sitemap: https://dystore.ru/sitemap.xml
+Sitemap: https://dyson-group.ru/sitemap.xml
 
 # Время задержки между запросами (в секундах)
 Crawl-delay: 1

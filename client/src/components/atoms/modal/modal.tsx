@@ -1,13 +1,28 @@
 // modal.tsx
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useId } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence } from 'framer-motion';
-import { ModalOverlay, ModalContainer, ModalContent, ModalCloseButton } from './modal.style';
+import {
+  ModalOverlay,
+  ModalContainer,
+  ModalContent,
+  ModalHeader,
+  ModalTitle,
+  ModalCloseButton,
+} from './modal.style';
+
+type Size = 'sm' | 'md' | 'lg' | 'xl';
+type Variant = 'center' | 'sheet';
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
+  title?: string; // не обязателен
+  size?: Size; // пресеты ширины
+  maxWidth?: string; // кастом ширины, перекрывает size
+  variant?: Variant; // 'center' | 'sheet'
+  padding?: number; // внутренний отступ
   closeOnOverlayClick?: boolean;
   closeOnEsc?: boolean;
 }
@@ -16,37 +31,35 @@ export const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   children,
+  title,
+  size = 'md',
+  maxWidth,
+  variant = 'center',
+  padding = 24,
   closeOnOverlayClick = true,
   closeOnEsc = true,
 }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+  const isSheet = variant === 'sheet';
 
-  // ESC key listener
   useEffect(() => {
     if (!closeOnEsc || !isOpen) return;
-
-    const handleEsc = (e: KeyboardEvent) => {
+    const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
-
-    document.addEventListener('keydown', handleEsc);
-    return () => document.removeEventListener('keydown', handleEsc);
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
   }, [isOpen, closeOnEsc, onClose]);
 
-  // prevent body scroll
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    }
+    if (isOpen) document.body.style.overflow = 'hidden';
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
     };
   }, [isOpen]);
 
   const handleOverlayClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget && closeOnOverlayClick) {
-      onClose();
-    }
+    if (e.target === e.currentTarget && closeOnOverlayClick) onClose();
   };
 
   if (typeof window === 'undefined') return null;
@@ -55,25 +68,41 @@ export const Modal: React.FC<ModalProps> = ({
     <AnimatePresence>
       {isOpen && (
         <ModalOverlay
+          $alignStart={isSheet}
+          onClick={handleOverlayClick}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          onClick={handleOverlayClick}
+          transition={{ duration: 0.18 }}
           aria-modal="true"
           role="dialog"
-          ref={modalRef}
+          {...(title ? { 'aria-labelledby': titleId } : {})}
         >
           <ModalContainer
-            initial={{ scale: 0.95, y: 20, opacity: 0 }}
-            animate={{ scale: 1, y: 0, opacity: 1 }}
-            exit={{ scale: 0.95, y: 20, opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            $size={size}
+            {...(maxWidth ? { $maxWidth: maxWidth } : {})}
+            $isSheet={isSheet}
+            initial={isSheet ? { y: 24, opacity: 0 } : { y: 12, scale: 0.98, opacity: 0 }}
+            animate={isSheet ? { y: 0, opacity: 1 } : { y: 0, scale: 1, opacity: 1 }}
+            exit={isSheet ? { y: 16, opacity: 0 } : { y: 8, scale: 0.98, opacity: 0 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
           >
-            <ModalContent>
-              <ModalCloseButton onClick={onClose} aria-label="Закрыть модальное окно">
-                ✕
-              </ModalCloseButton>
+            {title && (
+              <ModalHeader>
+                <ModalTitle id={titleId}>{title}</ModalTitle>
+                <ModalCloseButton onClick={onClose} aria-label="Закрыть">
+                  ✕
+                </ModalCloseButton>
+              </ModalHeader>
+            )}
+            <ModalContent $padding={padding}>
+              {!title && (
+                <div style={{ position: 'absolute', right: 16, top: 16 }}>
+                  <ModalCloseButton onClick={onClose} aria-label="Закрыть">
+                    ✕
+                  </ModalCloseButton>
+                </div>
+              )}
               {children}
             </ModalContent>
           </ModalContainer>

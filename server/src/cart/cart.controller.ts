@@ -10,94 +10,111 @@ import {
   ParseIntPipe,
   HttpException,
   HttpStatus,
-} from '@nestjs/common';
+  Req,
+  Res,
+} from "@nestjs/common";
 import {
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
-} from '@nestjs/swagger';
-import { CartService } from './cart.service';
-import { AddToCartDto } from './dto/add-to-cart.dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { CurrentUser } from '../common/decorators/current-user.decorator';
-import { User } from '@prisma/client';
+} from "@nestjs/swagger";
+import { CartService } from "./cart.service";
+import { AddToCartDto } from "./dto/add-to-cart.dto";
+import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
+import { CurrentUser } from "../common/decorators/current-user.decorator";
+import { User } from "@prisma/client";
+import { CART_COOKIE, CART_COOKIE_OPTS } from "src/constants/cart.constant";
 
-@ApiTags('Cart')
-@Controller('cart')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
+@ApiTags("Cart")
+@Controller("cart")
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 
-  @ApiOperation({ summary: 'Get user cart' })
-  @ApiResponse({ status: 200, description: 'User cart with items' })
+  @ApiOperation({ summary: "Get cart (guest or user)" })
+  @ApiResponse({ status: 200 })
   @Get()
-  async getCart(@CurrentUser() user: User) {
-    try {
-      return await this.cartService.getCartWithItems(user.id);
-    } catch (error) {
-      throw new HttpException(
-        'Ошибка при получении корзины',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+  async getCart(
+    @Req() req: any,
+    @Res({ passthrough: true }) res: any,
+    @CurrentUser() user?: User,
+  ) {
+    const token = req.cookies?.[CART_COOKIE] as string | undefined;
+    const identity = { userId: user?.id, token };
+
+    const { cart, createdNew } =
+      await this.cartService.getOrCreateCart(identity);
+    if (!token || createdNew)
+      res.cookie(CART_COOKIE, cart.token, CART_COOKIE_OPTS);
+
+    return this.cartService.getCartWithItems({ id: cart.id });
   }
 
-  @ApiOperation({ summary: 'Add item to cart' })
-  @ApiResponse({ status: 200, description: 'Item added to cart' })
-  @ApiResponse({ status: 400, description: 'Invalid request' })
-  @Post('add')
+  @ApiOperation({ summary: "Add item (guest or user)" })
+  @ApiResponse({ status: 200 })
+  @Post("add")
   async addToCart(
-    @CurrentUser() user: User,
-    @Body() addToCartDto: AddToCartDto,
+    @Req() req: any,
+    @Res({ passthrough: true }) res: any,
+    @CurrentUser() user: User | undefined,
+    @Body() dto: AddToCartDto,
   ) {
     try {
-      return await this.cartService.addToCart(user.id, addToCartDto);
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
+      const token: string | undefined = req.cookies?.[CART_COOKIE];
+      const { cart, createdNew } = await this.cartService.getOrCreateCart({
+        userId: user?.id,
+        token,
+      });
+      if (!token || createdNew)
+        res.cookie(CART_COOKIE, cart.token, CART_COOKIE_OPTS);
+      return this.cartService.addToCartByIdentity(
+        { userId: user?.id, token: cart.token },
+        dto,
+      );
+    } catch (e) {
+      if (e instanceof HttpException) throw e;
       throw new HttpException(
-        'Ошибка при добавлении товара в корзину',
+        "Ошибка при добавлении товара в корзину",
         HttpStatus.BAD_REQUEST,
       );
     }
   }
 
-  @ApiOperation({ summary: 'Remove item from cart' })
-  @ApiResponse({ status: 200, description: 'Item removed from cart' })
-  @ApiResponse({ status: 404, description: 'Item not found' })
-  @Delete('remove/:productId')
+  @ApiOperation({ summary: "Remove item (guest or user)" })
+  @ApiResponse({ status: 200 })
+  @Delete("remove/:productId")
   async removeFromCart(
-    @CurrentUser() user: User,
-    @Param('productId', ParseIntPipe) productId: number,
+    @Req() req: any,
+    @CurrentUser() user: User | undefined,
+    @Param("productId", ParseIntPipe) productId: number,
   ) {
-    try {
-      return await this.cartService.removeFromCart(user.id, productId);
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      throw new HttpException(
-        'Ошибка при удалении товара из корзины',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
+    const token: string | undefined = req.cookies?.[CART_COOKIE];
+    return this.cartService.removeFromCartByIdentity(
+      { userId: user?.id, token },
+      productId,
+    );
   }
 
-  @ApiOperation({ summary: 'Get cart total' })
-  @ApiResponse({ status: 200, description: 'Cart total amount' })
-  @Get('total')
-  async getCartTotal(@CurrentUser() user: User): Promise<{ total: number }> {
-    try {
-      const total = await this.cartService.calculateTotal(user.id);
-      return { total };
-    } catch (error) {
-      throw new HttpException(
-        'Ошибка при расчете суммы корзины',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+  // total можно без авторизации
+  @ApiOperation({ summary: "Get cart total (guest or user)" })
+  @Get("total")
+  async getCartTotal(@Req() req: any, @CurrentUser() user?: User) {
+    const token: string | undefined = req.cookies?.[CART_COOKIE];
+    const total = await this.cartService.calculateTotalByIdentity({
+      userId: user?.id,
+      token,
+    });
+    return { total };
+  }
+
+  // Мерджим после логина
+  @ApiOperation({ summary: "Merge guest cart into user cart after login" })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Post("merge-on-login")
+  async mergeOnLogin(@Req() req: any, @CurrentUser() user: User) {
+    const token: string | undefined = req.cookies?.[CART_COOKIE];
+    if (!token) return this.getCart(req, undefined, user);
+    return this.cartService.mergeGuestIntoUser(token, user.id);
   }
 }

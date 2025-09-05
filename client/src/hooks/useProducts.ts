@@ -15,10 +15,14 @@ export const useProducts = () => {
 
   const refetch = () => mutate();
 
+  const errorMessage = error
+    ? (error as any)?.response?.data?.message || (error as Error).message || 'Ошибка загрузки'
+    : null;
+
   return {
     products: data || [],
     loading: isLoading,
-    error,
+    error: errorMessage,
     refetch,
   };
 };
@@ -36,10 +40,14 @@ export const useProduct = (id: number) => {
 
   const refetch = () => mutate();
 
+  const errorMessage = error
+    ? (error as any)?.response?.data?.message || (error as Error).message || 'Ошибка загрузки'
+    : null;
+
   return {
     product: data || null,
     loading: isLoading,
-    error,
+    error: errorMessage,
     refetch,
   };
 };
@@ -58,10 +66,14 @@ export const useProductsByCategory = (categoryId: number) => {
 
   const refetch = () => mutate();
 
+  const errorMessage = error
+    ? (error as any)?.response?.data?.message || (error as Error).message || 'Ошибка загрузки'
+    : null;
+
   return {
     products: data || [],
     loading: isLoading,
-    error,
+    error: errorMessage,
     refetch,
   };
 };

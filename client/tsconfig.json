@@ -29,7 +29,8 @@
       "@/types/*": ["./src/types/*"],
       "@/styles/*": ["./src/styles/*"],
       "@/data/*": ["./src/data/*"],
-      "@/hooks/*": ["./src/hooks/*"]
+      "@/hooks/*": ["./src/hooks/*"],
+      "@/features/*": ["./src/features/*"]
     },
     "forceConsistentCasingInFileNames": true,
     "noUnusedLocals": true,

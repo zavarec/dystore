@@ -10,14 +10,15 @@ export const DropdownTrigger = styled.button<{
   $isActive: boolean;
   $isOpen: boolean;
 }>`
-  color: ${props => (props.$isActive ? '#007bff' : '#ffffff')};
+  color: ${props => (props.$isActive ? '#ffffff' : '#ffffff')};
   text-decoration: none;
-  font-weight: ${props => (props.$isActive ? '600' : '400')};
+  font-weight: 400;
   font-size: 16px;
   position: relative;
-  padding: 32px 22px 24px 22px;
-  background: none;
+  padding: 32px 18px 24px 18px;
+  background: ${props => (props.$isActive ? 'rgba(255, 255, 255, 0.1)' : 'transparent')};
   border: none;
+  border-bottom: 1px solid transparent; /* фиксируем высоту */
   cursor: pointer;
   transition: color 0.3s ease;
   display: flex;
@@ -27,9 +28,13 @@ export const DropdownTrigger = styled.button<{
 
   font-family: var(--font-nunito-sans);
 
+  &:active {
+    background: #007bff;
+  }
+
   &:hover {
     background: rgba(255, 255, 255, 0.1);
-    border-bottom: 1px solid white;
+    border-bottom-color: rgba(255, 255, 255, 0.5); /* меняем только цвет */
   }
 `;
 

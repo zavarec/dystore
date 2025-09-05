@@ -10,7 +10,8 @@ import ordersSlice from './slices/orders-slice/orders.slice';
 import promotionsSlice from './slices/promotion-slice/promotion.slice';
 import categoryPromoSectionsSlice from './slices/category-promo-sections/category-promo-sections.slice';
 
-// Store factory для SSR
+import seoSlice from './slices/seo-meta-slice/seo.slice';
+
 const makeStore = () =>
   configureStore({
     reducer: {
@@ -21,15 +22,11 @@ const makeStore = () =>
       uiSlice,
       authSlice,
       cartSlice,
+      seoSlice,
       promotionsSlice,
       categoryPromoSectionsSlice,
     },
-    middleware: getDefaultMiddleware =>
-      getDefaultMiddleware({
-        serializableCheck: {
-          ignoredActions: ['persist/PERSIST'],
-        },
-      }),
+
     devTools: process.env.NODE_ENV !== 'production',
   });
 

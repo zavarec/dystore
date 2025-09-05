@@ -16,9 +16,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   for (const [key, value] of Object.entries(req.headers)) {
     if (!value) continue;
     const lower = key.toLowerCase();
-    if (['host', 'connection', 'accept-encoding', 'content-length', 'cookie'].includes(lower))
-      continue;
+    if (['host', 'connection', 'accept-encoding', 'content-length'].includes(lower)) continue;
     headers[key] = Array.isArray(value) ? value.join(', ') : value;
+  }
+  // Пробрасываем куки на бэкенд (нужно для CART_COOKIE и др.)
+  if (req.headers.cookie) {
+    headers['cookie'] = Array.isArray(req.headers.cookie)
+      ? req.headers.cookie.join('; ')
+      : req.headers.cookie;
   }
   if (accessToken) {
     headers['Authorization'] = `Bearer ${accessToken}`;

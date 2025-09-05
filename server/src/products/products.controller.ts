@@ -1,4 +1,3 @@
-// src/products/products.controller.ts
 import {
   Controller,
   Get,
@@ -45,40 +44,24 @@ export class ProductsController {
     }
   }
 
-  @ApiOperation({ summary: "Get product by ID" })
-  @ApiResponse({ status: 200, description: "Product details" })
-  @ApiResponse({ status: 404, description: "Product not found" })
-  @Get(":id")
-  async findOne(@Param("id", ParseIntPipe) id: number) {
-    try {
-      const product = await this.productsService.findOne(id);
-      if (!product) {
-        throw new HttpException("Товар не найден", HttpStatus.NOT_FOUND);
-      }
-      return product;
-    } catch (error) {
-      if (error instanceof HttpException) {
-        throw error;
-      }
-      throw new HttpException(
-        "Ошибка при получении товара",
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+  @ApiOperation({ summary: "Get product by slug" })
+  @ApiResponse({ status: 200 })
+  @ApiResponse({ status: 404 })
+  @Get("slug/:slug")
+  async findOneBySlug(@Param("slug") slug: string) {
+    const product = await this.productsService.findBySlug(slug);
+    if (!product)
+      throw new HttpException("Товар не найден", HttpStatus.NOT_FOUND);
+    return product;
   }
 
-  @ApiOperation({ summary: "Get products by category" })
-  @ApiResponse({ status: 200, description: "Products in category" })
-  @Get("category/:categoryId")
-  async findByCategory(@Param("categoryId", ParseIntPipe) categoryId: number) {
-    try {
-      return await this.productsService.findByCategory(categoryId);
-    } catch (error) {
-      throw new HttpException(
-        "Ошибка при получении товаров категории",
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+  @ApiOperation({ summary: "Get product by ID" })
+  @Get("id/:id")
+  async findOne(@Param("id", ParseIntPipe) id: number) {
+    const product = await this.productsService.findOne(id);
+    if (!product)
+      throw new HttpException("Товар не найден", HttpStatus.NOT_FOUND);
+    return product;
   }
 
   @ApiOperation({ summary: "Get products by category including descendants" })
@@ -94,6 +77,20 @@ export class ProductsController {
     } catch (error) {
       throw new HttpException(
         "Ошибка при получении товаров с подкатегориями",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @ApiOperation({ summary: "Get products by category" })
+  @ApiResponse({ status: 200, description: "Products in category" })
+  @Get("category/:categoryId")
+  async findByCategory(@Param("categoryId", ParseIntPipe) categoryId: number) {
+    try {
+      return await this.productsService.findByCategory(categoryId);
+    } catch (error) {
+      throw new HttpException(
+        "Ошибка при получении товаров категории",
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

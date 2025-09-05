@@ -25,6 +25,7 @@ import {
   Pagination as SPagination,
   PageButton as SPageButton,
 } from '@/styles/pages/admin/admin-products-page.style';
+import { TableRowSkeleton } from '@/components/atoms/skeleton';
 
 const AdminProductsPage: NextPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -84,7 +85,27 @@ const AdminProductsPage: NextPage = () => {
   if (loading) {
     return (
       <AdminLayout title="Продукты">
-        <div>Загрузка...</div>
+        <STableContainer>
+          <STable>
+            <thead>
+              <tr>
+                <STh>ID</STh>
+                <STh>Изображение</STh>
+                <STh>Название</STh>
+                <STh>Категория</STh>
+                <STh>Цена</STh>
+                <STh>На складе</STh>
+                <STh>Статус</STh>
+                <STh>Действия</STh>
+              </tr>
+            </thead>
+            <tbody>
+              {Array.from({ length: 10 }).map((_, i) => (
+                <TableRowSkeleton key={i} columns={8} />
+              ))}
+            </tbody>
+          </STable>
+        </STableContainer>
       </AdminLayout>
     );
   }

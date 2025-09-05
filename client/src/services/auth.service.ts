@@ -13,6 +13,16 @@ import { isServer } from '@/utils/ssr';
 import Cookies from 'js-cookie';
 
 export class AuthService {
+  private static async getOrInitCsrfToken(): Promise<string | undefined> {
+    let token = Cookies.get('XSRF-TOKEN');
+    if (!token) {
+      try {
+        await fetch('/api/csrf', { credentials: 'include' });
+        token = Cookies.get('XSRF-TOKEN');
+      } catch {}
+    }
+    return token;
+  }
   // Отправка кода подтверждения
   static async sendCode(data: SendCodeRequest): Promise<SendCodeResponse> {
     const response = await apiClient.post<SendCodeResponse>('/auth/send-code', data);
@@ -21,7 +31,7 @@ export class AuthService {
 
   // Проверка кода и получение токена
   static async verifyCode(data: VerifyCodeRequest): Promise<VerifyCodeResponse> {
-    const token = Cookies.get('XSRF-TOKEN');
+    const token = await this.getOrInitCsrfToken();
     const res = await fetch('/api/auth/verify-code', {
       method: 'POST',
       headers: {
@@ -40,7 +50,7 @@ export class AuthService {
 
   // Логин по username/password через внутренний API (установит httpOnly cookie)
   static async login(data: LoginRequest): Promise<{ success: boolean }> {
-    const token = Cookies.get('XSRF-TOKEN');
+    const token = await this.getOrInitCsrfToken();
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: {
@@ -78,7 +88,7 @@ export class AuthService {
 
   static async removeToken(): Promise<void> {
     if (isServer) return;
-    const token = Cookies.get('XSRF-TOKEN');
+    const token = await this.getOrInitCsrfToken();
     await fetch('/api/auth/logout', {
       method: 'POST',
       credentials: 'include',

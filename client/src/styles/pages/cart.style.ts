@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
+import { commonStyles, tokens } from '../shared';
 
 export const CartPageContainer = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
+  ${commonStyles.container};
   padding: 40px 20px;
   min-height: 60vh;
 `;
@@ -69,7 +69,7 @@ export const ItemName = styled.div`
     transition: color 0.2s ease;
 
     &:hover {
-      color: #007bff;
+      color: ${tokens.colors.primary};
     }
   }
 `;
@@ -83,7 +83,7 @@ export const ItemDescription = styled.div`
 export const ItemPrice = styled.div`
   font-size: 20px;
   font-weight: 600;
-  color: #007bff;
+  color: ${tokens.colors.primary};
 `;
 
 export const QuantityControls = styled.div`
@@ -111,7 +111,7 @@ export const QuantityButton = styled.button`
 
   &:hover:not(:disabled) {
     background: #e9ecef;
-    color: #007bff;
+    color: ${tokens.colors.primary};
   }
 
   &:disabled {
@@ -150,9 +150,9 @@ export const RemoveButton = styled.button`
   width: 40px;
   height: 40px;
   border-radius: 8px;
-  border: 1px solid #dc3545;
+  border: 1px solid ${tokens.colors.danger};
   background: white;
-  color: #dc3545;
+  color: ${tokens.colors.danger};
   font-size: 18px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -161,7 +161,7 @@ export const RemoveButton = styled.button`
   justify-content: center;
 
   &:hover:not(:disabled) {
-    background: #dc3545;
+    background: ${tokens.colors.danger};
     color: white;
   }
 
@@ -249,16 +249,10 @@ export const EmptyCartDescription = styled.p`
 `;
 
 export const ContinueShoppingButton = styled.button`
-  background: #007bff;
+  ${commonStyles.button};
+  background: ${tokens.colors.primary};
   color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 16px 32px;
   font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
   display: inline-block;
 
   &:hover {

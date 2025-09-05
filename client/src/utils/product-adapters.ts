@@ -4,11 +4,14 @@ import { Product, ProductWithDetails } from '@/types/models/product.model';
  * Преобразует продукт из API в расширенный формат для UI
  */
 export const adaptProductForUI = (product: Product): ProductWithDetails => {
-  // Создаем slug из названия
-  const slug = product.name
-    .toLowerCase()
-    .replace(/[^a-zA-Zа-яё0-9\s]/g, '')
-    .replace(/\s+/g, '-');
+  // Используем slug из БД, а генерируем из названия только если его нет
+  const slug =
+    product.slug && product.slug.trim().length > 0
+      ? product.slug
+      : product.name
+          .toLowerCase()
+          .replace(/[^a-zA-Zа-яё0-9\s-]/g, '')
+          .replace(/\s+/g, '-');
 
   // Определяем статусы на основе реальных данных
   const isPopular = product.popularity > 400; // Популярные = высокая популярность
@@ -64,7 +67,7 @@ export const adaptProductForUI = (product: Product): ProductWithDetails => {
     warranty: '2 года',
     isPopular,
     isNew,
-    metaTitle: `${product.name} - Купить в DyStore`,
+    metaTitle: `${product.name} - Купить в DysonGroup`,
     metaDescription: `${product.shortDescription || product.name}. Официальная гарантия. Быстрая доставка. Лучшие цены.`,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),

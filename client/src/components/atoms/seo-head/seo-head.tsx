@@ -41,7 +41,7 @@ export const SEOHead: React.FC<SEOHeadProps> = ({
           <meta property="og:image:alt" content={openGraph.imageAlt} />
           <meta property="og:url" content={openGraph.url} />
           <meta property="og:type" content={openGraph.type || 'website'} />
-          <meta property="og:site_name" content={openGraph.siteName || 'DyStore'} />
+          <meta property="og:site_name" content={openGraph.siteName || 'dyson-group'} />
           <meta property="og:locale" content={openGraph.locale || 'ru_RU'} />
         </>
       )}

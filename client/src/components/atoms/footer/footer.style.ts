@@ -43,7 +43,7 @@ export const FooterLink = styled(Link)`
   transition: color 0.3s ease;
 
   &:hover {
-    color: #007bff;
+    color: #fff;
   }
 `;
 
@@ -64,7 +64,7 @@ export const FooterBottom = styled.div`
 export const Logo = styled.div`
   font-size: 1.5rem;
   font-weight: 700;
-  color: #007bff;
+  color: #fff;
   margin-bottom: 15px;
   display: flex;
   align-items: center;
@@ -74,7 +74,7 @@ export const Logo = styled.div`
 export const LogoIcon = styled.div`
   width: 28px;
   height: 28px;
-  background: linear-gradient(135deg, #007bff, #0056b3);
+  background: linear-gradient(135deg, #ffff,rgb(52, 52, 53));
   border-radius: 6px;
   display: flex;
   align-items: center;

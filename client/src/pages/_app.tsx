@@ -16,6 +16,7 @@ import { fontClassNames } from '@/styles/fonts';
 
 import 'react-toastify/dist/ReactToastify.css';
 import { GlobalGutters } from '@/styles/global-gutters';
+import { initCsrf } from '@/services/security.service';
 
 // Глобальные стили - чистые как после уборки Dyson
 const globalStyles = css`
@@ -117,21 +118,20 @@ const globalStyles = css`
   }
 `;
 
-// ✅ ИСПРАВЛЕНИЕ: Компонент для инициализации аутентификации с SSR поддержкой
 const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const dispatch = useAppDispatch();
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    // Помечаем как hydrated
-    setIsHydrated(true);
+    (async () => {
+      await initCsrf(); // 🔑 токен попал в cookie
+      setIsHydrated(true);
+      console.log('isHydrated', isHydrated);
 
-    // Инициализируем состояние аутентификации
-    dispatch(initializeAuth());
-    dispatch(fetchCart());
-
-    // С httpOnly куками нельзя прочитать токен — пробуем загрузить профиль сразу
-    dispatch(loadUserProfile());
+      dispatch(initializeAuth());
+      dispatch(fetchCart()); // GET — безопасно
+      dispatch(loadUserProfile());
+    })();
   }, [dispatch]);
 
   // ✅ ИСПРАВЛЕНИЕ: Предотвращаем hydration mismatch

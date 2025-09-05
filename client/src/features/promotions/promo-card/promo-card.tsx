@@ -21,7 +21,7 @@ export const PromoCard: React.FC<PromoCardProps> = ({ promo, label }) => {
 
   const handleClick = () => {
     if (promo.product) {
-      router.push(`/product/${promo.product.id}`);
+      router.push(`/product/${promo.product.slug}`);
     }
   };
 
@@ -54,6 +54,8 @@ export const PromoCard: React.FC<PromoCardProps> = ({ promo, label }) => {
           style={{ objectFit: 'cover' }}
           sizes="100vw"
           priority
+          placeholder="blur"
+          blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMTAwMCcgaGVpZ2h0PSc1NjAnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zyc+PHJlY3Qgd2lkdGg9JzEwMDAnIGhlaWdodD0nNTYwJyBmaWxsPScjZTllY2VmJy8+PC9zdmc+"
         />
       ) : null}
 
@@ -71,7 +73,7 @@ export const PromoCard: React.FC<PromoCardProps> = ({ promo, label }) => {
             {promo.ctaText ?? 'Купить'}
           </Button>
           {promo.product && (
-            <Link href={`/product/${promo.product.id}`} style={{ color: '#007bff' }}>
+            <Link href={`/product/${promo.product.slug}`} style={{ color: '#007bff' }}>
               Подробнее
             </Link>
           )}

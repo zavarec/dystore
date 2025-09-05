@@ -28,7 +28,7 @@ const AdminLoginPage: NextPage = () => {
     <LoginContainer>
       <LoginCard>
         <LoginHeader>
-          <LoginTitle>DyStore Admin</LoginTitle>
+          <LoginTitle>DysonGroup Admin</LoginTitle>
           <LoginSubtitle>Войдите для управления магазином</LoginSubtitle>
         </LoginHeader>
         <UsernameAuthForm />

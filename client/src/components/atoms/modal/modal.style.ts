@@ -1,89 +1,110 @@
+// modal.style.ts
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
 
-export const ModalOverlay = styled(motion.div)`
+export const ModalOverlay = styled(motion.div)<{ $alignStart?: boolean }>`
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: saturate(140%) blur(2px);
   display: flex;
-  align-items: center;
+  align-items: ${({ $alignStart }) => ($alignStart ? 'flex-end' : 'center')};
   justify-content: center;
   z-index: 1000;
-  padding: 20px;
-  padding-top: 10vh;
+  padding: 16px;
 `;
 
-export const ModalContainer = styled(motion.div)`
-  position: relative;
-  max-width: 500px;
-  width: 100%;
-  max-height: 90vh;
-  overflow: hidden;
-  border-radius: 24px;
-  background: white;
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.3),
-    0 8px 25px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+const sizeToMaxWidth: Record<'sm' | 'md' | 'lg' | 'xl', string> = {
+  sm: '420px',
+  md: '560px',
+  lg: '720px',
+  xl: '960px',
+};
 
-  @media (max-width: 768px) {
-    border-radius: 20px;
-  }
+export const ModalContainer = styled(motion.div)<{
+  $size: 'sm' | 'md' | 'lg' | 'xl';
+  $maxWidth?: string;
+  $isSheet?: boolean;
+}>`
+  position: relative;
+  width: 100%;
+  max-width: ${({ $maxWidth, $size }) => $maxWidth ?? sizeToMaxWidth[$size]};
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: ${({ $isSheet }) => ($isSheet ? '20px 20px 16px 16px' : '24px')};
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.28),
+    0 8px 28px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  overflow: hidden;
 
   @media (max-width: 520px) {
-    max-width: calc(100vw - 40px);
-    width: calc(100vw - 40px);
+    max-width: 100%;
+    ${({ $isSheet }) =>
+      $isSheet
+        ? `
+      border-radius: 20px 20px 0 0;
+      max-height: 92vh;
+    `
+        : ''}
   }
 `;
 
-export const ModalContent = styled.div`
-  position: relative;
-  width: 100%;
-  height: 100%;
-  box-sizing: border-box;
-  overflow-y: auto;
-  max-height: 90vh;
-  font-family: var(--font-nunito-sans);
+export const ModalHeader = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 22px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+`;
 
+export const ModalTitle = styled.h3`
+  margin: 0;
+  flex: 1;
+  font-family: var(--font-nunito-sans);
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1.2;
+  color: #1a1a1a;
 `;
 
 export const ModalCloseButton = styled.button`
-  position: absolute;
-  top: 20px;
-  right: 20px;
   width: 32px;
   height: 32px;
-  border: none;
-  background: #f5f5f5;
+  border: 0;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 16px;
+  background: #f5f5f5;
   color: #525252;
-  transition: all 0.2s ease;
-  z-index: 10;
-
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease,
+    color 0.18s ease;
   &:hover {
-    background: #e5e5e5;
+    background: #e9e9e9;
     color: #1a1a1a;
-    transform: scale(1.05);
+    transform: scale(1.06);
   }
-
   &:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.2);
   }
+`;
 
-  @media (max-width: 768px) {
-    top: 16px;
-    right: 16px;
-    width: 28px;
-    height: 28px;
-    font-size: 14px;
+export const ModalContent = styled.div<{ $padding: number }>`
+  padding: ${({ $padding }) => `${$padding}px`};
+  overflow: auto;
+  max-height: calc(85vh - 62px);
+  font-family: var(--font-nunito-sans);
+  font-size: 16px;
+  line-height: 1.55;
+  color: #2b2b2b;
+  p {
+    margin: 0 0 12px;
   }
 `;

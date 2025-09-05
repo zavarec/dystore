@@ -14,6 +14,8 @@ export const useCategoryProducts = (categoryId?: number) => {
     },
   );
 
+  console.log(data, 'DATA');
+
   const refetch = () => mutate();
 
   return {

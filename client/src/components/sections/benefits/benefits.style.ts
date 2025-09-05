@@ -56,7 +56,7 @@ export const BenefitItem = styled(motion.li)`
 `;
 
 export const BenefitContent = styled.div`
-  border-radius: 4px;
+  border-radius: 2px;
   display: flex;
   flex-direction: row;
   align-items: center;

@@ -7,13 +7,23 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 export const fetchActivePromosBySlot = createAsyncThunk<
   Promotion[] | Promotion | null,
   PromotionSlot
->('promotions/fetchActiveBySlot', async (slot, thunkAPI) => {
-  try {
-    return await PromotionsService.getActiveBySlot(slot);
-  } catch (err: any) {
-    return thunkAPI.rejectWithValue(err.message);
-  }
-});
+>(
+  'promotions/fetchActiveBySlot',
+  async (slot, thunkAPI) => {
+    try {
+      return await PromotionsService.getActiveBySlot(slot);
+    } catch (err: any) {
+      return thunkAPI.rejectWithValue(err.message);
+    }
+  },
+  {
+    // Предотвращаем дубликаты: если для слота уже есть незавершённый запрос, не стартуем новый
+    condition: (slot, { getState }: any) => {
+      const state = getState();
+      return !state.promotionsSlice.requestedSlots?.[slot];
+    },
+  },
+);
 
 // 🔹 Добавить новое промо
 export const createPromotion = createAsyncThunk<Promotion, Partial<Promotion>>(

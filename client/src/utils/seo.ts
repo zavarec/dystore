@@ -1,6 +1,7 @@
 import { ProductWithDetails, ProductStructuredData } from '@/types/models/product.model';
-import { SEOProps } from '@/types/common';
+import { OpenGraphProps, SEOProps } from '@/types/common';
 
+import { SeoMeta } from '@/types/models/seo-meta.model';
 // Генерация структурированных данных для продуктов - потому что Google любит порядок
 export const generateProductStructuredData = (
   product: ProductWithDetails,
@@ -82,7 +83,7 @@ export const generateProductSEO = (product: ProductWithDetails, baseUrl: string)
       imageAlt: primaryImage?.alt || product.name,
       url: `${baseUrl}/product/${product.slug || product.id}`,
       type: 'product',
-      siteName: 'DyStore',
+      siteName: 'DysonGroup',
       locale: 'ru_RU',
     },
     structuredData: generateProductStructuredData(product, baseUrl),
@@ -98,18 +99,18 @@ export const generateCategorySEO = (
   productsCount: number,
 ): SEOProps => {
   return {
-    title: `${categoryName} Dyson - Купить в интернет-магазине DyStore`,
+    title: `${categoryName} Dyson - Купить в интернет-магазине DysonGroup`,
     description: `${description} Большой выбор ${categoryName.toLowerCase()} Dyson. ${productsCount} товаров в наличии. ✓ Гарантия ✓ Быстрая доставка`,
     keywords: `${categoryName}, Dyson, купить, интернет-магазин, ${categorySlug}`,
     canonical: `${baseUrl}/category/${categorySlug}`,
     openGraph: {
-      title: `${categoryName} Dyson - DyStore`,
+      title: `${categoryName} Dyson - DysonGroup`,
       description: `Купить ${categoryName.toLowerCase()} Dyson с гарантией. ${productsCount} товаров в наличии.`,
       image: `${baseUrl}/images/categories/${categorySlug}-og.jpg`,
       imageAlt: `${categoryName} Dyson`,
       url: `${baseUrl}/category/${categorySlug}`,
       type: 'website',
-      siteName: 'DyStore',
+      siteName: 'DysonGroup',
       locale: 'ru_RU',
     },
   };
@@ -149,3 +150,67 @@ export const getOptimizedImageUrl = (
 
   return `${url}?${params.toString()}`;
 };
+
+export async function fetchSeoMetaSSR(
+  pageType: 'CATEGORY' | 'PRODUCT' | 'LANDING' | 'STATIC',
+  entityId: string,
+  locale = 'ru',
+) {
+  const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+
+  // const url = `${API}/seo-meta?pageType=${encodeURIComponent(pageType)}&entityId=${encodeURIComponent(entityId)}&locale=${encodeURIComponent(locale)}`;
+
+  const url = `${API}/seo-meta/${encodeURIComponent(pageType)}/${encodeURIComponent(
+    entityId,
+  )}?locale=${encodeURIComponent(locale)}`;
+
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/json',
+    },
+  });
+  if (!res.ok) {
+    // 404 -> просто вернём null, пусть сработают фолбэки
+    return null;
+  }
+
+  const ct = res.headers.get('content-type') || '';
+  if (!ct.includes('application/json')) return null;
+
+  const text = await res.text();
+  if (!text) return null;
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
+export function buildSEOFromMeta(fallback: SEOProps, meta?: SeoMeta | null): SEOProps {
+  if (!meta) return fallback;
+
+  const og = {
+    title: meta.ogTitle || meta.title || fallback.title,
+    description: meta.ogDescription || meta.description || '',
+    image: meta.ogImage || fallback.openGraph?.image || '',
+    imageAlt: fallback.openGraph?.imageAlt || '',
+    url: fallback.openGraph?.url || '',
+    type: fallback.openGraph?.type || 'website',
+    siteName: fallback.openGraph?.siteName || 'DysonGroup',
+    locale: fallback.openGraph?.locale || 'ru_RU',
+  };
+
+  return {
+    title: meta.title || fallback.title || '',
+    description: meta.description || fallback.description || '',
+    keywords: meta.keywords || fallback.keywords || '',
+    canonical: meta.canonical || fallback.canonical || '',
+    openGraph: og,
+    structuredData: meta.structuredData || fallback.structuredData || {},
+    // простая интерпретация robots
+    noindex: meta.robots?.includes('noindex') ? true : fallback.noindex || false,
+    nofollow: meta.robots?.includes('nofollow') ? true : fallback.nofollow || false,
+  };
+}

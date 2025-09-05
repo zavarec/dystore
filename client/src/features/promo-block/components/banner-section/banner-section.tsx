@@ -2,6 +2,7 @@
 import { CategoryPromoSection } from '@/types/models/category-promo-section.model';
 import { BannerWrap, Media, ContentRow, BannerContent } from './banner-section.style';
 import { CtaRow, CtaBtn } from '../../promo-block.style';
+import Image from 'next/image';
 
 export function BannerSection(s: CategoryPromoSection) {
   const side = (s as any).contentSide === 'RIGHT' ? 'RIGHT' : 'LEFT';
@@ -12,7 +13,18 @@ export function BannerSection(s: CategoryPromoSection) {
     <BannerWrap $bg={(s as any).bgColor ?? null} $height={(s as any).heightPx ?? null}>
       {/* Фоновое медиа на всю ширину/высоту */}
       <Media>
-        {s.imageUrl && <img src={s.imageUrl} alt={s.title || ''} />}
+        {s.imageUrl && (
+          <Image
+            src={s.imageUrl}
+            alt={s.title || ''}
+            fill
+            sizes="100vw"
+            priority
+            placeholder="blur"
+            blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMTAwMCcgaGVpZ2h0PSc1NjAnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zyc+PHJlY3Qgd2lkdGg9JzEwMDAnIGhlaWdodD0nNTYwJyBmaWxsPScjZTllY2VmJy8+PC9zdmc+"
+            style={{ objectFit: 'cover' }}
+          />
+        )}
         {s.videoUrl && (
           <video src={s.videoUrl} autoPlay muted loop playsInline aria-label={s.title || ''} />
         )}

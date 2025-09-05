@@ -41,6 +41,7 @@ export class SeedService {
       const product = await this.prisma.product.create({
         data: {
           name: "Test Product",
+          slug: "test-product",
           shortDescription: "Short description",
           description: "Full description of test product",
           price: 1000,

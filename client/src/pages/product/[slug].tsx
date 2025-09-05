@@ -28,6 +28,7 @@ import {
 } from '@/styles/pages/product-slug.style';
 import { fetchCart } from '@/store/slices/cart-slice/cart.thunks';
 import { AddToCartButtonVariant } from '@/features/cart/add-to-cart-button/add-to-cart-button';
+import { formatPriceRub } from '@/utils/format';
 
 interface ProductPageProps {
   product: ProductWithDetails;
@@ -76,11 +77,14 @@ const ProductPage: NextPage<ProductPageProps> = ({ product }) => {
   const isInStock = product.stock > 0;
   const brand = 'Dyson'; // Все продукты Dyson согласно seed данным
 
+  const canonical = `https://dyson-group.ru/product/${encodeURIComponent(product.slug ?? product.id)}`;
+
   // SEO данные
   const seoData = {
-    title: `${product.name} - Купить в DyStore с доставкой | Официальная гарантия`,
+    title: `${product.name} - Купить в DysonGroup с доставкой | Официальная гарантия`,
     description: `${product.shortDescription || product.description || product.name}. Цена ${product.price.toLocaleString()} ₽. ✓ Официальная гарантия 2 года ✓ Быстрая доставка ✓ Качественное обслуживание`,
-    canonical: `https://dystore.ru/product/${product.id}`,
+    // canonical: `https://dyson-group.ru/product/${product.id}`,
+    canonical: canonical,
     keywords: `${product.name}, ${brand}, купить, интернет-магазин, Dyson`,
   };
 
@@ -95,8 +99,8 @@ const ProductPage: NextPage<ProductPageProps> = ({ product }) => {
       '@type': 'Brand',
       name: brand,
     },
-    sku: `DYSON-${product.id}`,
-    image: [imageUrl.startsWith('http') ? imageUrl : `https://dystore.ru${imageUrl}`],
+    sku: `DYSON-${product.slug}`,
+    image: [imageUrl.startsWith('http') ? imageUrl : `https://dyson-group.ru${imageUrl}`],
     offers: {
       '@type': 'Offer',
       price: product.price,
@@ -104,8 +108,8 @@ const ProductPage: NextPage<ProductPageProps> = ({ product }) => {
       availability: isInStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
       seller: {
         '@type': 'Organization',
-        name: 'DyStore',
-        url: 'https://dystore.ru',
+        name: 'DysonGroup',
+        url: 'https://dyson-group.ru',
       },
       url: seoData.canonical,
       priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 дней
@@ -121,13 +125,13 @@ const ProductPage: NextPage<ProductPageProps> = ({ product }) => {
         '@type': 'ListItem',
         position: 1,
         name: 'Главная',
-        item: 'https://dystore.ru',
+        item: 'https://dyson-group.ru',
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: getCategoryName(product.category),
-        item: `https://dystore.ru/category/${categorySlug}`,
+        item: `https://dyson-group.ru/category/${categorySlug}`,
       },
       {
         '@type': 'ListItem',
@@ -137,6 +141,7 @@ const ProductPage: NextPage<ProductPageProps> = ({ product }) => {
       },
     ],
   };
+  console.log(product, 'PRODUCT in product page');
 
   return (
     <>
@@ -154,12 +159,12 @@ const ProductPage: NextPage<ProductPageProps> = ({ product }) => {
         />
         <meta
           property="og:image"
-          content={imageUrl.startsWith('http') ? imageUrl : `https://dystore.ru${imageUrl}`}
+          content={imageUrl.startsWith('http') ? imageUrl : `https://dyson-group.ru${imageUrl}`}
         />
         <meta property="og:image:alt" content={product.name} />
         <meta property="og:url" content={seoData.canonical} />
         <meta property="og:type" content="product" />
-        <meta property="og:site_name" content="DyStore" />
+        <meta property="og:site_name" content="DysonGroup" />
         <meta property="og:locale" content="ru_RU" />
         <meta property="product:price:amount" content={product.price.toString()} />
         <meta property="product:price:currency" content="RUB" />
@@ -174,7 +179,7 @@ const ProductPage: NextPage<ProductPageProps> = ({ product }) => {
         />
         <meta
           name="twitter:image"
-          content={imageUrl.startsWith('http') ? imageUrl : `https://dystore.ru${imageUrl}`}
+          content={imageUrl.startsWith('http') ? imageUrl : `https://dyson-group.ru${imageUrl}`}
         />
 
         {/* Структурированные данные */}
@@ -200,7 +205,7 @@ const ProductPage: NextPage<ProductPageProps> = ({ product }) => {
             {getCategoryName(product.category)}
           </BreadcrumbLink>
           <span> / </span>
-          <span>{product.name}</span>
+          {/* <span>{product.name}</span> */}
         </ProductBreadcrumbs>
 
         <div
@@ -220,6 +225,9 @@ const ProductPage: NextPage<ProductPageProps> = ({ product }) => {
                 height={600}
                 priority
                 style={{ objectFit: 'contain' }}
+                sizes="(max-width: 768px) 100vw, 50vw"
+                placeholder="blur"
+                blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nNjAwJyBoZWlnaHQ9JzYwMCcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJz48cmVjdCB3aWR0aD0nNjAwJyBoZWlnaHQ9JzYwMCcgZmlsbD0nI2U5ZWNlZicvPjwvc3ZnPg=="
               />
             </ProductMainImage>
           </ProductImageSection>
@@ -238,7 +246,7 @@ const ProductPage: NextPage<ProductPageProps> = ({ product }) => {
             )}
 
             <ProductPrice>
-              <CurrentPrice>{product.price.toLocaleString()} ₽</CurrentPrice>
+              <CurrentPrice>{formatPriceRub(product.price)}</CurrentPrice>
             </ProductPrice>
 
             {isInStock ? (
@@ -249,7 +257,7 @@ const ProductPage: NextPage<ProductPageProps> = ({ product }) => {
 
             <ProductActions>
               <AddToCartButton
-                // productId={product.id}
+                productId={product.id}
                 product={product}
                 variant={ButtonVariant.PRIMARY}
                 size={AddToCartButtonVariant.LARGE}
@@ -283,37 +291,98 @@ function getCategoryName(category: any): string {
   return 'Товары';
 }
 
+// export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
+//   try {
+//     const products = await ServerProductsService.getAllProducts();
+//     const ids = Array.isArray(products) ? products.map(p => String(p.id)) : [];
+//     const paths = ids.flatMap(slug =>
+//       (locales || ['ru']).map(locale => ({ params: { slug }, locale })),
+//     );
+//     return { paths, fallback: 'blocking' };
+//   } catch {
+//     return { paths: [], fallback: 'blocking' };
+//   }
+// };
+
+// export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
+//   try {
+//     const productId = params?.slug as string;
+//     const productRaw: Product = await ServerProductsService.getProductById(Number(productId));
+//     if (!productRaw?.id) {
+//       return { notFound: true, revalidate: 60 };
+//     }
+
+//     const product = adaptProductForUI(productRaw);
+
+//     return {
+//       props: {
+//         ...(await serverSideTranslations(locale ?? 'ru', ['common'])),
+//         product,
+//       },
+//       revalidate: 3600,
+//     };
+//   } catch {
+//     return { notFound: true, revalidate: 60 };
+//   }
+// };
+
 export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
   try {
     const products = await ServerProductsService.getAllProducts();
-    const ids = Array.isArray(products) ? products.map(p => String(p.id)) : [];
-    const paths = ids.flatMap(slug =>
+    const slugs = (products || []).map(p => p.slug).filter(Boolean);
+    console.log(slugs, 'SLUGS in product page');
+
+    const paths = slugs.flatMap(slug =>
       (locales || ['ru']).map(locale => ({ params: { slug }, locale })),
     );
+
     return { paths, fallback: 'blocking' };
   } catch {
     return { paths: [], fallback: 'blocking' };
   }
 };
 
+// ✅ Забираем продукт по SLUG (а не по id)
 export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
   try {
-    const productId = params?.slug as string;
-    const productRaw: Product = await ServerProductsService.getProductById(Number(productId));
-    if (!productRaw?.id) {
-      return { notFound: true, revalidate: 60 };
+    const slug = String(params?.slug || '');
+    // Диагностика SSR запроса
+    try {
+      // 1) Определяем id по slug
+      const bySlug: Product = await ServerProductsService.getProductBySlug(slug);
+      console.log('[product/[slug]] fetched by slug:', slug, '=> id:', bySlug?.id);
+
+      if (!bySlug?.id) {
+        return { notFound: true, revalidate: 60 };
+      }
+
+      // 2) Грузим товар по id (как просили)
+      const productById: Product = await ServerProductsService.getProductById(Number(bySlug.id));
+      const product = adaptProductForUI(productById || bySlug);
+
+      return {
+        props: {
+          ...(await serverSideTranslations(locale ?? 'ru', ['common'])),
+          product,
+        },
+        revalidate: 3600,
+      };
+    } catch (err: any) {
+      console.error(
+        '[product/[slug]] fetch error for slug',
+        slug,
+        err?.response?.status,
+        err?.response?.data || err?.message,
+      );
+      throw err;
     }
-
-    const product = adaptProductForUI(productRaw);
-
-    return {
-      props: {
-        ...(await serverSideTranslations(locale ?? 'ru', ['common'])),
-        product,
-      },
-      revalidate: 3600,
-    };
-  } catch {
+  } catch (e) {
+    console.error(
+      '[product/[slug]] getStaticProps failed, returning notFound. Slug:',
+      params?.slug,
+      'Error:',
+      (e as any)?.message,
+    );
     return { notFound: true, revalidate: 60 };
   }
 };

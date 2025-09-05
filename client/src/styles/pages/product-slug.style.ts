@@ -1,8 +1,8 @@
 import styled from '@emotion/styled';
+import { tokens, commonStyles } from '../shared';
 
 export const ProductPageContainer = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
+  ${commonStyles.container};
   padding: 40px 20px;
 `;
 
@@ -12,7 +12,7 @@ export const ProductBreadcrumbs = styled.nav`
   color: #666;
 
   a {
-    color: #007bff;
+    color: ${tokens.colors.primary};
     text-decoration: none;
     transition: color 0.2s ease;
 
@@ -24,7 +24,7 @@ export const ProductBreadcrumbs = styled.nav`
 `;
 
 export const BreadcrumbLink = styled.a`
-  color: #007bff;
+  color: ${tokens.colors.primary};
   text-decoration: none;
   transition: color 0.2s ease;
 
@@ -72,7 +72,7 @@ export const ThumbnailImage = styled.div`
   justify-content: center;
 
   &:hover {
-    border-color: #007bff;
+    border-color: ${tokens.colors.primary};
   }
 `;
 
@@ -107,7 +107,7 @@ export const ProductPrice = styled.div`
 export const CurrentPrice = styled.span`
   font-size: 32px;
   font-weight: 700;
-  color: #007bff;
+  color: ${tokens.colors.primary};
 `;
 
 export const OriginalPrice = styled.span`
@@ -117,7 +117,7 @@ export const OriginalPrice = styled.span`
 `;
 
 export const DiscountBadge = styled.span`
-  background: #dc3545;
+  background: ${tokens.colors.danger};
   color: white;
   padding: 4px 12px;
   border-radius: 20px;

@@ -35,31 +35,31 @@ const HomePage: NextPage = () => {
   }, [adaptedProducts]);
 
   const seoProps = {
-    title: 'DyStore - Официальный магазин техники Dyson в России',
+    title: 'DysonGroup - Официальный магазин техники Dyson в России',
     description:
       'Купить технику Dyson с официальной гарантией. Пылесосы, фены, очистители воздуха. ✓ Быстрая доставка ✓ 2 года гарантии ✓ Лучшие цены',
     keywords: 'Dyson, пылесосы, фены, очистители воздуха, купить, интернет-магазин',
-    canonical: 'https://dystore.ru',
+    canonical: 'https://dyson-group.ru',
     openGraph: {
-      title: 'DyStore - Официальный магазин техники Dyson',
+      title: 'DysonGroup - Официальный магазин техники Dyson',
       description:
         'Купить технику Dyson с официальной гарантией. Пылесосы, фены, очистители воздуха.',
-      image: 'https://dystore.ru/images/og-home.jpg',
-      imageAlt: 'DyStore - магазин техники Dyson',
-      url: 'https://dystore.ru',
+      image: 'https://dyson-group.ru/images/og-home.jpg',
+      imageAlt: 'DysonGroup - магазин техники Dyson',
+      url: 'https://dyson-group.ru',
       type: 'website',
-      siteName: 'DyStore',
+      siteName: 'DysonGroup',
       locale: 'ru_RU',
     },
     structuredData: {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
-      name: 'DyStore',
-      url: 'https://dystore.ru',
+      name: 'DysonGroup',
+      url: 'https://dyson-group.ru',
       description: 'Официальный магазин техники Dyson в России',
       potentialAction: {
         '@type': 'SearchAction',
-        target: 'https://dystore.ru/search?q={search_term_string}',
+        target: 'https://dyson-group.ru/search?q={search_term_string}',
         'query-input': 'required name=search_term_string',
       },
     },
@@ -95,9 +95,7 @@ const HomePage: NextPage = () => {
       </div>
 
       <Container>
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: '40px' }}>Загрузка товаров...</div>
-        ) : error ? (
+        {error ? (
           <div style={{ textAlign: 'center', padding: '40px', color: 'red' }}>
             Ошибка загрузки: {error}
           </div>
@@ -107,6 +105,7 @@ const HomePage: NextPage = () => {
               title="Рекомендуемые товары"
               products={featuredProducts}
               variant="primary"
+              loading={loading}
             />
 
             <ProductSection
@@ -114,6 +113,7 @@ const HomePage: NextPage = () => {
               products={popularProducts}
               variant="outline"
               maxItems={3}
+              loading={loading}
             />
           </>
         )}

@@ -37,12 +37,17 @@ import { HorizontalScroller } from '@/components/atoms/horizontal-scroller/horiz
 import { CategoryCard } from '@/components/sections/categories/components';
 import { PromoBlock } from '@/features/promo-block/promo-block';
 import { categoryVideoMap } from '@/constants/category-video-map';
+import { buildSEOFromMeta, fetchSeoMetaSSR } from '@/utils/seo';
+
+import { SeoMeta } from '@/types/models/seo-meta.model';
 
 interface CategoryPageProps {
   slug: string;
+  seoMeta: SeoMeta | null;
+  locale: string;
 }
 
-const CategoryPage: NextPage<CategoryPageProps> = ({ slug }) => {
+const CategoryPage: NextPage<CategoryPageProps> = ({ slug, seoMeta, locale }) => {
   const router = useRouter();
   const [sortBy, setSortBy] = useState<ProductSortBy>(ProductSortBy.POPULARITY);
 
@@ -122,16 +127,31 @@ const CategoryPage: NextPage<CategoryPageProps> = ({ slug }) => {
         (acc[section.placement] ||= []).push(section);
         return acc;
       },
-      {} as any,
+      {} as Record<CategoryPromoPlacement, typeof promoSections>,
     );
   }, [promoSections]);
 
+  const fallBackSEO = useMemo(
+    () => ({
+      title: `${categoryName} - DysonGroup`,
+      description: `${categoryDescription}. Официальная гарантия, быстрая доставка.`,
+      canonical: `https://dyson-group.ru/category/${slug}`,
+      openGraph: {
+        title: `${categoryName} - DysonGroup`,
+        description: `${categoryDescription}.`,
+        image: '',
+        url: `https://dyson-group.ru/category/${slug}`,
+        type: 'website',
+        siteName: 'DysonGroup',
+        locale: locale ?? 'ru_RU',
+        imageAlt: `${categoryName} - DysonGroup`,
+      },
+    }),
+    [slug, locale],
+  ); // и
+
   // SEO данные
-  const seoData = {
-    title: `${categoryName} - DyStore`,
-    description: `${categoryDescription}. Официальная гарантия, быстрая доставка.`,
-    canonical: `https://dystore.ru/category/${slug}`,
-  };
+  const seoData = buildSEOFromMeta(fallBackSEO, seoMeta);
 
   return (
     <>
@@ -153,7 +173,7 @@ const CategoryPage: NextPage<CategoryPageProps> = ({ slug }) => {
             variant={ButtonVariant.GREEN}
             style={{ borderRadius: 6 }}
           >
-            Смотреть подкатегории
+            Перейти к разделам
           </Button>
         </VideoBanner>
       )}
@@ -163,7 +183,7 @@ const CategoryPage: NextPage<CategoryPageProps> = ({ slug }) => {
       <Container>
         <Header>
           <div>
-            <nav style={{ marginBottom: '16px' }}>
+            <nav>
               <Link href="/" style={{ color: '#666', textDecoration: 'none' }}>
                 Главная
               </Link>
@@ -182,12 +202,7 @@ const CategoryPage: NextPage<CategoryPageProps> = ({ slug }) => {
       )}
 
       {hasChildren && (
-        <section
-          id="subcategories"
-          style={{
-            padding: '40px 0',
-          }}
-        >
+        <section id="subcategories">
           <HorizontalScroller
             items={category?.children || []}
             renderItem={cat => (
@@ -244,7 +259,7 @@ const CategoryPage: NextPage<CategoryPageProps> = ({ slug }) => {
             )}
 
             {loading ? (
-              <div style={{ textAlign: 'center', padding: '40px' }}>Загрузка товаров...</div>
+              <ProductSection title="" products={[]} variant="primary" loading={true} />
             ) : sortedProducts.length === 0 ? (
               <EmptyState>
                 <EmptyIcon>🔍</EmptyIcon>
@@ -290,10 +305,14 @@ export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
 export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
   const slug = params?.slug as string;
 
+  const seoMeta: SeoMeta | null = await fetchSeoMetaSSR('CATEGORY', slug, locale ?? 'ru');
+
   return {
     props: {
       ...(await serverSideTranslations(locale ?? 'ru', ['common'])),
       slug,
+      seoMeta,
+      locale,
     },
     revalidate: 3600, // Перегенерация каждый час
   };

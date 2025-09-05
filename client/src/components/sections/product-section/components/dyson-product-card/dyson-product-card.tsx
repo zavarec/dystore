@@ -31,6 +31,13 @@ export const DysonProductCard: React.FC<DysonProductCardProps> = ({ product, ind
   // Рассчитываем скидку
   const discount = product.originalPrice ? product.originalPrice - product.price : 0;
 
+  const href = `/product/${product.slug}`;
+
+  console.log(product, 'PRODUCT in product card');
+
+  const genericBlur =
+    'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMjgwJyBoZWlnaHQ9JzI4MCcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJz48cmVjdCB3aWR0aD0nMjgwJyBoZWlnaHQ9JzI4MCcgZmlsbD0nI2U5ZWNlZicvPjwvc3ZnPg==';
+
   // Создаем звезды для рейтинга
   const renderStars = (rating: number) => {
     const stars = [];
@@ -62,7 +69,7 @@ export const DysonProductCard: React.FC<DysonProductCardProps> = ({ product, ind
       {/* Бейдж скидки */}
       {discount > 0 && <SaveBadge>Save ₽{discount.toLocaleString('ru-RU')}</SaveBadge>}
 
-      <Link href={`/product/${product.id}`}>
+      <Link href={href}>
         <ProductTitleWithImageWrapper>
           {/* Изображение товара */}
 
@@ -74,11 +81,14 @@ export const DysonProductCard: React.FC<DysonProductCardProps> = ({ product, ind
               height={280}
               style={{ objectFit: 'contain' }}
               priority={index < 3}
+              sizes="(max-width: 768px) 100vw, 50vw"
+              placeholder="blur"
+              blurDataURL={genericBlur}
             />
           </ProductImage>
 
           <ProductTitle>
-            <Link href={`/product/${product.id}`}>{product.name}</Link>
+            <span>{product.name}</span>
           </ProductTitle>
 
           {/* Рейтинг */}

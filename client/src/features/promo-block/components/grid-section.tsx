@@ -1,5 +1,6 @@
 import { CategoryPromoSection } from '@/types/models/category-promo-section.model';
 import { Card, GridWrap, Media } from '../promo-block.style';
+import Image from 'next/image';
 
 export function GridSection(s: CategoryPromoSection) {
   // На будущее можно распарсить из s.data список элементов; пока — fallback к баннеру/тексту
@@ -14,7 +15,15 @@ export function GridSection(s: CategoryPromoSection) {
       <GridWrap>
         {s.imageUrl && (
           <Media>
-            <img src={s.imageUrl} alt={s.title || ''} />
+            <Image
+              src={s.imageUrl}
+              alt={s.title || ''}
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              placeholder="blur"
+              blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nNjQwJyBoZWlnaHQ9JzM2MCcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJz48cmVjdCB3aWR0aD0nNjQwJyBoZWlnaHQ9JzM2MCcgZmlsbD0nI2U5ZWNlZicvPjwvc3ZnPg=="
+              style={{ objectFit: 'cover' }}
+            />
           </Media>
         )}
         {s.videoUrl && (

@@ -30,7 +30,7 @@ const AdminLoginPage: NextPage = () => {
     <SLoginContainer>
       <SLoginCard>
         <SLoginHeader>
-          <SLoginTitle>DyStore Admin</SLoginTitle>
+          <SLoginTitle>DysonGroup Admin</SLoginTitle>
           <SLoginSubtitle>Войдите для управления магазином</SLoginSubtitle>
         </SLoginHeader>
         <UsernameAuthForm />

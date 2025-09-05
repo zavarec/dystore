@@ -19,7 +19,7 @@ import {
 // 404 страница - когда даже Dyson не может найти то, что вы ищете
 const Custom404: NextPage = () => {
   const seoProps = {
-    title: 'Страница не найдена - DyStore',
+    title: 'Страница не найдена - DysonGroup',
     description:
       'Запрашиваемая страница не найдена. Вернитесь на главную страницу или воспользуйтесь поиском.',
     noindex: true,

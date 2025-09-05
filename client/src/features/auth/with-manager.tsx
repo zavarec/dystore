@@ -23,22 +23,30 @@ export function withManager<P extends object>(Component: NextPage<P>) {
 
     useEffect(() => {
       if (!ready) return;
+      // Пока профиль грузится — не редиректим
+      if (isLoading) return;
+
+      // Нет аутентификации после загрузки — отправляем на логин
       if (!isAuthenticated) {
         void router.replace('/admin/login');
         return;
       }
-      if (isLoading) return;
 
-      const allowed = user && (user.role === UserRole.MANAGER || user.role === UserRole.DIRECTOR);
+      // Профиль ещё не подгружен — ждём
+      if (!user) return;
+
+      // Проверяем роли только когда пользователь загружен
+      const allowed = user.role === UserRole.MANAGER || user.role === UserRole.DIRECTOR;
       if (!allowed) {
         void router.replace('/');
       }
     }, [ready, isAuthenticated, isLoading, user, router]);
 
     if (!ready) return null;
-    if (!isAuthenticated) return null;
     if (isLoading) return null;
-    const allowed = user && (user.role === UserRole.MANAGER || user.role === UserRole.DIRECTOR);
+    if (!isAuthenticated) return null;
+    if (!user) return null;
+    const allowed = user.role === UserRole.MANAGER || user.role === UserRole.DIRECTOR;
     if (!allowed) return null;
 
     return <Component {...(props as P)} />;

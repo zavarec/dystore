@@ -29,3 +29,6 @@ export const dysonFutura = localFont({
 });
 
 export const fontClassNames = `${nunitoSans.variable} ${inter.variable} ${dysonFutura.variable}`;
+
+
+

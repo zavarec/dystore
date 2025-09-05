@@ -76,6 +76,7 @@ export const ProductImage = styled.img`
   height: 50px;
   object-fit: cover;
   border-radius: 4px;
+  loading: lazy;
 `;
 
 export const StockBadge = styled.span<{ $inStock: boolean }>`

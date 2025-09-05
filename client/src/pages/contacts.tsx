@@ -18,8 +18,8 @@ const ContactsPage = () => (
       <br />
       <br />
       <b>Email:</b>{' '}
-      <a href="mailto:support@dystore.ru" style={{ color: '#007bff' }}>
-        support@dystore.ru
+      <a href="mailto:support@dyson-group.ru" style={{ color: '#007bff' }}>
+        support@dyson-group.ru
       </a>
       <br />
       <b>Телефон:</b>{' '}

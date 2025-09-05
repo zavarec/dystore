@@ -15,6 +15,8 @@ interface PromotionsState {
   promotions: Record<PromotionSlot, Promotion[]>;
   homeSections: PageSectionDTO[];
   getPromotionsLoading: boolean;
+  // Флаг, чтобы не дублировать запросы по слотам (React StrictMode в dev)
+  requestedSlots: Record<PromotionSlot, boolean>;
   createPromotionLoading: boolean;
   updatePromotionLoading: boolean;
   deletePromotionLoading: boolean;
@@ -26,6 +28,7 @@ const initialState: PromotionsState = {
   homeSections: [],
 
   getPromotionsLoading: false,
+  requestedSlots: { HERO: false, PRODUCT_OF_DAY: false, FEATURED: false, CUSTOM: false },
   createPromotionLoading: false,
   updatePromotionLoading: false,
   deletePromotionLoading: false,
@@ -40,8 +43,10 @@ const promotionsSlice = createSlice({
   extraReducers: builder => {
     builder
       // 🔹 Получить активные промо по слоту
-      .addCase(fetchActivePromosBySlot.pending, state => {
+      .addCase(fetchActivePromosBySlot.pending, (state, action) => {
         state.getPromotionsLoading = true;
+        const slot = action.meta.arg as PromotionSlot;
+        state.requestedSlots[slot] = true;
         state.error = null;
       })
       .addCase(fetchActivePromosBySlot.fulfilled, (state, action) => {
@@ -52,9 +57,12 @@ const promotionsSlice = createSlice({
         } else {
           state.promotions[slot] = (action.payload as Promotion[]) ?? [];
         }
+        state.requestedSlots[slot] = false;
       })
       .addCase(fetchActivePromosBySlot.rejected, (state, action) => {
         state.getPromotionsLoading = false;
+        const slot = action.meta?.arg as PromotionSlot;
+        if (slot) state.requestedSlots[slot] = false;
         state.error = action.payload as string;
       })
 

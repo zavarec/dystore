@@ -8,6 +8,9 @@ export interface Product {
   /** Название продукта */
   name: string;
 
+  /** URL-слаг для красивых ссылок (например: "dyson-v15-detect") */
+  slug?: string;
+
   /** Полное описание продукта */
   description?: string;
 
@@ -39,7 +42,7 @@ export interface Product {
 // Расширенный тип продукта для UI (с дополнительными полями для SEO и отображения)
 export interface ProductWithDetails extends Product {
   /** URL-слаг для красивых ссылок (например: "dyson-v15-detect") */
-  slug?: string;
+  slug: string;
   /** Оригинальная цена до скидки для отображения зачеркнутой цены */
   originalPrice?: number;
   /** Валюта цены (по умолчанию RUB) */

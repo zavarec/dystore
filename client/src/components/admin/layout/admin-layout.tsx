@@ -46,6 +46,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => 
         { href: '/admin/categories/new-category-page', label: 'Добавить категорию', icon: Plus },
         { href: '/admin/users', label: 'Пользователи', icon: List },
         { href: '/admin/promotions', label: 'Промо', icon: Megaphone },
+        { href: '/admin/seo', label: 'SEO-настройки', icon: Megaphone },
       ],
     },
   ];
@@ -53,7 +54,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => 
   return (
     <LayoutContainer>
       <Sidebar>
-        <Logo>DyStore Admin</Logo>
+        <Logo>DysonGroup Admin</Logo>
 
         {navItems.map(section => (
           <NavSection key={section.section}>

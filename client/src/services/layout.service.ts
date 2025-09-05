@@ -11,14 +11,24 @@ export interface PageSectionDTO {
 }
 
 export const LayoutService = {
+  // Кэш промиса, чтобы не дублировать параллельные вызовы adminList
+  _adminListPromise: null as Promise<PageSectionDTO[]> | null,
+
   async getHome() {
     const { data } = await apiClient.get<PageSectionDTO[]>('/layout/home');
     return data;
   },
 
   async adminList() {
-    const { data } = await apiClient.get<PageSectionDTO[]>('/admin/layout/home');
-    return data;
+    if (!this._adminListPromise) {
+      this._adminListPromise = apiClient
+        .get<PageSectionDTO[]>('/admin/layout/home')
+        .then(r => r.data)
+        .finally(() => {
+          this._adminListPromise = null;
+        });
+    }
+    return this._adminListPromise;
   },
 
   async reorder(items: { id: number; position: number }[]) {

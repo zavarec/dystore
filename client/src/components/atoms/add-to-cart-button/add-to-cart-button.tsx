@@ -24,10 +24,10 @@ interface AddToCartButtonProps {
   style?: React.CSSProperties;
 }
 
-// Заменить импорты
-import { useLocalStorage } from '@/utils/ssr';
+import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+import { addToCart } from '@/store/slices/cart-slice/cart.thunks';
+import { selectCartItems } from '@/store/slices/cart-slice/cart.selectors';
 
-// Заменить в компоненте AddToCartButton:
 export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   product,
   variant = ButtonVariant.PRIMARY,
@@ -45,17 +45,13 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
     setMounted(true);
   }, []);
 
-  // ✅ ИСПРАВЛЕНИЕ: Используем безопасный хук
-  const [cartItems, setCartItems, isHydrated] = useLocalStorage('simpleCart', []);
+  const dispatch = useAppDispatch();
+  const cartItems = useAppSelector(selectCartItems);
 
-  // Вычисляем количество только после hydration
-  const quantityInCart = isHydrated
-    ? cartItems.find((item: any) => item.productId === product.id)?.quantity || 0
-    : 0;
+  const quantityInCart =
+    cartItems.find((item: any) => item.productId === product.id)?.quantity || 0;
 
   const handleAddToCart = async () => {
-    if (!isHydrated) return; // Не позволяем добавлять до hydration
-
     const isInStock = product.stock > 0;
     if (!isInStock) {
       toast.error('Товар временно отсутствует в наличии');
@@ -64,29 +60,12 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
 
     setIsLoading(true);
     try {
-      let updatedCart = [...cartItems];
-      const existingItemIndex = updatedCart.findIndex(item => item.productId === product.id);
-
-      if (existingItemIndex >= 0) {
-        updatedCart[existingItemIndex].quantity += quantity;
-      } else {
-        const newItem = {
-          id: Date.now(),
+      dispatch(
+        addToCart({
           productId: product.id,
-          quantity: quantity,
-          name: product.name,
-          price: product.price,
-          imageUrl: product.imageUrl ?? '/images/placeholder.webp',
-        };
-        updatedCart.push(newItem);
-      }
-
-      setCartItems(updatedCart);
-
-      // Уведомляем другие компоненты об обновлении
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new Event('cartUpdated'));
-      }
+          quantity,
+        }),
+      );
 
       toast.success(`${product.name} добавлен в корзину`);
     } catch (error) {
@@ -103,10 +82,10 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
         variant={variant}
         size={size}
         onClick={handleAddToCart}
-        disabled={disabled || !product.stock || isLoading || !isHydrated || !mounted} // Блокируем до hydration/mount
+        disabled={disabled || !product.stock || isLoading || !mounted}
         fullWidth={true}
       >
-        {!mounted || !isHydrated
+        {!mounted
           ? 'Загрузка...'
           : !product.stock
             ? 'Нет в наличии'
@@ -115,7 +94,7 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
               : 'В корзину'}
       </Button>
 
-      {showQuantity && isHydrated && mounted && quantityInCart > 0 && (
+      {showQuantity && mounted && quantityInCart > 0 && (
         <QuantityBadge suppressHydrationWarning>{quantityInCart}</QuantityBadge>
       )}
     </AddToCartButtonWrapper>

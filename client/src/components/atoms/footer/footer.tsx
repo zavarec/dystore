@@ -23,7 +23,7 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
           <FooterSection>
             <Logo>
               <LogoIcon>D</LogoIcon>
-              DyStore
+              Dyson Group
             </Logo>
             <FooterText>
               Официальный магазин техники Dyson в России. Инновационные решения для дома с гарантией
@@ -32,7 +32,7 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
             <FooterText>
               📞 8 (800) 555-35-35
               <br />
-              📧 info@dystore.ru
+              📧 info@dyson-group.ru
             </FooterText>
           </FooterSection>
 
@@ -64,7 +64,7 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
         </FooterGrid>
 
         <FooterBottom>
-          <p>© 2024 DyStore. Все права защищены.</p>
+          <p>© 2024 DysonGroup. Все права защищены.</p>
         </FooterBottom>
       </FooterContent>
     </FooterContainer>

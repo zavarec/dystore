@@ -43,7 +43,7 @@ export const Logo = styled(Link)`
   gap: 8px;
 
   &:hover {
-    color: #007bff;
+    color: #ffffff;
   }
 
   @media (max-width: 1100px) {
@@ -119,7 +119,7 @@ export const HeaderLeft = styled.div`
 `;
 
 export const StyledNavLink = styled.a<{ $isActive: boolean }>`
-  color: ${props => (props.$isActive ? '#007bff' : '#ffffff')};
+  color: ${props => (props.$isActive ? '#ffffff' : '#ffffff')};
   text-decoration: none;
   font-weight: ${props => (props.$isActive ? '600' : '400')};
   font-size: 14px;

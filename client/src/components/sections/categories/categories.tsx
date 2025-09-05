@@ -8,7 +8,8 @@ import {
   ScrollContainer,
 } from './categories.style';
 import { fetchRootCategories } from '@/store/slices/categories-slice/categories.thunks';
-import { CategoriesSkeleton, CategoryCard } from './components';
+import { CategoryCard } from './components';
+import { CategoryCardSkeleton } from '@/components/atoms/skeleton';
 import {
   selectIsRootCategoriesLoading,
   selectRootCategories,
@@ -29,6 +30,7 @@ export const Categories: React.FC = () => {
     window.location.href = `/category/${categorySlug}`;
   };
 
+  // При загрузке показываем скелеты с размерами карточек
   if (isLoading) {
     return (
       <CategoriesSection>
@@ -36,7 +38,20 @@ export const Categories: React.FC = () => {
           <CategoriesHeader>
             <CategoriesTitle>Категории товаров</CategoriesTitle>
           </CategoriesHeader>
-          <CategoriesSkeleton />
+          <ScrollContainer>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  flex: '0 0 auto',
+                  scrollSnapAlign: 'start',
+                  minWidth: '220px',
+                }}
+              >
+                <CategoryCardSkeleton variant="square" />
+              </div>
+            ))}
+          </ScrollContainer>
         </CategoriesContainer>
       </CategoriesSection>
     );

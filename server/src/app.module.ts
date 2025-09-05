@@ -17,6 +17,8 @@ import { GlobalExceptionFilter } from "./common/filters/global-exception.filter"
 import { PromotionsModule } from "./promotions/promotions.module";
 import { LayoutModule } from "./layout/layout.module";
 import { CategoryPromoSectionsModule } from "./category-promo-sections/category-promo-sections.module";
+import { SeoMetaModule } from "./seo-meta/seo-meta.module";
+import { CsrfController } from "./common/controllers/csrf.controller";
 
 @Module({
   imports: [
@@ -41,8 +43,9 @@ import { CategoryPromoSectionsModule } from "./category-promo-sections/category-
     PromotionsModule,
     LayoutModule,
     CategoryPromoSectionsModule,
+    SeoMetaModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, CsrfController],
   providers: [
     AppService,
     {

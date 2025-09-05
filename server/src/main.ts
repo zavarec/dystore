@@ -1,29 +1,61 @@
-// src/main.ts
 import { NestFactory } from "@nestjs/core";
 import { ValidationPipe, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
 import helmet from "helmet";
+
 // import compression from "compression";
+import * as csrf from "csurf";
+
+const cookieParser = require("cookie-parser");
 
 async function bootstrap() {
   const logger = new Logger("Bootstrap");
 
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+  app.use(cookieParser()); // ← ОБЯЗАТЕЛЬНО до роутов
+
+  app.use((req, res, next) => {
+    res.header("Vary", "Origin");
+    next();
+  });
+
+  const whitelist: (string | RegExp)[] = [
+    process.env.FRONTEND_ORIGIN || "",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    /^https?:\/\/194\.87\.76\.238(?::\d+)?$/, // твой сервер по IP и любому порту
+    /^http?:\/\/194\.87\.76\.238(?::\d+)?$/,
+  ].filter(Boolean) as (string | RegExp)[];
 
   // CORS
   app.enableCors({
-    origin: [
-      "http://localhost:3000",
-      "http://127.0.0.1:3000",
-      "https://dystore.vercel.app",
-    ],
+    origin: whitelist,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-XSRF-TOKEN"],
     credentials: true,
   });
+
+  const csrfProtection = csrf({
+    // cookie для СЕКРЕТА (csurf хранит здесь secret, НЕ сам token!)
+    cookie: {
+      key: "_csrf", // ❗ другое имя, не XSRF-TOKEN
+      httpOnly: true, // секрет фронту не нужен
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
+    },
+    // где брать ТОКЕН при проверке (мы будем слать в заголовке)
+    value: (req: any) =>
+      req.headers["x-xsrf-token"] ||
+      req.headers["x-csrf-token"] ||
+      req.headers["csrf-token"] ||
+      (req.body && req.body._csrf),
+  });
+
+  app.use("/api/csrf", csrfProtection);
 
   // Security & performance
   app.use(helmet());
@@ -45,9 +77,9 @@ async function bootstrap() {
   );
 
   // Swagger setup
-  const config = new DocumentBuilder()
-    .setTitle("DyStore API")
-    .setDescription("DyStore E-commerce API Documentation")
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle("DysonGroup API")
+    .setDescription("DysonGroup E-commerce API Documentation")
     .setVersion("1.0.0")
     .addBearerAuth()
     .addTag("Authentication", "User authentication and authorization")
@@ -57,7 +89,7 @@ async function bootstrap() {
     .addTag("Orders", "Order management")
     .build();
 
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup("api-docs", app, document, {
     swaggerOptions: {
       persistAuthorization: true,
@@ -72,7 +104,7 @@ async function bootstrap() {
   app.enableShutdownHooks();
 
   const port = configService.get<number>("PORT", 3000);
-  await app.listen(port);
+  await app.listen(port, "0.0.0.0");
 
   logger.log(`Application is running on: http://localhost:${port}/api`);
   logger.log(

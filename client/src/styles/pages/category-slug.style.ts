@@ -1,9 +1,9 @@
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
+import { commonStyles, tokens } from '../shared';
 
 export const Container = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
+  ${commonStyles.container};
   padding: 40px 20px;
 `;
 
@@ -16,7 +16,6 @@ export const CategoryTitle = styled.h1`
   font-size: 3rem;
   font-weight: 700;
   color: #333;
-  margin-bottom: 16px;
 
   @media (max-width: 768px) {
     font-size: 2.5rem;
@@ -73,7 +72,7 @@ export const Select = styled.select`
 
   &:focus {
     outline: none;
-    border-color: #007bff;
+    border-color: ${tokens.colors.primary};
     box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
   }
 `;
@@ -91,10 +90,9 @@ export const ProductGrid = styled.div`
 `;
 
 export const ProductCard = styled(motion.div)`
-  background: white;
+  ${commonStyles.card};
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
   border: 1px solid #f0f0f0;
   cursor: pointer;
@@ -128,11 +126,11 @@ export const ProductBadge = styled.div<{ type: 'new' | 'popular' | 'sale' }>`
   background: ${props => {
     switch (props.type) {
       case 'new':
-        return '#28a745';
+        return tokens.colors.success;
       case 'popular':
-        return '#007bff';
+        return tokens.colors.primary;
       case 'sale':
-        return '#dc3545';
+        return tokens.colors.danger;
       default:
         return '#6c757d';
     }
