@@ -23,6 +23,17 @@ const cartSlice = createSlice({
     clearError: state => {
       state.error = null;
     },
+    setQuantity: (state, action: PayloadAction<{ productId: number; quantity: number }>) => {
+      if (!state.cart) return;
+
+      const { productId, quantity } = action.payload;
+      const nextQ = Math.max(1, Number.isFinite(quantity) ? quantity : 1);
+
+      const item = state.cart.items.find(it => it.productId === productId);
+      if (!item) return;
+
+      item.quantity = nextQ;
+    },
   },
   extraReducers: builder => {
     builder
@@ -77,25 +88,6 @@ const cartSlice = createSlice({
   },
 });
 
-// Доп. редьюсеры определяем отдельно для аккуратности типов
-export const { clearError } = cartSlice.actions;
+export const { clearError, setQuantity } = cartSlice.actions;
 
-// Гидрация корзины из локального снапшота
-export const hydrateCart = (payload: Cart | null): PayloadAction<Cart | null> => ({
-  type: 'cart/hydrate',
-  payload,
-});
-
-// Расширяем редьюсером для действия hydrate
-const baseReducer = cartSlice.reducer;
-const enhancedReducer = (state: any, action: any) => {
-  if (action.type === 'cart/hydrate') {
-    return {
-      ...state,
-      cart: action.payload,
-    };
-  }
-  return baseReducer(state, action);
-};
-
-export default enhancedReducer;
+export default cartSlice.reducer;

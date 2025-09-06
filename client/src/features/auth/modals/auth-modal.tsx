@@ -1,11 +1,17 @@
 import React, { useEffect } from 'react';
-import { Modal } from '@/components/atoms/modal';
-import { AuthModalContent } from '@/features/auth/modals/auth-modal-content';
-import { useAppSelector, useAppDispatch } from '@/hooks/redux';
-import { setAuthModalOpen } from '@/store/slices/uiSlice';
+import { PhoneAuthForm } from '@/features/auth/forms/phone-auth-form';
+// import { UsernameAuthForm } from '@/features/auth/forms/username-auth-form';
+// import { AuthModeButton, AuthModeContainer, AuthModeSelector } from './auth-modal-content.style';
+import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { selectIsAuthenticated } from '@/store/slices/auth-slice/auth.selectors';
+import { setAuthModalOpen } from '@/store/slices/uiSlice';
+import { Modal } from '@/components/atoms/modal';
 
-export const AuthModal: React.FC = () => {
+interface AuthModalProps {
+  onClose?: () => void;
+}
+
+export const AuthModal: React.FC<AuthModalProps> = () => {
   const dispatch = useAppDispatch();
   const isAuthModalOpen = useAppSelector(state => state.uiSlice.isAuthModalOpen);
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
@@ -22,8 +28,11 @@ export const AuthModal: React.FC = () => {
   };
 
   return (
-    <Modal isOpen={isAuthModalOpen} onClose={handleClose} size="sm" variant="center" padding={20}>
-      <AuthModalContent onClose={handleClose} />
-    </Modal>
+    <div>
+      <Modal isOpen={isAuthModalOpen} onClose={handleClose} size="sm" variant="center" padding={20}>
+        {/* Только вход по телефону в обычном режиме */}
+        <PhoneAuthForm />
+      </Modal>
+    </div>
   );
 };

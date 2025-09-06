@@ -105,34 +105,39 @@ export const SuccessMessage = styled.div`
     font-size: 12px;
   }
 `;
-
 export const CloseButton = styled.button`
+  all: unset;
   position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: #f5f5f5;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 16px;
-  color: #525252;
-  transition: all 0.2s ease;
-  z-index: 10;
+  top: 8px;
+  right: 8px;
 
+  /* большой и предсказуемый хитбокс */
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+
+  cursor: pointer;
+  border-radius: 8px;
+  z-index: 100; /* выше содержимого формы */
+  -webkit-tap-highlight-color: transparent;
+
+  /* визуальный отклик */
   &:hover {
-    background: #e5e5e5;
-    color: #1a1a1a;
-    transform: scale(1.05);
+    background: rgba(0, 0, 0, 0.06);
+  }
+  &:active {
+    transform: translateY(0.5px);
   }
 
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.2);
+  /* на случай перекрытий */
+  pointer-events: auto;
+
+  /* если внутри будет svg — пусть растягивается адекватно */
+  svg {
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
   }
 `;
 

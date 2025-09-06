@@ -38,6 +38,7 @@ import { CategoryCard } from '@/components/sections/categories/components';
 import { PromoBlock } from '@/features/promo-block/promo-block';
 import { categoryVideoMap } from '@/constants/category-video-map';
 import { buildSEOFromMeta, fetchSeoMetaSSR } from '@/utils/seo';
+import { allCategoriesPreviewImage } from '@/constants/category.constnat';
 
 import { SeoMeta } from '@/types/models/seo-meta.model';
 
@@ -106,6 +107,23 @@ const CategoryPage: NextPage<CategoryPageProps> = ({ slug, seoMeta, locale }) =>
     ? `Выберите подкатегорию раздела «${categoryName}»`
     : `Товары категории ${categoryName}`;
   const categoryVideoSrc = categoryVideoMap[slug];
+
+  const subcategoryItems = useMemo(() => {
+    const children = category?.children || [];
+    if (!category) return children;
+
+    const viewAll = {
+      id: -1,
+      name: 'Смотреть всё',
+      slug,
+      image:
+        (allCategoriesPreviewImage as Record<string, string>)[slug] ||
+        category.image ||
+        '/images/placeholder.webp',
+    };
+
+    return [...children, viewAll];
+  }, [category, slug]);
 
   const handleCategoryClick = useCallback(
     (subcategorySlug: string) => {
@@ -204,7 +222,7 @@ const CategoryPage: NextPage<CategoryPageProps> = ({ slug, seoMeta, locale }) =>
       {hasChildren && (
         <section id="subcategories">
           <HorizontalScroller
-            items={category?.children || []}
+            items={subcategoryItems}
             renderItem={cat => (
               <div style={{ width: '100%', display: 'flex' }}>
                 <CategoryCard category={cat} onClick={handleCategoryClick} variant="square" />

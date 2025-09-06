@@ -7,7 +7,8 @@ import { Footer } from '../atoms/footer';
 
 import { NoSSR } from '../atoms/no-ssr/no-ssr';
 import { AmoCrmWidget } from '../integrations/amo-crm-widget';
-import { AuthModalContent } from '@/features/auth/modals';
+import { AuthModal } from '@/features/auth/modals/auth-modal';
+
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -34,7 +35,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, className }) => {
         {!isAdminRoute && <Footer />}
       </PageContainer>
       <NoSSR fallback={null}>
-        <AuthModalContent />
+        <AuthModal/>
       </NoSSR>
     </>
   );

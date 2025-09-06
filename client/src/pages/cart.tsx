@@ -1,12 +1,12 @@
+// pages/cart.tsx
 import { useState } from 'react';
-import { GetServerSideProps, NextPage } from 'next';
-
+import dynamic from 'next/dynamic';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
+
 import { Button } from '@/components/atoms/button';
 import { ButtonVariant } from '@/components/atoms/button/button.style';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
@@ -41,57 +41,43 @@ import {
   selectCartTotalItems,
   selectCartTotalPrice,
 } from '@/store/slices/cart-slice/cart.selectors';
-import { formatNumberRu } from '@/utils/format';
-import { Cart, CartItem as CartItemType } from '@/types/models/cart.model';
+
 import { clearCart, removeFromCart } from '@/store/slices/cart-slice/cart.thunks';
-import axios from 'axios';
 
-type CartPateProps = {
-  initialCart: Cart | null;
-};
+import { formatNumberRu } from '@/utils/format';
+import { CartItem as CartItemType } from '@/types/models/cart.model';
+import { setQuantity } from '@/store/slices/cart-slice/cart.slice';
+import { selectIsAuthenticated } from '@/store/slices/auth-slice/auth.selectors';
+import { setAuthModalOpen } from '@/store/slices/uiSlice';
 
-// Основной компонент корзины
-const CartContent: React.FC<CartPateProps> = ({ initialCart }) => {
+const CartPage: React.FC = () => {
   const router = useRouter();
-  const [isLoading] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const dispatch = useAppDispatch();
 
+  const [isLoading, setIsLoading] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [comment, setComment] = useState('');
 
-  const dispatch = useAppDispatch();
-  // Redux-данные (после гидрации попадут сюда)
-  const storeItems = useAppSelector(selectCartItems);
-  const storeTotalItems = useAppSelector(selectCartTotalItems);
-  const storeTotalPrice = useAppSelector(selectCartTotalPrice);
+  const cartItems = useAppSelector(selectCartItems);
+  const totalItems = useAppSelector(selectCartTotalItems);
+  const totalPrice = useAppSelector(selectCartTotalPrice);
+  const isAuth = useAppSelector(selectIsAuthenticated);
 
-  // SSR-фоллбек
-  const ssrItems = (initialCart?.items ?? []) as CartItemType[];
-  const ssrTotalItems = ssrItems.reduce((s, it) => s + (it.quantity || 0), 0);
-  const ssrTotalPrice = ssrItems.reduce((s, it) => s + Number(it.product.price) * it.quantity, 0);
+  const handleQuantityChange = (productId: number, newQuantity: number) => {
+    const item = cartItems.find(i => i.productId === productId);
+    if (!item) return;
 
-  // финальные источники данных: если в сторе уже есть – берём их, иначе SSR
-  const cartItems = storeItems && storeItems.length ? storeItems : ssrItems;
-  const totalItems = storeItems && storeItems.length ? storeTotalItems : ssrTotalItems;
-  const totalPrice = storeItems && storeItems.length ? storeTotalPrice : ssrTotalPrice;
-
-  const handleQuantityChange = (itemId: number, newQuantity: number) => {
     if (newQuantity < 1) {
-      handleRemoveItem(itemId);
+      handleRemoveByProductId(productId);
       return;
     }
 
-    const product = cartItems.find((i: CartItemType) => i.id === itemId);
-    if (!product) return;
-    // dispatch(setQuantity({ productId: product.productId, quantity: newQuantity }));
+    dispatch(setQuantity({ productId, quantity: newQuantity }));
   };
 
-  const handleRemoveItem = (itemId: number) => {
-    const product = cartItems.find((i: CartItemType) => i.id === itemId);
-    if (!product) return;
-    dispatch(removeFromCart(product.productId));
-
+  const handleRemoveByProductId = (productId: number) => {
+    dispatch(removeFromCart(productId));
     toast.info('Товар удален из корзины', {
       position: 'bottom-right',
       autoClose: 2000,
@@ -107,46 +93,38 @@ const CartContent: React.FC<CartPateProps> = ({ initialCart }) => {
   };
 
   const handleCheckout = async () => {
-    if (cartItems.length === 0) {
+    if (!cartItems.length) {
       toast.error('Корзина пуста');
       return;
     }
 
+    if (!isAuth) {
+      dispatch(setAuthModalOpen(true));
+      return;
+    }
+
     setIsCheckingOut(true);
-
     try {
-      // Проверка авторизации: пробуем создать заказ, сервер вернет 401 при отсутствии куки
-
-      // Синхронизируем локальную корзину с серверной
       await Promise.all(
         cartItems.map((item: CartItemType) =>
           CartService.addToCart({ productId: item.productId, quantity: item.quantity }),
         ),
       );
 
-      // Создаем заказ
       const payload: { deliveryAddress: string; comment?: string } = {
-        deliveryAddress: deliveryAddress || 'Адрес не указан',
+        deliveryAddress: (deliveryAddress || 'Адрес не указан').trim(),
       };
       const trimmedComment = comment.trim();
-      if (trimmedComment) {
-        payload.comment = trimmedComment;
-      }
+      if (trimmedComment) payload.comment = trimmedComment;
+
       await OrdersService.createOrder(payload);
 
       toast.success('Заказ успешно оформлен! Мы свяжемся с вами в ближайшее время.', {
         position: 'top-center',
         autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
       });
 
-      // Очищаем корзину после успешного заказа
       handleClearCart();
-
-      // Перенаправляем на главную страницу
       router.push('/');
     } catch (error) {
       console.error('Ошибка при оформлении заказа:', error);
@@ -159,8 +137,7 @@ const CartContent: React.FC<CartPateProps> = ({ initialCart }) => {
     }
   };
 
-  // Показываем пустую корзину
-  if (cartItems.length === 0) {
+  if (!cartItems.length) {
     return (
       <>
         <Head>
@@ -188,7 +165,6 @@ const CartContent: React.FC<CartPateProps> = ({ initialCart }) => {
     );
   }
 
-  // Показываем корзину с товарами
   return (
     <>
       <Head>
@@ -202,9 +178,9 @@ const CartContent: React.FC<CartPateProps> = ({ initialCart }) => {
 
       <CartPageContainer>
         <CartHeader>
-          <CartTitle suppressHydrationWarning>
-            Корзина ({mounted ? totalItems : 0} товаров)
-          </CartTitle>
+          <CartTitle>Корзина ({totalItems} товаров)</CartTitle>
+
+          {/* <Button variant={ButtonVariant.OUTLINE} onClick={handleClearCart}>Очистить корзину</Button> */}
         </CartHeader>
 
         <div
@@ -215,7 +191,7 @@ const CartContent: React.FC<CartPateProps> = ({ initialCart }) => {
           }}
         >
           <CartItems>
-            {cartItems.map((item: CartItemType) => (
+            {cartItems.map(item => (
               <CartItem key={item.id}>
                 <ItemImage>
                   <Image
@@ -237,18 +213,28 @@ const CartContent: React.FC<CartPateProps> = ({ initialCart }) => {
 
                 <QuantityControls>
                   <QuantityButton
-                    onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                    onClick={() => handleQuantityChange(item.productId, item.quantity - 1)}
                     disabled={isLoading}
                   >
                     −
                   </QuantityButton>
+
                   <QuantityInput
                     type="number"
                     value={item.quantity}
-                    onChange={e => handleQuantityChange(item.id, parseInt(e.target.value) || 1)}
-                    min="1"
+                    onChange={e =>
+                      handleQuantityChange(
+                        item.productId,
+                        Number.isNaN(e.currentTarget.valueAsNumber)
+                          ? 1
+                          : Math.max(1, e.currentTarget.valueAsNumber),
+                      )
+                    }
+                    min={1}
                     disabled={isLoading}
+                    inputMode="numeric"
                   />
+
                   <QuantityButton
                     onClick={() => handleQuantityChange(item.productId, item.quantity + 1)}
                     disabled={isLoading}
@@ -258,9 +244,10 @@ const CartContent: React.FC<CartPateProps> = ({ initialCart }) => {
                 </QuantityControls>
 
                 <RemoveButton
-                  onClick={() => handleRemoveItem(item.id)}
+                  onClick={() => handleRemoveByProductId(item.productId)}
                   disabled={isLoading}
                   aria-label={`Удалить ${item.product.name} из корзины`}
+                  title="Удалить из корзины"
                 >
                   ✕
                 </RemoveButton>
@@ -270,6 +257,7 @@ const CartContent: React.FC<CartPateProps> = ({ initialCart }) => {
 
           <CartSummary>
             <h3>Итого</h3>
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 16 }}>
               <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <span>Адрес доставки</span>
@@ -282,6 +270,7 @@ const CartContent: React.FC<CartPateProps> = ({ initialCart }) => {
                   style={{ padding: 10, border: '1px solid #e5e7eb', borderRadius: 8 }}
                 />
               </label>
+
               <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 <span>Комментарий к заказу (необязательно)</span>
                 <textarea
@@ -299,18 +288,22 @@ const CartContent: React.FC<CartPateProps> = ({ initialCart }) => {
                 />
               </label>
             </div>
+
             <SummaryRow>
               <span>Товары ({totalItems})</span>
               <span>{formatNumberRu(totalPrice)} ₽</span>
             </SummaryRow>
+
             <SummaryRow>
               <span>Доставка</span>
               <span>Бесплатно</span>
             </SummaryRow>
+
             <TotalRow>
               <span>К оплате</span>
               <span>{formatNumberRu(totalPrice)} ₽</span>
             </TotalRow>
+
             <CheckoutSection>
               <Button
                 onClick={handleCheckout}
@@ -321,7 +314,8 @@ const CartContent: React.FC<CartPateProps> = ({ initialCart }) => {
               >
                 {isCheckingOut ? 'Оформляем заказ...' : 'Оформить заказ'}
               </Button>
-              <div style={{ marginTop: '16px' }}>
+
+              <div style={{ marginTop: 16 }}>
                 <Link href="/" passHref legacyBehavior>
                   <Button variant={ButtonVariant.OUTLINE} size="medium" fullWidth>
                     Продолжить покупки
@@ -336,57 +330,5 @@ const CartContent: React.FC<CartPateProps> = ({ initialCart }) => {
   );
 };
 
-const CartPage: NextPage<CartPateProps> = ({ initialCart }) => {
-  return (
-    // <NoSSR fallback={<CartLoading />}>
-    <CartContent initialCart={initialCart} />
-    // </NoSSR>
-  );
-};
-
-function appendSetCookies(res: any, ...cookieSets: Array<string[] | undefined>) {
-  const list = cookieSets.flat().filter(Boolean) as string[];
-  if (list.length) {
-    // если уже были set-cookie – склеим
-    const existed = res.getHeader('Set-Cookie') as string[] | undefined;
-    const all = [...(existed ?? []), ...list];
-    res.setHeader('Set-Cookie', all);
-  }
-}
-
-export const getServerSideProps: GetServerSideProps = async ctx => {
-  const { req, res, locale } = ctx;
-
-  const cookie = req.headers.cookie ?? '';
-
-  const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api',
-    // важно: нам нужны сырые заголовки и тело как есть
-    validateStatus: () => true,
-  });
-
-  // 1) тянем корзину гостя (GET /cart). Это не требует CSRF.
-  const cartResp = await api.get('/cart', {
-    headers: { Cookie: cookie },
-  });
-  // Пробрасываем ВСЕ Set-Cookie от API обратно клиенту (cart_id и т.п.)
-  appendSetCookies(res, cartResp.headers['set-cookie']);
-  // Если API вернул не OK — можно показать пустую корзину
-  const initialCart = cartResp.status === 200 ? (cartResp.data ?? null) : null;
-  // 2) сразу выдадим и CSRF (GET /csrf), чтобы первый POST прошёл без ошибки
-  const csrfResp = await api.get('/csrf', {
-    headers: { Cookie: cookie },
-  });
-  appendSetCookies(res, csrfResp.headers['set-cookie']);
-
-  const i18n = await serverSideTranslations(locale ?? 'ru', ['common']);
-
-  return {
-    props: {
-      initialCart,
-      ...i18n,
-    },
-  };
-};
-
-export default CartPage;
+// Полностью отключаем SSR для страницы корзины
+export default dynamic(() => Promise.resolve(CartPage), { ssr: false });

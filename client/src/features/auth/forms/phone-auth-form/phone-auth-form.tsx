@@ -27,6 +27,7 @@ import {
   selectIsLoading,
 } from '@/store/slices/auth-slice/auth.selectors';
 import { PhoneInput } from '@/components/atoms/phone-input/phone-input';
+import { CloseButton } from '../username-auth-form/username-auth-form.style';
 
 interface PhoneFormData {
   phone: string;
@@ -153,8 +154,22 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({ onClose }) => {
   if (!codeSent) {
     // Форма ввода номера телефона
     return (
-      <div style={{ padding: '24px', position: 'relative' }}>
+      <div style={{ padding: '24px', position: 'relative', pointerEvents: 'none' }}>
+        {onClose && (
+          <CloseButton onClick={onClose} aria-label="Закрыть форму авторизации" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M18 6L6 18M6 6l12 12"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
+          </CloseButton>
+        )}
+
         <AuthFormTitle>Вход по номеру телефона</AuthFormTitle>
+
         <AuthFormSubtitle>Введите номер телефона для получения кода подтверждения</AuthFormSubtitle>
 
         <form onSubmit={phoneForm.handleSubmit(onPhoneSubmit)} noValidate>
@@ -191,6 +206,7 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({ onClose }) => {
               fullWidth
               disabled={isLoading}
               aria-label="Отправить код подтверждения"
+              style={{ pointerEvents: 'auto' }}
             >
               {isLoading ? 'Отправляем...' : 'Получить код'}
             </Button>
@@ -243,12 +259,12 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({ onClose }) => {
           {timeLeft > 0 ? (
             <TimerText>Повторная отправка через {timeLeft} сек</TimerText>
           ) : (
-            <ResendButton type="button" onClick={handleResendCode} disabled={isLoading}>
+            <ResendButton type="button" onClick={handleResendCode} disabled={isLoading} style={{ pointerEvents: 'auto' }}>
               Отправить код повторно
             </ResendButton>
           )}
 
-          <ResendButton type="button" onClick={handleBackToPhone} disabled={isLoading}>
+          <ResendButton type="button" onClick={handleBackToPhone} disabled={isLoading} style={{ pointerEvents: 'auto' }}>
             Изменить номер телефона
           </ResendButton>
         </FormActions>
