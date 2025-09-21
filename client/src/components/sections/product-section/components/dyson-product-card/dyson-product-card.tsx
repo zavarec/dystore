@@ -75,7 +75,7 @@ export const DysonProductCard: React.FC<DysonProductCardProps> = ({ product, ind
 
           <ProductImage>
             <Image
-              src={product.imageUrl || '/images/placeholder.webp'}
+              src={product.mainImage?.url || '/images/placeholder.webp'}
               alt={product.name}
               width={280}
               height={280}

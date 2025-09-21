@@ -21,7 +21,7 @@ interface Benefit {
 const benefits: Benefit[] = [
   {
     id: '3',
-    iconUrl: 'https://www.dyson.com/content/dam/dyson/icons/reasons-to-buy/Price%20Promise.png',
+    iconUrl: 'https://www.dyson.com/content/dam/dyson/adobetarget/icons/money-back-dollar2.png',
     title: 'Гарантия лучшей цены',
     description: 'Мы гарантируем лучшую цену на рынке',
   },
@@ -35,7 +35,7 @@ const benefits: Benefit[] = [
   },
   {
     id: '2',
-    iconUrl: 'https://www.dyson.com/content/dam/dyson/adobetarget/icons/money-back-dollar2.png',
+    iconUrl: ' https://www.dyson.com/content/dam/dyson/icons/reasons-to-buy/Price%20Promise.png',
     title: 'Гарантия на товар',
     description:
       'Возврат товара осуществляется в строгом соответствии с законодательством Российской Федерации. Чтобы избежать возможных недоразумений, мы рекомендуем тщательно осмотреть товар перед оплатой: проверить его комплектацию, наличие документов и убедиться в отсутствии повреждений или дефектов.\nДля оформления возврата или обмена, пожалуйста, свяжитесь с нашей службой поддержки и передайте товар для проверки. Для оформления возврата или обмена, пожалуйста, свяжитесь с нашей службой поддержки и передайте товар для проверки.',

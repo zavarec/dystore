@@ -1,14 +1,19 @@
-import { CategoryPromoSection } from '@/types/models/category-promo-section.model';
+import { PromoSection } from '@/types/models/promo-section.model';
 import { Card, CtaBtn, CtaRow, Strip } from '../promo-block.style';
 import Image from 'next/image';
 
-export function StripSection(s: CategoryPromoSection) {
+export function StripSection(s: PromoSection) {
   return (
     <Card
       $text={s.textColor ?? null}
       $title={s.titleColor ?? null}
       $font={s.font ?? null}
       $bg={s.bgColor ?? null}
+      style={{
+        paddingTop: (s as any).paddingTopPx ?? undefined,
+        paddingBottom: (s as any).paddingBottomPx ?? undefined,
+        fontSize: (s as any).contentFontSizePx ?? undefined,
+      }}
     >
       {s.title && <h3>{s.title}</h3>}
       <Strip>

@@ -4,6 +4,8 @@ import { Product, ProductWithDetails } from '@/types/models/product.model';
  * Преобразует продукт из API в расширенный формат для UI
  */
 export const adaptProductForUI = (product: Product): ProductWithDetails => {
+  console.log('Adapting product:', product.name, 'mainImage:', product.mainImage);
+
   // Используем slug из БД, а генерируем из названия только если его нет
   const slug =
     product.slug && product.slug.trim().length > 0
@@ -18,17 +20,28 @@ export const adaptProductForUI = (product: Product): ProductWithDetails => {
   const isNew = product.id % 3 === 0; // Каждый третий как новинка
   // isFeatured уже приходит из API
 
-  // Создаем изображения (всегда используем плейсхолдер, так как реальных изображений пока нет)
-  const images = [
-    {
-      id: `${product.id}-1`,
-      url: '/images/placeholder.webp',
-      alt: product.name,
-      width: 800,
-      height: 800,
-      isPrimary: true,
-    },
-  ];
+  // Создаем изображения на основе данных из API
+  const images = product.mainImage
+    ? [
+        {
+          id: product.mainImage.id,
+          url: product.mainImage.url,
+          alt: product.name,
+          width: 800,
+          height: 800,
+          isPrimary: true,
+        },
+      ]
+    : [
+        {
+          id: `${product.id}-1`,
+          url: '/images/placeholder.webp',
+          alt: product.name,
+          width: 800,
+          height: 800,
+          isPrimary: true,
+        },
+      ];
 
   // Базовые характеристики на основе цены
   const specifications = [

@@ -1,14 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+
 import type { AppProps } from 'next/app';
-import { appWithTranslation } from 'next-i18next';
+
 import { Global, css } from '@emotion/react';
+import { appWithTranslation } from 'next-i18next';
 import { Provider } from 'react-redux';
 import { ToastContainer } from 'react-toastify';
-import { wrapper } from '@/store';
+
+import { LoadingSpinner } from '@/components/atoms/loading-spinner/loading-spinner';
 import { Layout } from '@/components/layout';
 import { useAppDispatch } from '@/hooks/redux';
-import { loadUserProfile } from '@/store/slices/auth-slice/auth.thunks';
+import { initCsrf } from '@/services/security.service';
+import { wrapper } from '@/store';
 import { initializeAuth } from '@/store/slices/auth-slice/auth.slice';
+import { loadUserProfile } from '@/store/slices/auth-slice/auth.thunks';
 import { fetchCart } from '@/store/slices/cart-slice/cart.thunks';
 
 // Централизованные шрифты
@@ -16,7 +21,6 @@ import { fontClassNames } from '@/styles/fonts';
 
 import 'react-toastify/dist/ReactToastify.css';
 import { GlobalGutters } from '@/styles/global-gutters';
-import { initCsrf } from '@/services/security.service';
 
 // Глобальные стили - чистые как после уборки Dyson
 const globalStyles = css`
@@ -41,6 +45,10 @@ const globalStyles = css`
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden; /* Предотвращаем горизонтальную прокрутку */
+    font-family: 'Helvetica', 'Arial', sans-serif;
+  }
+  h2 {
+    font-size: 32px;
   }
 
   a {
@@ -124,20 +132,24 @@ const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
   useEffect(() => {
     (async () => {
-      await initCsrf(); // 🔑 токен попал в cookie
-      setIsHydrated(true);
-      console.log('isHydrated', isHydrated);
+      try {
+        await initCsrf(); // 🔑 токен попал в cookie
+        setIsHydrated(true);
 
-      dispatch(initializeAuth());
-      dispatch(fetchCart()); // GET — безопасно
-      dispatch(loadUserProfile());
+        dispatch(initializeAuth());
+        dispatch(fetchCart()); // GET — безопасно
+        dispatch(loadUserProfile());
+      } catch (error) {
+        console.error('Ошибка инициализации авторизации:', error);
+        setIsHydrated(true); // Все равно показываем контент
+      }
     })();
   }, [dispatch]);
 
   // ✅ ИСПРАВЛЕНИЕ: Предотвращаем hydration mismatch
   // Показываем контент с suppressHydrationWarning до завершения hydration
   if (!isHydrated) {
-    return <div suppressHydrationWarning>{children}</div>;
+    return <LoadingSpinner message="Инициализация..." />;
   }
 
   return <>{children}</>;

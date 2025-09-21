@@ -27,7 +27,7 @@ export const HeaderContent = styled.div`
   gap: 24px;
 
   @media (max-width: 1100px) {
-    padding: 0 16px;
+    padding: 0 var(--page-gutter);
     height: 60px;
     justify-content: space-between;
   }

@@ -1,3 +1,4 @@
+import { Type } from "class-transformer";
 import {
   IsString,
   IsNumber,
@@ -6,7 +7,10 @@ import {
   Min,
   IsUrl,
   IsNotEmpty,
+  ValidateNested,
 } from "class-validator";
+import { BoxItemDto } from "./save-box-items.dto";
+import { SpecItemDto } from "./save-specs.dto";
 
 export class CreateProductDto {
   @IsString({ message: "Название должно быть строкой" })
@@ -24,6 +28,10 @@ export class CreateProductDto {
   @IsString({ message: "Короткое описание должно быть строкой" })
   shortDescription?: string;
 
+  @IsOptional()
+  @IsString({ message: "URL изображения габаритов должно быть строкой" })
+  dimensionsImageUrl?: string;
+
   @IsNumber(
     { maxDecimalPlaces: 2 },
     { message: "Цена должна быть числом с максимум 2 знаками после запятой" },
@@ -37,10 +45,28 @@ export class CreateProductDto {
   stock?: number;
 
   @IsOptional()
-  @IsUrl({}, { message: "URL изображения должен быть корректным" })
+  @IsString()
   imageUrl?: string;
 
   @IsNumber({}, { message: "ID категории должен быть числом" })
   @IsPositive({ message: "ID категории должен быть положительным числом" })
   categoryId: number;
+
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => BoxItemDto)
+  boxItems?: BoxItemDto[];
+
+  @IsOptional()
+  @ValidateNested({ each: true })
+  @Type(() => SpecItemDto)
+  specs?: SpecItemDto[];
+
+  @IsOptional()
+  @IsString()
+  mainImageId?: string;
+
+  @IsOptional()
+  @IsString()
+  dimensionsImageId?: string;
 }

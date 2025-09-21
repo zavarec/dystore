@@ -1,8 +1,6 @@
 import styled from '@emotion/styled';
-import { PromoFont } from '@/types/models/category-promo-section.model';
+import { PromoFont } from '@/types/models/promo-section.model';
 import { fontFamilyMap } from '@/constants/fonts.constants';
-
-
 
 type CardProps = {
   $text?: string | null;

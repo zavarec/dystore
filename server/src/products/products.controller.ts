@@ -10,6 +10,8 @@ import {
   UseGuards,
   HttpException,
   HttpStatus,
+  Patch,
+  Logger,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -24,10 +26,14 @@ import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../common/guards/role.guard";
 import { Roles } from "../common/decorators/role.decorator";
 import { Role } from "@prisma/client";
+import { SaveBoxItemsDto } from "./dto/save-box-items.dto";
+import { SaveSpecsDto } from "./dto/save-specs.dto";
 
 @ApiTags("Products")
 @Controller("products")
 export class ProductsController {
+  private readonly logger = new Logger(ProductsController.name);
+
   constructor(private readonly productsService: ProductsService) {}
 
   @ApiOperation({ summary: "Get all products" })
@@ -96,6 +102,22 @@ export class ProductsController {
     }
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MANAGER, Role.DIRECTOR)
+  @Put(":id/box-items")
+  saveBox(@Param("id") id: string, @Body() dto: SaveBoxItemsDto) {
+    return this.productsService.replaceBoxItems(+id, dto.items);
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MANAGER, Role.DIRECTOR)
+  @Put(":id/specs")
+  saveSpecs(@Param("id") id: string, @Body() dto: SaveSpecsDto) {
+    return this.productsService.replaceSpecs(+id, dto.items);
+  }
+
   @ApiOperation({ summary: "Create new product (requires authentication)" })
   @ApiResponse({ status: 201, description: "Product created" })
   @ApiResponse({ status: 401, description: "Unauthorized" })
@@ -136,6 +158,10 @@ export class ProductsController {
       }
       return updatedProduct;
     } catch (error) {
+      this.logger.error(
+        `Ошибка при обновлении товара (id=${id})`,
+        error.stack || JSON.stringify(error),
+      );
       if (error instanceof HttpException) {
         throw error;
       }
@@ -164,5 +190,45 @@ export class ProductsController {
         HttpStatus.BAD_REQUEST,
       );
     }
+  }
+
+  @Patch(":id/main-image")
+  setMain(
+    @Param("id", ParseIntPipe) id: number,
+    @Body() dto: { fileId: string },
+  ) {
+    return this.productsService.setMainImage(id, dto.fileId);
+  }
+
+  @Patch(":id/dimensions-image")
+  setDimensions(
+    @Param("id", ParseIntPipe) id: number,
+    @Body() dto: { fileId: string },
+  ) {
+    return this.productsService.setDimensionsImage(id, dto.fileId);
+  }
+
+  @Post(":id/media")
+  addMedia(
+    @Param("id", ParseIntPipe) id: number,
+    @Body()
+    dto: {
+      fileId: string;
+      kind?: "IMAGE" | "VIDEO";
+      role?: string;
+      alt?: string;
+      title?: string;
+      order?: number;
+    },
+  ) {
+    return this.productsService.addGalleryMedia({ productId: id, ...dto });
+  }
+
+  @Delete(":id/media/:mediaId")
+  deleteMedia(
+    @Param("id", ParseIntPipe) id: number,
+    @Param("mediaId", ParseIntPipe) mediaId: number,
+  ) {
+    return this.productsService.removeGalleryMedia(id, mediaId);
   }
 }

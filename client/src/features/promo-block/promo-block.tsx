@@ -1,36 +1,38 @@
-import {
-  CategoryPromoSection,
-  CategoryPromoVariant,
-} from '@/types/models/category-promo-section.model';
-import { BannerSection } from './components/banner-section/banner-section';
-import { TextSection } from './components/text-section/text-section';
-import { GridSection } from './components/grid-section';
-import { StripSection } from './components/strip-section';
-import { PairSection } from './components/pair-saction';
-import { HeadlineStripSection } from './components/headline-strip-section/headline-strip-section';
+import type { PromoSection } from '@/types/models/promo-section.model';
+import { PromoVariant } from '@/types/models/promo-section.model';
 
-function renderByVariant(s: CategoryPromoSection) {
+import { BannerSection } from './components/banner-section/banner-section';
+import { GridSection } from './components/grid-section';
+import { HeadlineStripSection } from './components/headline-strip-section/headline-strip-section';
+import { PairSection } from './components/pair-saction';
+import { PromoCarouselSection } from './components/promo-carousel-section/promo-carousel-section';
+import { StripSection } from './components/strip-section';
+import { TextSection } from './components/text-section/text-section';
+
+function renderByVariant(s: PromoSection) {
   switch (s.variant) {
-    case CategoryPromoVariant.BANNER:
+    case PromoVariant.BANNER:
       return <BannerSection {...s} />;
-    case CategoryPromoVariant.TEXT_STRIP:
+    case PromoVariant.TEXT_STRIP:
       return <TextSection {...s} />;
-    case CategoryPromoVariant.GRID:
+    case PromoVariant.GRID:
       return <GridSection {...s} />;
-    case CategoryPromoVariant.STRIP_USP:
+    case PromoVariant.STRIP_USP:
       return <StripSection {...s} />;
-    case CategoryPromoVariant.IMAGE_PAIR:
+    case PromoVariant.IMAGE_PAIR:
       return <PairSection {...s} />;
-    case CategoryPromoVariant.TEXT_QUOTE:
+    case PromoVariant.TEXT_QUOTE:
       return <TextSection {...s} />;
-    case (CategoryPromoVariant as any).HEADLINE_STRIP:
+    case PromoVariant.HEADLINE_STRIP:
       return <HeadlineStripSection {...s} />;
+    case PromoVariant.CAROUSEL:
+      return <PromoCarouselSection {...s} />;
     default:
       return <BannerSection {...s} />;
   }
 }
 
-export function PromoBlock({ sections }: { sections: CategoryPromoSection[] }) {
+export function PromoBlock({ sections }: { sections: PromoSection[] }) {
   if (!sections || sections.length === 0) return null;
   return (
     <>

@@ -1,16 +1,24 @@
 import React, { useEffect } from 'react';
-import { GetStaticPaths, GetStaticProps, NextPage } from 'next';
+
+import type { GetStaticPaths, GetStaticProps, NextPage } from 'next';
+
 import Head from 'next/head';
 import Image from 'next/image';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useAppDispatch } from '@/hooks/redux';
 
-import { ProductWithDetails } from '@/types/models/product.model';
-import { Product } from '@/types/models/product.model';
-import { adaptProductForUI } from '@/utils/product-adapters';
-import { ServerProductsService } from '@/services';
-import { AddToCartButton } from '@/features/cart/add-to-cart-button';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
 import { ButtonVariant } from '@/components/atoms/button/button.style';
+import { Benefits } from '@/components/sections/benefits';
+import { Accessuares } from '@/features/accessuares/accessuares';
+import { AddToCartButton } from '@/features/cart/add-to-cart-button';
+import { AddToCartButtonVariant } from '@/features/cart/add-to-cart-button/add-to-cart-button';
+import { formatPriceRub } from '@/utils/format';
+import { Specifications } from '@/features/specifications/specifications';
+import { fetchPromoForPageSSR } from '@/services/server/promo.server.service';
+import { PromoSlotRenderer } from '@/features/promo-block/promo-slot-renderer';
+import { useAppDispatch } from '@/hooks/redux';
+import { ServerProductsService } from '@/services';
+import { fetchCart } from '@/store/slices/cart-slice/cart.thunks';
 import {
   ProductPageContainer,
   ProductImageSection,
@@ -25,27 +33,22 @@ import {
   ProductActions,
   InStockBadge,
   OutOfStockBadge,
+  ProductInfoWithImageWrapperStyled,
 } from '@/styles/pages/product-slug.style';
-import { fetchCart } from '@/store/slices/cart-slice/cart.thunks';
-import { AddToCartButtonVariant } from '@/features/cart/add-to-cart-button/add-to-cart-button';
-import { formatPriceRub } from '@/utils/format';
+import type { ProductWithDetails, Product } from '@/types/models/product.model';
+import type { PromoPlacement } from '@/types/models/promo-placement.model';
+import { PromoPageType } from '@/types/models/promo-placement.model';
+import { PromoSlot } from '@/types/models/promo-section.model';
+import { adaptProductForUI } from '@/utils/product-adapters';
 
 interface ProductPageProps {
   product: ProductWithDetails;
+  placements?: PromoPlacement[]; // список PromoPlacement с включенной promoSection
 }
 
-// // Утилиты для работы с продуктом
-// const generateProductSlug = (product: ProductWithDetails): string => {
-//   return (
-//     product.slug ||
-//     product.name
-//       .toLowerCase()
-//       .replace(/\s+/g, '-')
-//       .replace(/[^\w\-]/g, '')
-//   );
-// };
-
 const getProductImage = (product: ProductWithDetails): string => {
+  console.log(product, 'PRODUCT in getProductImage');
+
   return product.images?.[0]?.url || '/images/placeholder.webp';
 };
 
@@ -56,7 +59,7 @@ const getCategorySlug = (category: any): string => {
   return 'products';
 };
 
-const ProductPage: NextPage<ProductPageProps> = ({ product }) => {
+const ProductPage: NextPage<ProductPageProps> = ({ product, placements }) => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -71,6 +74,9 @@ const ProductPage: NextPage<ProductPageProps> = ({ product }) => {
       </ProductPageContainer>
     );
   }
+
+  // const bySlot = useMemo(() => groupBySlot(placements ?? []), [placements]);
+  // адаптер вынесен в PromoSlot
 
   const imageUrl = getProductImage(product);
   const categorySlug = getCategorySlug(product.category);
@@ -141,7 +147,8 @@ const ProductPage: NextPage<ProductPageProps> = ({ product }) => {
       },
     ],
   };
-  console.log(product, 'PRODUCT in product page');
+
+  console.log(placements, 'PLACEMENTS in product page');
 
   return (
     <>
@@ -197,6 +204,9 @@ const ProductPage: NextPage<ProductPageProps> = ({ product }) => {
         />
       </Head>
 
+      {/* Промо: над всей страницей товара */}
+      <PromoSlotRenderer placements={placements ?? []} slot={PromoSlot.ABOVE_HERO} />
+
       <ProductPageContainer>
         <ProductBreadcrumbs>
           <BreadcrumbLink href="/">Главная</BreadcrumbLink>
@@ -208,23 +218,19 @@ const ProductPage: NextPage<ProductPageProps> = ({ product }) => {
           {/* <span>{product.name}</span> */}
         </ProductBreadcrumbs>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '40px',
-            alignItems: 'start',
-          }}
-        >
+        <ProductInfoWithImageWrapperStyled>
           <ProductImageSection>
             <ProductMainImage>
               <Image
-                src={product.imageUrl || ''}
-                alt={product.name}
+                src={product.mainImage?.url || ''}
+                alt={product.mainImage?.storedName || product.name}
                 width={600}
                 height={600}
                 priority
-                style={{ objectFit: 'contain' }}
+                style={{
+                  objectFit: 'contain',
+                  height: '100%',
+                }}
                 sizes="(max-width: 768px) 100vw, 50vw"
                 placeholder="blur"
                 blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nNjAwJyBoZWlnaHQ9JzYwMCcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJz48cmVjdCB3aWR0aD0nNjAwJyBoZWlnaHQ9JzYwMCcgZmlsbD0nI2U5ZWNlZicvPjwvc3ZnPg=="
@@ -265,8 +271,26 @@ const ProductPage: NextPage<ProductPageProps> = ({ product }) => {
               />
             </ProductActions>
           </ProductInfoSection>
-        </div>
+        </ProductInfoWithImageWrapperStyled>
       </ProductPageContainer>
+
+      <Specifications
+        specs={product.specs ?? []}
+        dimensionsImageUrl={product.dimensionsImageUrl ?? null}
+        title="Характеристики"
+      />
+
+      <Benefits />
+
+      <PromoSlotRenderer placements={placements ?? []} slot={PromoSlot.BELOW_PRODUCTS} />
+
+      <Accessuares
+        productName={product.name}
+        boxItems={product.boxItems ?? []}
+        productImageUrl={product.mainImage?.url}
+      />
+
+      <PromoSlotRenderer placements={placements ?? []} slot={PromoSlot.PDP_BELOW_ACCESSORY} />
     </>
   );
 };
@@ -291,46 +315,10 @@ function getCategoryName(category: any): string {
   return 'Товары';
 }
 
-// export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
-//   try {
-//     const products = await ServerProductsService.getAllProducts();
-//     const ids = Array.isArray(products) ? products.map(p => String(p.id)) : [];
-//     const paths = ids.flatMap(slug =>
-//       (locales || ['ru']).map(locale => ({ params: { slug }, locale })),
-//     );
-//     return { paths, fallback: 'blocking' };
-//   } catch {
-//     return { paths: [], fallback: 'blocking' };
-//   }
-// };
-
-// export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
-//   try {
-//     const productId = params?.slug as string;
-//     const productRaw: Product = await ServerProductsService.getProductById(Number(productId));
-//     if (!productRaw?.id) {
-//       return { notFound: true, revalidate: 60 };
-//     }
-
-//     const product = adaptProductForUI(productRaw);
-
-//     return {
-//       props: {
-//         ...(await serverSideTranslations(locale ?? 'ru', ['common'])),
-//         product,
-//       },
-//       revalidate: 3600,
-//     };
-//   } catch {
-//     return { notFound: true, revalidate: 60 };
-//   }
-// };
-
 export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
   try {
     const products = await ServerProductsService.getAllProducts();
     const slugs = (products || []).map(p => p.slug).filter(Boolean);
-    console.log(slugs, 'SLUGS in product page');
 
     const paths = slugs.flatMap(slug =>
       (locales || ['ru']).map(locale => ({ params: { slug }, locale })),
@@ -342,49 +330,107 @@ export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
   }
 };
 
-// ✅ Забираем продукт по SLUG (а не по id)
 export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
+  const slug = String(params?.slug || '');
+  console.log('[GSP] slug =', slug);
+
   try {
-    const slug = String(params?.slug || '');
-    // Диагностика SSR запроса
-    try {
-      // 1) Определяем id по slug
-      const bySlug: Product = await ServerProductsService.getProductBySlug(slug);
-      console.log('[product/[slug]] fetched by slug:', slug, '=> id:', bySlug?.id);
+    // 1) Берём товар по slug
+    const bySlug = await ServerProductsService.getProductBySlug(slug);
+    console.log('[GSP] bySlug.id =', bySlug?.id);
 
-      if (!bySlug?.id) {
-        return { notFound: true, revalidate: 60 };
-      }
-
-      // 2) Грузим товар по id (как просили)
-      const productById: Product = await ServerProductsService.getProductById(Number(bySlug.id));
-      const product = adaptProductForUI(productById || bySlug);
-
-      return {
-        props: {
-          ...(await serverSideTranslations(locale ?? 'ru', ['common'])),
-          product,
-        },
-        revalidate: 3600,
-      };
-    } catch (err: any) {
-      console.error(
-        '[product/[slug]] fetch error for slug',
-        slug,
-        err?.response?.status,
-        err?.response?.data || err?.message,
-      );
-      throw err;
+    if (!bySlug?.id) {
+      return { notFound: true, revalidate: 60 };
     }
-  } catch (e) {
+
+    // 2) Пробуем добрать по id (если эндпоинт отличается)
+    let productRaw = bySlug;
+    try {
+      productRaw = await ServerProductsService.getProductById(Number(bySlug.id));
+    } catch (e: any) {
+      console.warn(
+        '[GSP] getById failed, fallback to bySlug',
+        e?.response?.status,
+        e?.response?.data || e?.message,
+      );
+    }
+
+    const product = adaptProductForUI(productRaw);
+    const placements = await fetchPromoForPageSSR(PromoPageType.PRODUCT, String(product.id));
+
+    return {
+      props: {
+        ...(await serverSideTranslations(locale ?? 'ru', ['common'])),
+        product,
+        placements,
+      },
+      revalidate: 3600,
+    };
+  } catch (e: any) {
     console.error(
-      '[product/[slug]] getStaticProps failed, returning notFound. Slug:',
-      params?.slug,
-      'Error:',
-      (e as any)?.message,
+      '[GSP] failed for slug',
+      slug,
+      e?.response?.status,
+      e?.response?.data || e?.message,
     );
     return { notFound: true, revalidate: 60 };
   }
 };
+
+// // ✅ Забираем продукт по SLUG (а не по id)
+// export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
+//   try {
+//     const slug = String(params?.slug || '');
+//     // Диагностика SSR запроса
+//     console.log('[GSP] slug =', slug);
+//     console.log('[GSP] bySlug.id =', bySlug?.id);
+
+//     // 1) Определяем id по slug
+//     const bySlug: Product = await ServerProductsService.getProductBySlug(slug);
+
+//     if (!bySlug?.id) {
+//       console.log(bySlug, 'bySlug');
+
+//       return { notFound: true, revalidate: 60 };
+//     }
+//     let productRaw = bySlug;
+
+//     try {
+//       // 2) Грузим товар по id (как просили)
+//       const productRaw: Product = await ServerProductsService.getProductById(Number(bySlug.id));
+
+//       // const placements = await PromoService.getForPage(PromoPageType.PRODUCT, String(product.id));
+
+//       const product = adaptProductForUI(productRaw || bySlug);
+
+//       const placements = await fetchPromoForPageSSR(PromoPageType.PRODUCT, String(product.id));
+//       console.log(product, 'product');
+//       return {
+//         props: {
+//           ...(await serverSideTranslations(locale ?? 'ru', ['common'])),
+//           product,
+//           placements,
+//         },
+//         revalidate: 3600,
+//       };
+//     } catch (err: any) {
+//       console.error(
+//         '[product/[slug]] fetch error for slug',
+//         slug,
+//         err?.response?.status,
+//         err?.response?.data || err?.message,
+//       );
+//       throw err;
+//     }
+//   } catch (e) {
+//     console.error(
+//       '[product/[slug]] getStaticProps failed, returning notFound. Slug:',
+//       params?.slug,
+//       'Error:',
+//       (e as any)?.message,
+//     );
+//     return { notFound: true, revalidate: 60 };
+//   }
+// };
 
 export default ProductPage;

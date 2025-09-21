@@ -8,7 +8,7 @@ import cartSlice from './slices/cart-slice/cart.slice';
 import categoriesSlice from './slices/categories-slice/categories.slice';
 import ordersSlice from './slices/orders-slice/orders.slice';
 import promotionsSlice from './slices/promotion-slice/promotion.slice';
-import categoryPromoSectionsSlice from './slices/category-promo-sections/category-promo-sections.slice';
+import sectionsWithPlacementsSlice from './slices/promo/promo.slice';
 
 import seoSlice from './slices/seo-meta-slice/seo.slice';
 
@@ -24,7 +24,7 @@ const makeStore = () =>
       cartSlice,
       seoSlice,
       promotionsSlice,
-      categoryPromoSectionsSlice,
+      sectionsWithPlacementsSlice,
     },
 
     devTools: process.env.NODE_ENV !== 'production',

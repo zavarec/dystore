@@ -1,9 +1,11 @@
 import styled from '@emotion/styled';
+
 import { tokens, commonStyles } from '../shared';
 
 export const ProductPageContainer = styled.div`
   ${commonStyles.container};
-  padding: 40px 20px;
+  padding-top: 40px;
+  padding-right: 0;
 `;
 
 export const ProductBreadcrumbs = styled.nav`
@@ -43,13 +45,14 @@ export const ProductImageSection = styled.div`
 export const ProductMainImage = styled.div`
   width: 100%;
   height: 600px;
-  background: #f8f9fa;
+  // background: #f8f9fa;
   border-radius: 12px;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid #e5e5e5;
+  // border: 1px solid #e5e5e5;
+  object-fit: contain;
 `;
 
 export const ProductThumbnails = styled.div`
@@ -278,4 +281,11 @@ export const ResponsiveProductPage = `
       grid-template-columns: 1fr;
     }
   }
+`;
+
+export const ProductInfoWithImageWrapperStyled = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
 `;

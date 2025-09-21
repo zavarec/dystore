@@ -1,4 +1,3 @@
-// pages/cart.tsx
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
@@ -54,7 +53,7 @@ const CartPage: React.FC = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [comment, setComment] = useState('');
@@ -165,6 +164,8 @@ const CartPage: React.FC = () => {
     );
   }
 
+// const imageUrl = 
+
   return (
     <>
       <Head>
@@ -195,7 +196,7 @@ const CartPage: React.FC = () => {
               <CartItem key={item.id}>
                 <ItemImage>
                   <Image
-                    src={item.product.imageUrl ?? '/images/placeholder.webp'}
+                    src={item.product.mainImage?.url ?? '/images/placeholder.webp'}
                     alt={item.product.name}
                     width={120}
                     height={120}

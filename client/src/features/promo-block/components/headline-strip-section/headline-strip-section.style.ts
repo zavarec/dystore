@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { PromoFont } from '@/types/models/category-promo-section.model';
+import { PromoFont } from '@/types/models/promo-section.model';
 import { fontFamilyMap } from '@/constants/fonts.constants';
 
 export const StripWrap = styled.section<{
@@ -22,12 +22,13 @@ export const StripTitle = styled.h3<{
   $color?: string | null;
   $font?: PromoFont | null;
   $align?: string | null;
+  $fs?: number | null;
 }>`
   margin: 0;
   text-align: ${({ $align }) => $align ?? 'center'};
   font-family: ${({ $font }) => fontFamilyMap[$font || 'DEFAULT']};
   color: ${({ $color }) => $color ?? '#fff'};
   font-weight: 600;
-  font-size: clamp(20px, 2.4vw, 28px);
+  font-size: ${({ $fs }) => ($fs != null ? `${$fs}px` : 'clamp(20px, 2.4vw, 28px)')};
   line-height: 1.2;
 `;

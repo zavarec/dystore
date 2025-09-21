@@ -9,6 +9,10 @@ export function middleware(req: NextRequest) {
   const isAdminPath = pathname.startsWith('/admin');
   if (!isAdminPath) return NextResponse.next();
 
+  // Не защищаем страницу логина, чтобы избежать бесконечного редиректа
+  const isAdminLoginPath = pathname === '/admin/login' || pathname.startsWith('/admin/login/');
+  if (isAdminLoginPath) return NextResponse.next();
+
   const token = req.cookies.get('access_token')?.value;
   if (!token) {
     const loginUrl = req.nextUrl.clone();

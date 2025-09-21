@@ -35,24 +35,26 @@ export const CategoriesTitle = styled.h2`
   }
 `;
 
-export const ScrollContainer = styled.div`
+export const ScrollContainer = styled.div<{ $center?: boolean }>`
   display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
+  align-items: center;
   gap: 24px;
+
+  overflow-x: auto; /* включаем скролл при переполнении */
+  scroll-snap-type: ${p => (p.$center ? 'none' : 'x mandatory')};
+  justify-content: ${p => (p.$center ? 'center' : 'flex-start')};
+
   padding-bottom: 10px;
   padding-right: 40px;
 
-  /* Скрыть скроллбар везде */
-  -ms-overflow-style: none; /* IE и Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
   &::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+    display: none;
     width: 0;
     height: 0;
-    
   }
   &::-webkit-scrollbar-track {
-    background: transparent; /* убираем серый фон */
+    background: transparent;
   }
 `;

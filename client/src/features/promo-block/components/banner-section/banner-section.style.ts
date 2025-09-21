@@ -1,6 +1,6 @@
-// components/promo/components/banner-section.style.ts
 import styled from '@emotion/styled';
-import { PromoFont } from '@/types/models/category-promo-section.model';
+
+import type { PromoFont } from '@/types/models/promo-section.model';
 
 export const BannerWrap = styled.section<{ $bg?: string | null; $height?: number | null }>`
   position: relative;
@@ -27,7 +27,11 @@ export const Media = styled.div`
 `;
 
 /* Контейнер поверх медиа, управляет стороной контента */
-export const ContentRow = styled.div<{ $side: 'LEFT' | 'RIGHT' | 'CENTER' }>`
+export const ContentRow = styled.div<{
+  $side: 'LEFT' | 'RIGHT' | 'CENTER';
+  $pt?: number | null;
+  $pb?: number | null;
+}>`
   position: relative;
   z-index: 2; /* 👈 контент точно поверх медиа и оверлея */
 
@@ -37,6 +41,9 @@ export const ContentRow = styled.div<{ $side: 'LEFT' | 'RIGHT' | 'CENTER' }>`
     $side === 'RIGHT' ? 'flex-end' : $side === 'CENTER' ? 'center' : 'flex-start'};
   width: 100%;
   min-height: inherit;
+
+  padding-top: ${({ $pt }) => ($pt != null ? `${$pt}px` : 'clamp(24px, 6vw, 96px)')};
+  padding-bottom: ${({ $pb }) => ($pb != null ? `${$pb}px` : 'clamp(24px, 6vw, 96px)')};
 
   /* глобальные поля 70px: --page-gutter = clamp(16px, 5vw, 70px) */
   /* padding-inline: var(--page-gutter, 70px); */
@@ -52,9 +59,12 @@ export const BannerContent = styled.div<{
   $text?: string | null;
   $title?: string | null;
   $font?: PromoFont | null;
+  titleSize?: number | null;
+  contentSize: number | null;
 }>`
   max-width: 640px; /* ширина текстового блока */
-  color: ${({ $text }) => $text || '#fff'};
+  /* color: ${({ $text }) => $text || '#fff'}; */
+  color: #fff;
   font-family: ${({ $font }) =>
     $font === 'INTER'
       ? 'Inter, system-ui, sans-serif'
@@ -75,16 +85,17 @@ export const BannerContent = styled.div<{
 
   h3 {
     margin: 0 0 16px 0;
-    font-size: 2.5rem;
+    font-size: ${({ titleSize }) => (titleSize != null ? `${titleSize}px` : '2.5rem')};
     line-height: 1.2;
     color: ${({ $title }) => $title || '#fff'};
   }
 
   p {
     margin: 0 0 16px 0;
-    font-size: 1.125rem;
+    font-size: ${({ contentSize }) => (contentSize != null ? `${contentSize}px` : '2.5rem')};
     line-height: 1.5;
     opacity: 0.9;
+    color: ${({ $text }) => $text || '#fff'};
   }
 
   @media (max-width: 768px) {

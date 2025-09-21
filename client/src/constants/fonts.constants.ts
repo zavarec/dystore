@@ -1,4 +1,4 @@
-import { PromoFont } from '@/types/models/category-promo-section.model';
+import { PromoFont } from '@/types/models/promo-section.model';
 
 export const fontFamilyMap: Record<PromoFont | 'DEFAULT', string> = {
   INTER: '"Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',

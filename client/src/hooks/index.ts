@@ -10,3 +10,4 @@ export * from './useCategoryProducts';
 export * from './useNewProduct';
 export * from './useProducts';
 export * from './useEditProduct';
+export * from './useAuthGuard';

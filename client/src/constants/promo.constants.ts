@@ -1,31 +1,34 @@
-import {
-  CategoryPromoVariant,
-  CategoryPromoPlacement,
-} from '@/types/models/category-promo-section.model';
+import { PromoSlot, PromoVariant } from '@/types/models/promo-section.model';
 
-export const CategoryPromoVariantLabels: Record<CategoryPromoVariant, string> = {
-  [CategoryPromoVariant.BANNER]: 'Баннер',
+export const promoVariantLabelsMap: Record<PromoVariant, string> = {
+  [PromoVariant.BANNER]: 'Баннер',
   // старый TEXT больше не используется в типах модели
-  [CategoryPromoVariant.TEXT_STRIP]: 'Текстовая плашка',
-  [CategoryPromoVariant.TEXT_QUOTE]: 'Цитата',
-  
-  [CategoryPromoVariant.GRID]: 'Сетка (несколько элементов)',
-  [CategoryPromoVariant.STRIP_USP]: 'Плашка с преимуществами',
-  [CategoryPromoVariant.IMAGE_PAIR]: 'Две картинки (сравнение)',
-  [CategoryPromoVariant.HEADLINE_STRIP]: 'Заголовочная плашка',
+  [PromoVariant.TEXT_STRIP]: 'Текстовая плашка',
+  [PromoVariant.TEXT_QUOTE]: 'Цитата',
+
+  [PromoVariant.GRID]: 'Сетка (несколько элементов)',
+  [PromoVariant.STRIP_USP]: 'Плашка с преимуществами',
+  [PromoVariant.IMAGE_PAIR]: 'Две картинки (сравнение)',
+  [PromoVariant.HEADLINE_STRIP]: 'Заголовочная плашка',
+  [PromoVariant.CAROUSEL]: 'Карусель',
 };
 
-export const CategoryPromoPlacementLabels: Record<CategoryPromoPlacement, string> = {
-  [CategoryPromoPlacement.ABOVE_HERO]: 'Над Hero-баннером',
-  [CategoryPromoPlacement.BELOW_HERO]: 'Под Hero-баннером',
+export const promoSlotLabelsMap: Record<PromoSlot, string> = {
+  [PromoSlot.ABOVE_HERO]: 'Над Hero-баннером',
+  [PromoSlot.BELOW_HERO]: 'Под Hero-баннером',
 
-  [CategoryPromoPlacement.ABOVE_SUBCATEGORIES]: 'Перед подкатегориями',
-  [CategoryPromoPlacement.BELOW_SUBCATEGORIES]: 'После подкатегорий',
+  [PromoSlot.ABOVE_SUBCATEGORIES]: 'Перед подкатегориями',
+  [PromoSlot.BELOW_SUBCATEGORIES]: 'После подкатегорий',
 
-  [CategoryPromoPlacement.ABOVE_FILTERS]: 'Перед фильтрами',
-  [CategoryPromoPlacement.BELOW_FILTERS]: 'После фильтров',
+  [PromoSlot.ABOVE_FILTERS]: 'Перед фильтрами',
+  [PromoSlot.BELOW_FILTERS]: 'После фильтров',
 
-  [CategoryPromoPlacement.ABOVE_PRODUCTS]: 'Перед списком товаров',
-  [CategoryPromoPlacement.BETWEEN_PRODUCTS]: 'Между товарами',
-  [CategoryPromoPlacement.BELOW_PRODUCTS]: 'После списка товаров',
+  [PromoSlot.ABOVE_PRODUCTS]: 'Перед списком товаров',
+  [PromoSlot.BETWEEN_PRODUCTS]: 'Между товарами',
+  [PromoSlot.BELOW_PRODUCTS]: 'После списка товаров',
+
+  [PromoSlot.PDP_FEATURES]: 'На странице товара (особенности)',
+  [PromoSlot.PDP_BELOW_GALLERY]: 'На странице товара (ниже галереи)',
+  [PromoSlot.PDP_BELOW_SPECS]: 'На странице товара (ниже характеристик)',
+  [PromoSlot.PDP_BELOW_ACCESSORY]: 'На странице товара (ниже аксессуаров)',
 };

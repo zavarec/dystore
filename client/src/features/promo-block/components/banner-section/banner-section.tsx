@@ -1,16 +1,18 @@
 // components/promo/components/banner-section.tsx
-import { CategoryPromoSection } from '@/types/models/category-promo-section.model';
-import { BannerWrap, Media, ContentRow, BannerContent } from './banner-section.style';
-import { CtaRow, CtaBtn } from '../../promo-block.style';
 import Image from 'next/image';
 
-export function BannerSection(s: CategoryPromoSection) {
-  const side = (s as any).contentSide === 'RIGHT' ? 'RIGHT' : 'LEFT';
+import type { PromoSection } from '@/types/models/promo-section.model';
+
+import { BannerWrap, Media, ContentRow, BannerContent } from './banner-section.style';
+import { CtaRow, CtaBtn } from '../../promo-block.style';
+
+export function BannerSection(s: PromoSection) {
+  const side = s.contentSide === 'RIGHT' ? 'RIGHT' : 'LEFT';
 
   console.log(s, 'sectionProps');
 
   return (
-    <BannerWrap $bg={(s as any).bgColor ?? null} $height={(s as any).heightPx ?? null}>
+    <BannerWrap $bg={s.bgColor ?? null} $height={s.heightPx ?? null}>
       {/* Фоновое медиа на всю ширину/высоту */}
       <Media>
         {s.imageUrl && (
@@ -31,12 +33,14 @@ export function BannerSection(s: CategoryPromoSection) {
       </Media>
 
       {/* Ряд, который выравнивает контент слева/справа */}
-      <ContentRow $side={side}>
+      <ContentRow $side={side} $pt={s.paddingTopPx ?? null} $pb={s.paddingBottomPx ?? null}>
         <BannerContent
           $side={side}
           $text={s.textColor ?? null}
           $title={s.titleColor ?? null}
           $font={s.font ?? null}
+          titleSize={s.titleFontSizePx ?? null}
+          contentSize={s.contentFontSizePx ?? null}
         >
           {s.title && <h3>{s.title}</h3>}
           {s.subtitle && <p>{s.subtitle}</p>}

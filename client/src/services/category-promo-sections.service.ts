@@ -1,17 +1,16 @@
 import { apiClient } from './api';
 import {
-  CategoryPromoPlacement,
-  CategoryPromoSection,
   CategoryPromoSectionAdmin,
-  CategoryPromoVariant,
   PromoFont,
   ContentSideEnum,
-} from '@/types/models/category-promo-section.model';
+  PromoSlot,
+  PromoVariant,
+} from '@/types/models/promo-section.model';
 
 export interface CreateCategoryPromoSectionDto {
   categoryId: number;
-  variant: CategoryPromoVariant;
-  placement: CategoryPromoPlacement;
+  variant: PromoVariant;
+  placement: PromoSlot;
   order?: number;
   isActive?: boolean;
   title?: string;
@@ -40,7 +39,7 @@ export class CategoryPromoSectionsService {
     return data;
   }
 
-  static async create(dto: CreateCategoryPromoSectionDto): Promise<CategoryPromoSection> {
+  static async create(dto: CreateCategoryPromoSectionDto): Promise<CategoryPromoSectionAdmin> {
     const { data } = await apiClient.post('/admin/category-promo-sections', dto);
     return data;
   }
@@ -48,7 +47,7 @@ export class CategoryPromoSectionsService {
   static async update(
     id: number,
     dto: UpdateCategoryPromoSectionDto,
-  ): Promise<CategoryPromoSection> {
+  ): Promise<CategoryPromoSectionAdmin> {
     const { data } = await apiClient.patch(`/admin/category-promo-sections/${id}`, dto);
     return data;
   }
@@ -58,7 +57,7 @@ export class CategoryPromoSectionsService {
   }
 
   // Публичный список для страницы категории по slug
-  static async publicByCategorySlug(slug: string): Promise<CategoryPromoSection[]> {
+  static async publicByCategorySlug(slug: string): Promise<CategoryPromoSectionAdmin[]> {
     const { data } = await apiClient.get(`/categories/${slug}/promo-sections`);
     return data;
   }

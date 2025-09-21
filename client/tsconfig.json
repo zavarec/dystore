@@ -30,7 +30,8 @@
       "@/styles/*": ["./src/styles/*"],
       "@/data/*": ["./src/data/*"],
       "@/hooks/*": ["./src/hooks/*"],
-      "@/features/*": ["./src/features/*"]
+      "@/features/*": ["./src/features/*"],
+      "@/constants/*": ["./src/constants/*"]
     },
     "forceConsistentCasingInFileNames": true,
     "noUnusedLocals": true,

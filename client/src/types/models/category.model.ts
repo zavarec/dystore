@@ -4,8 +4,9 @@ import { Product } from './product.model';
 export interface Category {
   id: number;
   name: string;
+  description?: string;
   slug: string;
-  image?: string;
+  imageUrl?: string;
   parentId?: number | null;
   parent?: Category | null;
   children?: Category[];
@@ -22,15 +23,17 @@ export interface CategoryTreeNode extends Category {
 // DTO для создания и обновления
 export interface CreateCategoryDto {
   name: string;
+  description?: string;
   slug: string;
-  image?: string;
+  imageId?: string;
   parentId?: number | null;
 }
 
 export interface UpdateCategoryDto {
   name?: string;
+  description?: string;
   slug?: string;
-  image?: string;
+  imageId?: string;
   parentId?: number | null;
 }
 

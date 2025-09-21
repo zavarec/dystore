@@ -1,8 +1,8 @@
-import { CategoryPromoSection } from '@/types/models/category-promo-section.model';
+import { PromoSection } from '@/types/models/promo-section.model';
 import { Card, GridWrap, Media } from '../promo-block.style';
 import Image from 'next/image';
 
-export function GridSection(s: CategoryPromoSection) {
+export function GridSection(s: PromoSection) {
   // На будущее можно распарсить из s.data список элементов; пока — fallback к баннеру/тексту
   return (
     <Card
@@ -10,6 +10,11 @@ export function GridSection(s: CategoryPromoSection) {
       $title={s.titleColor ?? null}
       $font={s.font ?? null}
       $bg={s.bgColor ?? null}
+      style={{
+        paddingTop: (s as any).paddingTopPx ?? undefined,
+        paddingBottom: (s as any).paddingBottomPx ?? undefined,
+        fontSize: (s as any).contentFontSizePx ?? undefined,
+      }}
     >
       {s.title && <h3>{s.title}</h3>}
       <GridWrap>

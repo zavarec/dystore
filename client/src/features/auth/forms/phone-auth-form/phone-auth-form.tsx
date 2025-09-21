@@ -40,9 +40,10 @@ interface CodeFormData {
 interface PhoneAuthFormProps {
   onClose?: () => void;
   showCloseButton?: boolean;
+  redirectTo?: string;
 }
 
-export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({ onClose }) => {
+export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({ onClose, redirectTo = '/' }) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
@@ -100,14 +101,12 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({ onClose }) => {
   useEffect(() => {
     if (isAuthenticated) {
       if (onClose) {
-        // Если есть обработчик закрытия (модальное окно), закрываем его
         onClose();
       } else {
-        // Если мы на странице авторизации, перенаправляем на главную
-        router.push('/');
+        router.push(redirectTo);
       }
     }
-  }, [isAuthenticated, onClose, router]);
+  }, [isAuthenticated, onClose, router, redirectTo]);
 
   const onPhoneSubmit = async (data: PhoneFormData) => {
     try {
@@ -259,12 +258,22 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({ onClose }) => {
           {timeLeft > 0 ? (
             <TimerText>Повторная отправка через {timeLeft} сек</TimerText>
           ) : (
-            <ResendButton type="button" onClick={handleResendCode} disabled={isLoading} style={{ pointerEvents: 'auto' }}>
+            <ResendButton
+              type="button"
+              onClick={handleResendCode}
+              disabled={isLoading}
+              style={{ pointerEvents: 'auto' }}
+            >
               Отправить код повторно
             </ResendButton>
           )}
 
-          <ResendButton type="button" onClick={handleBackToPhone} disabled={isLoading} style={{ pointerEvents: 'auto' }}>
+          <ResendButton
+            type="button"
+            onClick={handleBackToPhone}
+            disabled={isLoading}
+            style={{ pointerEvents: 'auto' }}
+          >
             Изменить номер телефона
           </ResendButton>
         </FormActions>

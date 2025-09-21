@@ -16,9 +16,14 @@ import { DatabaseModule } from "./database/database.module";
 import { GlobalExceptionFilter } from "./common/filters/global-exception.filter";
 import { PromotionsModule } from "./promotions/promotions.module";
 import { LayoutModule } from "./layout/layout.module";
-import { CategoryPromoSectionsModule } from "./category-promo-sections/category-promo-sections.module";
+
 import { SeoMetaModule } from "./seo-meta/seo-meta.module";
 import { CsrfController } from "./common/controllers/csrf.controller";
+import { SpecAttributesModule } from "./spec-attributes/spec-attributes.module";
+import { PromosModule } from "./promos/promo.module";
+import { ServeStaticModule } from "@nestjs/serve-static";
+import { join } from "path";
+import { UploadModule } from "./upload/upload.module";
 
 @Module({
   imports: [
@@ -26,6 +31,18 @@ import { CsrfController } from "./common/controllers/csrf.controller";
       isGlobal: true,
       envFilePath: ".env",
       // validationSchema,
+    }),
+    ServeStaticModule.forRootAsync({
+      useFactory: () => {
+        const uploadPath = process.env.UPLOAD_PATH || "./uploads";
+        return [
+          {
+            rootPath: join(process.cwd(), uploadPath),
+            serveRoot: "/uploads",
+            exclude: ["/api*"], // исключаем API роуты
+          },
+        ];
+      },
     }),
     ThrottlerModule.forRoot([
       {
@@ -42,8 +59,11 @@ import { CsrfController } from "./common/controllers/csrf.controller";
     OrdersModule,
     PromotionsModule,
     LayoutModule,
-    CategoryPromoSectionsModule,
+
     SeoMetaModule,
+    SpecAttributesModule,
+    PromosModule,
+    UploadModule,
   ],
   controllers: [AppController, CsrfController],
   providers: [

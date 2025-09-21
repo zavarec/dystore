@@ -21,10 +21,18 @@ export const tokens = {
       font-size: 2.5rem;
       font-weight: 700;
       line-height: 1.2;
+      font-family: var(--font-nunito-sans);
+    `,
+    h2: css`
+      font-size: 2rem;
+      font-weight: 300;
+      line-height: 1.25;
+      font-family: var(--font-nunito-sans);
     `,
     body: css`
       font-size: 1rem;
       line-height: 1.6;
+      font-family: var(--font-nunito-sans);
     `,
   },
 };
@@ -40,8 +48,8 @@ export const commonStyles = {
   `,
 
   container: css`
-    max-width: 1200px;
-    margin: 0 auto;
+    /* max-width: 1200px; */
+    /* margin: 0 auto; */
     padding: 0 var(--page-gutter);
   `,
 
@@ -52,5 +60,3 @@ export const commonStyles = {
     padding: 24px;
   `,
 };
-
-

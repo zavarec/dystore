@@ -1,27 +1,21 @@
+// pages/admin/products/new.tsx
 import React from 'react';
-import { GetServerSideProps, NextPage } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { NextPage } from 'next';
+import { useTranslation } from 'next-i18next';
 
 import { useNewProduct } from '@/hooks/useNewProduct';
 import { AdminLayout } from '@/components/admin/layout/admin-layout';
 import { ProductForm } from '@/components/admin/forms/product-form/product-form';
 
 const NewProductPage: NextPage = () => {
+  const { t } = useTranslation('common');
   const { handleSubmit, loading } = useNewProduct();
 
   return (
-    <AdminLayout title="Создание продукта">
+    <AdminLayout title={t('createProduct', 'Создание продукта')}>
       <ProductForm onSubmit={handleSubmit} loading={loading} />
     </AdminLayout>
   );
-};
-
-export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale ?? 'ru', ['common'])),
-    },
-  };
 };
 
 import { withManager } from '@/features/auth/with-manager';

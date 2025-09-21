@@ -8,6 +8,8 @@ import {
   updateProduct,
   deleteProduct,
   fetchProductsByCategoryIncludingDescendants,
+  fetchSpecAttributes,
+  createSpecAttribute,
 } from './products.thunks';
 import { Product } from '@/types/models/product.model';
 import { ProductsState } from './products.types';
@@ -18,6 +20,7 @@ const initialState: ProductsState = {
   categoryProducts: [],
   categoryProductsIncludingDescendants: [],
   categoryProductsIncludingDescendantsLoading: false,
+  specAttributes: [],
 
   searchQuery: '',
   totalItems: 0,
@@ -114,13 +117,13 @@ const productsSlice = createSlice({
         state.totalItems = state.items.length;
       })
       // Обновление продукта
-      .addCase(updateProduct.fulfilled, (state, action) => {
-        const index = state.items.findIndex((item: Product) => item.id === action.payload.id);
+      .addCase(updateProduct.fulfilled, (state, { payload }) => {
+        const index = state.items.findIndex((item: Product) => item.id === payload.id);
         if (index !== -1) {
-          state.items[index] = action.payload;
+          state.items[index] = payload;
         }
-        if (state.currentProduct?.id === action.payload.id) {
-          state.currentProduct = action.payload;
+        if (state.currentProduct?.id === payload.id) {
+          state.currentProduct = payload;
         }
       })
       // Удаление продукта
@@ -130,6 +133,22 @@ const productsSlice = createSlice({
         if (state.currentProduct?.id === action.payload) {
           state.currentProduct = null;
         }
+      })
+      // Атрибуты характеристик
+      .addCase(fetchSpecAttributes.pending, state => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchSpecAttributes.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.specAttributes = action.payload;
+      })
+      .addCase(fetchSpecAttributes.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(createSpecAttribute.fulfilled, (state, action) => {
+        state.specAttributes.push(action.payload);
       });
   },
 });

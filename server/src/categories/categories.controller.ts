@@ -11,6 +11,8 @@ import {
   UseGuards,
   HttpException,
   HttpStatus,
+  Logger,
+  Query,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -25,10 +27,13 @@ import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
 import { RolesGuard } from "../common/guards/role.guard";
 import { Roles } from "../common/decorators/role.decorator";
 import { Role } from "@prisma/client";
+import { FindProductsDto } from "./dto/find-products.dto";
 
 @ApiTags("Categories")
 @Controller("categories")
 export class CategoriesController {
+  private readonly logger = new Logger(CategoriesController.name);
+
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @ApiOperation({ summary: "Get all categories" })
@@ -43,6 +48,14 @@ export class CategoriesController {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  @Get(":slug/products")
+  async findProductsDeep(
+    @Param("slug") slug: string,
+    @Query() q: FindProductsDto,
+  ) {
+    return this.categoriesService.findProductsBySlug(slug, q);
   }
 
   @ApiOperation({ summary: "Get category tree" })
@@ -142,6 +155,10 @@ export class CategoriesController {
     try {
       return await this.categoriesService.update(id, updateCategoryDto);
     } catch (error) {
+      this.logger.error(
+        `Ошибка при обновлении товара (id=${id})`,
+        error.stack || JSON.stringify(error),
+      );
       if (error instanceof HttpException) {
         throw error;
       }

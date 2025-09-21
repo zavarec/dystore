@@ -20,7 +20,8 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
   loading = false,
 }) => {
   const displayProducts = maxItems ? products.slice(0, maxItems) : products;
-  console.log(displayProducts, 'DISPLAY PRODUCTS');
+  console.log('ProductSection props:', { title, products, variant, maxItems, loading });
+  console.log('Display products:', displayProducts);
 
   return (
     <Section>
@@ -30,7 +31,7 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
           ? Array.from({ length: Math.max(3, Math.min(displayProducts.length || 4, 8)) }).map(
               (_, index) => <ProductCardSkeleton key={index} />,
             )
-          : displayProducts.map((product, index) => (
+          : displayProducts?.map((product, index) => (
               <DysonProductCard
                 key={product.slug ?? product.id}
                 product={product}

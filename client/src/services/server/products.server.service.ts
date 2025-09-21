@@ -1,5 +1,6 @@
+import type { Product } from '@/types/models/product.model';
+
 import { serverApiClient } from '../api.server';
-import { Product } from '@/types/models/product.model';
 
 export class ServerProductsService {
   static async getAllProducts(): Promise<Product[]> {
@@ -8,15 +9,23 @@ export class ServerProductsService {
   }
 
   static async getProductById(id: number): Promise<Product> {
-    const { data } = await serverApiClient.get<Product>(`/products/id/${String(id)}`);
+    console.log(id, 'getProductById id');
+
+    const { data } = await serverApiClient.get<Product>(`/products/${String(id)}`);
+
+    console.log(data, 'getProductById data');
+
     return data;
   }
 
   static async getProductBySlug(slug: string): Promise<Product> {
+    console.log(slug, 'getProductBySlug slug');
     // ПОД API КОНТРОЛЛЕР: /products/slug/:slug
     const { data } = await serverApiClient.get<Product>(
       `/products/slug/${encodeURIComponent(slug)}`,
     );
+
+    console.log(data, 'getProductBySlug data');
     return data;
   }
 }

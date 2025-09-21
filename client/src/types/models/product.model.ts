@@ -1,4 +1,4 @@
-import { Category } from './category.model';
+import type { Category } from './category.model';
 
 // Базовый тип продукта (соответствует серверному API)
 export interface Product {
@@ -26,6 +26,9 @@ export interface Product {
   /** URL изображения продукта */
   imageUrl?: string;
 
+  /** URL изображения габаритов */
+  dimensionsImageUrl?: string;
+
   /** ID категории, к которой относится продукт */
   categoryId: number;
 
@@ -37,6 +40,14 @@ export interface Product {
 
   /** Объект категории (включается при запросах с join) */
   category?: Category;
+
+  mainImage?: {
+    id: string;
+    url: string; // ← это ты уже сохраняешь в files
+    mimetype: string;
+    storedName: string;
+  } | null;
+  dimensionsImage?: { id: string; url: string; mimetype: string; storedName: string } | null;
 }
 
 // Расширенный тип продукта для UI (с дополнительными полями для SEO и отображения)
@@ -85,9 +96,25 @@ export interface ProductWithDetails extends Product {
   createdAt?: string;
   /** Дата последнего обновления записи в ISO формате */
   updatedAt?: string;
+
+  /** Технические характеристики продукта */
+  specs?: SpecItemDto[];
+
+  /** Комплектация */
+  boxItems?: BoxItemDto[];
+
+  mainImage?: {
+    id: string;
+    url: string; // ← это ты уже сохраняешь в files
+    mimetype: string;
+    storedName: string;
+  } | null;
+  dimensionsImage?: { id: string; url: string; mimetype: string; storedName: string } | null;
 }
 
 export interface CreateProductDto {
+  /** URL-слаг для красивых ссылок (например: "dyson-v15-detect") */
+  slug: string;
   /** Название продукта */
   name: string;
   /** Описание продукта */
@@ -98,10 +125,20 @@ export interface CreateProductDto {
   stock: number;
   /** ID категории продукта */
   categoryId: number;
-  /** URL изображения продукта */
-  imageUrl?: string;
+  // /** URL изображения продукта */
+  // imageUrl?: string;
+
+  /** URL изображения габаритов */
+  dimensionsImageUrl?: string;
+  dimensionsImage?: { id: string; url: string; mimetype: string; storedName: string } | null;
+
   /** Является ли продукт рекомендуемым */
   isFeatured?: boolean;
+
+  /** Комплектация */
+  boxItems?: BoxItemDto[];
+  /** Характеристики */
+  specs?: SpecItemDto[];
 }
 
 export interface UpdateProductDto {
@@ -121,6 +158,17 @@ export interface UpdateProductDto {
   imageUrl?: string;
   /** Является ли продукт рекомендуемым */
   isFeatured?: boolean;
+  /** Новый URL изображения габаритов */
+  dimensionsImageUrl?: string;
+
+  /** Новый ID основного изображения */
+  mainImageId?: string;
+  /** Новый ID изображения габаритов */
+  dimensionsImageId?: string;
+  dimensionsImage?: { id: string; url: string; mimetype: string; storedName: string } | null;
+
+  boxItems?: BoxItemDto[];
+  specs?: SpecItemDto[];
 }
 
 export interface ProductImage {
@@ -270,4 +318,32 @@ export interface ProductStructuredData extends Record<string, unknown> {
   sku: string;
   /** Номер модели производителя */
   mpn: string;
+}
+
+export interface BoxItemDto {
+  id?: string;
+  accessoryId?: number; // либо выбираем из справочника
+  customName?: string; // либо задаём вручную
+  customImageId?: string;
+  customImage?: {
+    id: string;
+    url: string; // ← это ты уже сохраняешь в files
+    mimetype: string;
+    storedName: string;
+  };
+  description?: string;
+  qty: number;
+  order: number;
+}
+
+export interface SpecItemDto {
+  key?: string;
+  attributeId: number; // если выбираем из справочника
+  label?: string; // если задаём вручную
+  valueString?: string;
+  valueNumber?: number;
+  valueBool?: boolean;
+  unit?: string;
+  order: number;
+  customImageId?: string;
 }

@@ -241,81 +241,183 @@ async function main() {
 
   console.log(`✅ Создано ${createdSubcategories.length} подкатегорий`);
 
-  // Генерация товаров
-  console.log("🛍️ Создаю товары...");
+  // // Генерация товаров
+  // console.log("🛍️ Создаю товары...");
 
-  function slugify(str) {
-    return str
-      .toLowerCase()
-      .split("")
-      .map((ch) => cyrillicMap[ch] ?? ch)
-      .join("")
-      .replace(/\s+/g, "-")
-      .replace(/[^\w-]/g, "")
-      .replace(/-+/g, "-")
-      .replace(/^-|-$/g, "");
-  }
+  // function slugify(str) {
+  //   return str
+  //     .toLowerCase()
+  //     .split("")
+  //     .map((ch) => cyrillicMap[ch] ?? ch)
+  //     .join("")
+  //     .replace(/\s+/g, "-")
+  //     .replace(/[^\w-]/g, "")
+  //     .replace(/-+/g, "-")
+  //     .replace(/^-|-$/g, "");
+  // }
   const allProducts = [];
 
-  const imageMap = {
-    [vacuums.id]:
-      "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/images/products/hero/448799-01.png?$responsive$&cropPathE=desktop&fit=stretch,1&wid=1920",
-    [hairCare.id]:
-      "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/images/products/primary/598976-01.png?$responsive$&cropPathE=desktop&fit=stretch,1&wid=1920",
-    [climate.id]:
-      "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/images/products/hero-locale/en_GB/545814-01.png?$responsive$&cropPathE=desktop&fit=stretch,1&wid=1920",
-    [headphones.id]:
-      "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/images/products/hero-locale/en_GB/759558-01.png?$responsive$&cropPathE=desktop&fit=stretch,1&wid=1920",
-    [lighting.id]:
-      "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/images/products/hero/529476-01.png?$responsive$&cropPathE=desktop&fit=stretch,1&wid=1920",
-  };
+  // const imageMap = {
+  //   [vacuums.id]:
+  //     "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/images/products/hero/448799-01.png?$responsive$&cropPathE=desktop&fit=stretch,1&wid=1920",
+  //   [hairCare.id]:
+  //     "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/images/products/primary/598976-01.png?$responsive$&cropPathE=desktop&fit=stretch,1&wid=1920",
+  //   [climate.id]:
+  //     "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/images/products/hero-locale/en_GB/545814-01.png?$responsive$&cropPathE=desktop&fit=stretch,1&wid=1920",
+  //   [headphones.id]:
+  //     "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/images/products/hero-locale/en_GB/759558-01.png?$responsive$&cropPathE=desktop&fit=stretch,1&wid=1920",
+  //   [lighting.id]:
+  //     "https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/images/products/hero/529476-01.png?$responsive$&cropPathE=desktop&fit=stretch,1&wid=1920",
+  // };
 
-  for (const sub of createdSubcategories) {
-    const baseName = sub.name;
-    const parent = categories.find((p) => p.id === sub.parentId);
-    const imageUrl = parent ? imageMap[parent.id] : "";
+  // for (const sub of createdSubcategories) {
+  //   const baseName = sub.name;
+  //   const parent = categories.find((p) => p.id === sub.parentId);
+  //   const imageUrl = parent ? imageMap[parent.id] : "";
 
-    const unique = await Promise.all(
-      Array.from({ length: 5 }).map((_, i) =>
-        prisma.product.create({
-          data: {
-            name: `${baseName} Model ${i + 1}`,
-            slug: `${slugify(`${baseName} Model ${i + 1}`)}-p${sub.id}-m${i + 1}`,
+  //   const unique = await Promise.all(
+  //     Array.from({ length: 5 }).map((_, i) =>
+  //       prisma.product.create({
+  //         data: {
+  //           name: `${baseName} Model ${i + 1}`,
+  //           slug: `${slugify(`${baseName} Model ${i + 1}`)}-p${sub.id}-m${i + 1}`,
 
-            shortDescription: `${baseName} кратко: модель ${i + 1}`,
-            description: `Описание ${baseName} — уникальная модель ${i + 1} с особыми функциями.`,
-            price: 29990 + i * 2000,
-            stock: 10 + i,
-            imageUrl,
-            categoryId: sub.id,
-            isFeatured: i % 2 === 0,
-            popularity: 100 + i * 150,
-          },
-        }),
-      ),
-    );
+  //           shortDescription: `${baseName} кратко: модель ${i + 1}`,
+  //           description: `Описание ${baseName} — уникальная модель ${i + 1} с особыми функциями.`,
+  //           price: 29990 + i * 2000,
+  //           stock: 10 + i,
+  //           imageUrl,
+  //           categoryId: sub.id,
+  //           isFeatured: i % 2 === 0,
+  //           popularity: 100 + i * 150,
+  //         },
+  //       }),
+  //     ),
+  //   );
 
-    const copies = await Promise.all(
-      unique.map((p, idx) =>
-        prisma.product.create({
-          data: {
-            name: `${p.name} Copy`,
-            slug: `${p.slug}-copy${idx + 1}`,
-            shortDescription: p.shortDescription,
-            description: p.description,
-            price: p.price,
-            stock: p.stock,
-            imageUrl: p.imageUrl || "",
-            categoryId: p.categoryId,
-            isFeatured: p.isFeatured,
-            popularity: p.popularity,
-          },
-        }),
-      ),
-    );
+  //   const copies = await Promise.all(
+  //     unique.map((p, idx) =>
+  //       prisma.product.create({
+  //         data: {
+  //           name: `${p.name} Copy`,
+  //           slug: `${p.slug}-copy${idx + 1}`,
+  //           shortDescription: p.shortDescription,
+  //           description: p.description,
+  //           price: p.price,
+  //           stock: p.stock,
+  //           imageUrl: p.imageUrl || "",
+  //           categoryId: p.categoryId,
+  //           isFeatured: p.isFeatured,
+  //           popularity: p.popularity,
+  //         },
+  //       }),
+  //     ),
+  //   );
 
-    allProducts.push(...unique, ...copies);
-  }
+  //   allProducts.push(...unique, ...copies);
+  // }
+
+  // Аттрибуты характеристик
+
+  const allSpecAttributes = await prisma.specAttribute.findMany();
+  await prisma.specAttribute.deleteMany({});
+  console.log("✅ Аттрибуты характеристик удалены");
+
+  console.log("🔍 Создаю аттрибуты характеристик...");
+
+  await prisma.specAttribute.createMany({
+    data: [
+      {
+        key: "weight",
+        label: "Вес",
+        unit: "кг",
+        group: "Габариты",
+        order: 1,
+        type: "NUMBER",
+      },
+      {
+        key: "run_time",
+        label: "Максимальное время работы",
+        unit: "мин",
+        group: "Производительность",
+        order: 2,
+        type: "NUMBER",
+      },
+      {
+        key: "suction_power",
+        label: "Максимальная мощность всасывания",
+        unit: "аВт",
+        group: "Производительность",
+        order: 3,
+        type: "NUMBER",
+      },
+      {
+        key: "bin_volume",
+        label: "Объем контейнера",
+        unit: "литра",
+        group: "Вместимость",
+        order: 4,
+        type: "NUMBER",
+      },
+      {
+        key: "cyclone_tech",
+        label: "Технология циклонов",
+        group: "Фильтрация",
+        order: 5,
+        type: "STRING",
+      },
+      {
+        key: "filtration",
+        label: "Фильтр",
+        group: "Фильтрация",
+        order: 6,
+        type: "STRING",
+      },
+      {
+        key: "charge_time",
+        label: "Время зарядки",
+        unit: "часа",
+        group: "Аккумулятор",
+        order: 7,
+        type: "NUMBER",
+      },
+      {
+        key: "height",
+        label: "Высота",
+        unit: "мм",
+        group: "Габариты",
+        order: 8,
+        type: "NUMBER",
+      },
+      {
+        key: "length",
+        label: "Длина",
+        unit: "мм",
+        group: "Габариты",
+        order: 9,
+        type: "NUMBER",
+      },
+      {
+        key: "width",
+        label: "Ширина",
+        unit: "мм",
+        group: "Габариты",
+        order: 10,
+        type: "NUMBER",
+      },
+      {
+        key: "width",
+        label: "Ширина",
+        unit: "мм",
+        group: "Габариты",
+        order: 10,
+        type: "NUMBER",
+      },
+    ],
+    skipDuplicates: true,
+  });
+
+  console.log("✅ Аттрибуты характеристик созданы");
 
   const adminEmail = process.env.TEST_DIRECTOR_EMAIL;
 
@@ -492,6 +594,7 @@ async function main() {
   console.log(`   📁 Подкатегорий: ${createdSubcategories.length}`);
   console.log(`   🛍️ Товаров: ${allProducts.length}`);
   console.log(`   🛍️ Промо: ${allPromotions.length}`);
+  console.log(`   🛍️ Аттрибуты характеристик: ${allSpecAttributes.length}`);
 }
 
 main()

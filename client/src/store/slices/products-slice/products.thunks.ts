@@ -1,5 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { ProductsService } from '@/services';
+import { SpecAttributesService } from '@/services/spec-attributes.service';
+import type { CreateSpecAttributeDto } from '@/services/spec-attributes.service';
 import { CreateProductDto, UpdateProductDto } from '@/types/models/product.model';
 
 // Получить все продукты
@@ -87,6 +89,30 @@ export const deleteProduct = createAsyncThunk(
       return id;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Ошибка удаления продукта');
+    }
+  },
+);
+
+// Получить все атрибуты характеристик
+export const fetchSpecAttributes = createAsyncThunk(
+  'products/fetchSpecAttributes',
+  async (q: string | undefined, { rejectWithValue }) => {
+    try {
+      return await SpecAttributesService.list(q);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Ошибка загрузки атрибутов');
+    }
+  },
+);
+
+// Создать атрибут характеристики
+export const createSpecAttribute = createAsyncThunk(
+  'products/createSpecAttribute',
+  async (dto: CreateSpecAttributeDto, { rejectWithValue }) => {
+    try {
+      return await SpecAttributesService.create(dto);
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Ошибка создания атрибута');
     }
   },
 );

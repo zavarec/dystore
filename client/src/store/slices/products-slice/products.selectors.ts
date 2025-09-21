@@ -21,3 +21,6 @@ export const selectSearchQuery = (state: RootState) => state.productsSlice.searc
 export const selectCurrentPage = (state: RootState) => state.productsSlice.currentPage;
 export const selectItemsPerPage = (state: RootState) => state.productsSlice.itemsPerPage;
 export const selectTotalItems = (state: RootState) => state.productsSlice.totalItems;
+
+// Селекторы атрибутов характеристик
+export const selectSpecAttributes = (state: RootState) => state.productsSlice.specAttributes;

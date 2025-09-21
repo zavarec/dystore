@@ -1,12 +1,35 @@
-import React, { useEffect } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import { Product, CreateProductDto, UpdateProductDto } from '@/types/models/product.model';
-import { useCategories } from '@/hooks/useCategories';
-import { FloppyDisk, ArrowLeft } from '@phosphor-icons/react';
+import { useEffect, useState } from 'react';
+
 import Link from 'next/link';
 
+import { yupResolver } from '@hookform/resolvers/yup';
+import { FloppyDisk, ArrowLeft } from '@phosphor-icons/react';
+import { useForm, Controller, useFieldArray } from 'react-hook-form';
+
+// import { specAttributeRuMap } from '@/constants/spec-attributes.constant';
+// import FileUpload from '@/components/FileUpload/FileUpload';
+import { ProductImageUpload } from '@/components/FileUpload/product-file-upload';
+import type { UploadedFile } from '@/components/FileUpload/product-file-upload';
+import { useAppDispatch } from '@/hooks/redux';
+import { useSpecAttributes } from '@/hooks/use-spec-attributes';
+import { useCategories } from '@/hooks/useCategories';
+import type { SpecAttributeDto } from '@/services/spec-attributes.service';
+import { createSpecAttribute } from '@/store/slices/products-slice/products.thunks';
+import type {
+  Product,
+  CreateProductDto,
+  UpdateProductDto,
+  BoxItemDto,
+} from '@/types/models/product.model';
+import { mapFormToCreateDto } from '@/utils/map-form-to-create-product';
+import { slugify } from '@/utils/slugify';
+
+import type { ApiSpec, ProductFormValues } from './product-form.schema';
+import type * as yup from 'yup';
+
+import { BoxRow } from './components/box-row';
+import { SpecRow } from './components/spec-row';
+import { productSchema, specsToForm } from './product-form.schema';
 import {
   FormContainer,
   FormGrid,
@@ -21,7 +44,6 @@ import {
   CheckboxWrapper,
   Checkbox,
 } from './product-form.style';
-import { productSchema } from './product-form.schema';
 
 interface ProductFormProps {
   product?: Product;
@@ -31,39 +53,313 @@ interface ProductFormProps {
   isEdit?: boolean;
 }
 
+type PartialCreateWithUpdateProductDto = Partial<CreateProductDto | UpdateProductDto>;
+
+const norm = (s?: string) => (s ?? '').trim().replace(/\s+/g, ' ').toLowerCase();
+const makeSpecAttributeKey = (label: string) => {
+  const base = slugify(label).replace(/-/g, '_');
+  if (base.length > 0) {
+    return base;
+  }
+
+  return `attribute_${Math.random().toString(36).slice(2, 8)}`;
+};
+
 export const ProductForm: React.FC<ProductFormProps> = ({
   onSubmit,
   loading,
   initialValues,
   isEdit,
+  // product, // Не используется в текущей реализации
 }) => {
+  const [slugTouched, setSlugTouched] = useState(false);
+  // Состояния для уведомлений о загрузке файлов
+  const [uploadNotifications, setUploadNotifications] = useState<{
+    mainImage?: { type: 'success' | 'error'; message: string };
+    dimensionsImage?: { type: 'success' | 'error'; message: string };
+  }>({});
+  const dispatch = useAppDispatch();
+
   const { categories, error } = useCategories();
+  const { attributes } = useSpecAttributes();
+
+  console.log(attributes, 'ATTRIBUTES');
 
   const {
     control,
     handleSubmit,
+    getValues,
+    setValue,
+    watch,
     formState: { errors },
     reset,
-  } = useForm<Partial<CreateProductDto & UpdateProductDto>>({
-    resolver: yupResolver(
-      productSchema as yup.ObjectSchema<Partial<CreateProductDto & UpdateProductDto>>,
-    ),
-    defaultValues: initialValues || {},
+  } = useForm<ProductFormValues>({
+    resolver: yupResolver(productSchema as yup.ObjectSchema<ProductFormValues>),
+    defaultValues: {
+      slug: (initialValues as ProductFormValues)?.slug ?? '',
+      boxItems: (initialValues as ProductFormValues)?.boxItems ?? [],
+      specs: (initialValues as ProductFormValues)?.specs ?? [],
+    } as ProductFormValues,
   });
 
+  const {
+    fields: boxItems,
+    append: appendBox,
+    remove: removeBox,
+  } = useFieldArray({ control, name: 'boxItems' });
+
+  const {
+    fields: specs,
+    append: appendSpec,
+    remove: removeSpec,
+  } = useFieldArray({ control, name: 'specs' });
+
+  const showUploadNotification = (
+    field: 'mainImage' | 'dimensionsImage',
+    type: 'success' | 'error',
+    message: string,
+  ) => {
+    setUploadNotifications(prev => ({
+      ...prev,
+      [field]: { type, message },
+    }));
+
+    // Автоматически скрываем уведомление через 5 секунд
+    setTimeout(() => {
+      setUploadNotifications(prev => ({
+        ...prev,
+        [field]: undefined,
+      }));
+    }, 5000);
+  };
+
+  // автослаг по имени до ручного вмешательства
+  useEffect(() => {
+    if (!slugTouched) {
+      const value = slugify(getValues('name') ?? '');
+      setValue('slug', value, { shouldValidate: true });
+    }
+  }, [watch('name')]);
+
+  // нормализация входящих значений из API
   useEffect(() => {
     if (initialValues) {
-      reset(initialValues);
+      console.log('Initial values for form:', initialValues);
+      // Обрабатываем boxItems с изображениями
+      const normalizedBoxItems = (
+        (initialValues as PartialCreateWithUpdateProductDto).boxItems ?? []
+      ).map((item: BoxItemDto) => ({
+        ...item,
+        customImageId: item.customImage?.id || item.customImageId || '',
+        // customImageUrl: item.customImage?.url || item.customImageUrl || '',
+      }));
+
+      const norm = {
+        ...initialValues,
+        specs: specsToForm(
+          ((initialValues as PartialCreateWithUpdateProductDto).specs ?? []) as ApiSpec[],
+        ),
+        boxItems: normalizedBoxItems,
+        // Правильно обрабатываем изображения
+        imageUrl:
+          (initialValues as PartialCreateWithUpdateProductDto).mainImage?.url ||
+          (initialValues as PartialCreateWithUpdateProductDto).imageUrl ||
+          '',
+        mainImageId:
+          (initialValues as Partial<CreateProductDto | UpdateProductDto>).mainImage?.id ||
+          (initialValues as Partial<CreateProductDto | UpdateProductDto>).mainImageId ||
+          '',
+        dimensionsImageUrl:
+          (initialValues as Partial<CreateProductDto | UpdateProductDto>).dimensionsImage?.url ||
+          (initialValues as PartialCreateWithUpdateProductDto).dimensionsImageUrl ||
+          '',
+        dimensionsImageId:
+          (initialValues as PartialCreateWithUpdateProductDto).dimensionsImage?.id ||
+          (initialValues as PartialCreateWithUpdateProductDto).dimensionsImageId ||
+          '',
+      };
+      console.log('Normalized values for form:', norm);
+      reset(norm);
     }
   }, [initialValues, reset]);
 
-  const handleFormSubmit = async (data: CreateProductDto | UpdateProductDto) => {
-    await onSubmit(data);
+  useEffect(() => {
+    console.log(errors, 'ERRORS');
+  }, [errors]);
+
+  const onAppenedSpec = () =>
+    appendSpec({ attributeId: 0, label: '', value: '', unit: '', order: specs.length });
+
+  const onAppenedBox = () =>
+    appendBox({ customName: '', customImageId: '', qty: 1, order: boxItems.length });
+
+  const handleFormSubmit = async (data: ProductFormValues) => {
+    const specsList = data.specs ?? [];
+    const existingByName = new Map<string, SpecAttributeDto>(
+      (attributes ?? []).map(attr => [norm(attr.label), attr]),
+    );
+
+    const newAttributesByName = new Map<
+      string,
+      {
+        label: string;
+        unit?: string;
+      }
+    >();
+
+    specsList.forEach(spec => {
+      const cleanLabel = (spec.label ?? '').trim();
+      if (!cleanLabel) return;
+
+      const normalizedLabel = norm(cleanLabel);
+      const hasExistingId = Number(spec.attributeId) > 0;
+      const knownAttribute = existingByName.has(normalizedLabel);
+
+      if (!hasExistingId && !knownAttribute && !newAttributesByName.has(normalizedLabel)) {
+        newAttributesByName.set(normalizedLabel, {
+          label: cleanLabel,
+          unit: (spec.unit ?? '').trim() || '',
+        });
+      }
+    });
+
+    const usedAttributeKeys = new Set(
+      (attributes ?? []).map(attr => attr.key.toLowerCase()).filter(Boolean),
+    );
+
+    const created = await Promise.all(
+      Array.from(newAttributesByName.values()).map(async ({ label, unit }) => {
+        const baseKey = makeSpecAttributeKey(label);
+        let uniqueKey = baseKey;
+        let counter = 1;
+        while (usedAttributeKeys.has(uniqueKey.toLowerCase())) {
+          uniqueKey = `${baseKey}_${counter}`;
+          counter += 1;
+        }
+        usedAttributeKeys.add(uniqueKey.toLowerCase());
+
+        const payload = {
+          key: uniqueKey,
+          label,
+          unit: unit ?? undefined,
+          type: 'STRING' as const,
+        };
+
+        const res = await dispatch(createSpecAttribute(payload as SpecAttributeDto)).unwrap();
+        return res;
+      }),
+    );
+
+    const nameToId = new Map<string, number>();
+    (attributes ?? []).forEach(attribute => nameToId.set(norm(attribute.label), attribute.id));
+    created.forEach(attribute => nameToId.set(norm(attribute.label), attribute.id));
+
+    const patchedSpecs = (data.specs ?? [])
+      .map((s, idx) => {
+        const byId = Number(s.attributeId) > 0 ? s.attributeId : undefined;
+        const byName = s.label ? nameToId.get(norm(s.label)) : undefined;
+        const attributeId = byId ?? byName;
+
+        if (!attributeId) {
+          // Если сюда попали — значит нет ни id, ни созданного name (пустой label?)
+          // Можно отфильтровать или бросить ошибку. Я просто пропущу такую строку.
+          return null;
+        }
+        return {
+          attributeId,
+          value: s.value,
+          unit: s.unit,
+          order: idx,
+          // label в DTO обычно не нужен — зависит от твоего mapFormToCreateDto
+        };
+      })
+      .filter(Boolean) as Array<{
+      attributeId: number;
+      value: string;
+      unit?: string;
+      order: number;
+    }>;
+
+    const nextData: ProductFormValues = {
+      ...data,
+      specs: patchedSpecs,
+    };
+
+    await onSubmit(mapFormToCreateDto(nextData));
+
+    console.log(data, 'DATA');
+  };
+
+  // Обработчики загрузки изображений
+  const handleMainImageChange = (fileId?: string | null, file?: UploadedFile) => {
+    console.log(file, 'handleMainImageChange');
+    console.log(fileId, 'fileId');
+
+    // Если fileId пустой или null, устанавливаем undefined вместо пустой строки
+    const validFileId = fileId && fileId.trim() !== '' ? fileId : undefined;
+    setValue('mainImageId', validFileId, { shouldValidate: true });
+
+    if (file?.url) {
+      // Обновляем URL для отображения
+      setValue('imageUrl', file.url, { shouldValidate: true });
+      showUploadNotification('mainImage', 'success', 'Главное изображение загружено');
+    } else if (file?.storedName) {
+      setValue('imageUrl', `/api/upload/files/${encodeURIComponent(file?.storedName)}/view`, {
+        shouldValidate: true,
+      });
+    } else {
+      setValue('imageUrl', '', { shouldValidate: true });
+    }
+  };
+
+  const handleMainImageError = (error: string) => {
+    showUploadNotification('mainImage', 'error', error);
+  };
+
+  const handleDimensionsImageChange = (fileId?: string | null, file?: UploadedFile) => {
+    // Если fileId пустой или null, устанавливаем undefined вместо пустой строки
+    const validFileId = fileId && fileId.trim() !== '' ? fileId : undefined;
+    setValue('dimensionsImageId', validFileId, { shouldValidate: true });
+
+    if (file && file.url) {
+      setValue('dimensionsImageUrl', file.url, { shouldValidate: true });
+      showUploadNotification('dimensionsImage', 'success', 'Изображение габаритов загружено');
+    } else {
+      setValue('dimensionsImageUrl', '', { shouldValidate: true });
+    }
+  };
+
+  const handleDimensionsImageError = (error: string) => {
+    showUploadNotification('dimensionsImage', 'error', error);
   };
 
   return (
     <FormContainer onSubmit={handleSubmit(handleFormSubmit)}>
       <FormGrid>
+        {/* Slug */}
+        <FormGroup>
+          <Label htmlFor="slug">Slug *</Label>
+          <Controller
+            name="slug"
+            control={control}
+            render={({ field }) => (
+              <Input
+                id="slug"
+                type="text"
+                {...field}
+                onChange={e => {
+                  setSlugTouched(true);
+                  field.onChange(e);
+                }}
+                placeholder="dyson-v15-detect-absolute"
+                disabled={loading}
+              />
+            )}
+          />
+          {errors.slug && <ErrorMessage>{errors.slug.message}</ErrorMessage>}
+        </FormGroup>
+
+        {/* Название */}
         <FormGroup $fullWidth>
           <Label htmlFor="name">Название продукта *</Label>
           <Controller
@@ -82,6 +378,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           {errors.name && <ErrorMessage>{errors.name.message}</ErrorMessage>}
         </FormGroup>
 
+        {/* Описание */}
         <FormGroup $fullWidth>
           <Label htmlFor="description">Описание *</Label>
           <Controller
@@ -99,6 +396,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           {errors.description && <ErrorMessage>{errors.description.message}</ErrorMessage>}
         </FormGroup>
 
+        {/* Цена */}
         <FormGroup>
           <Label htmlFor="price">Цена (₽) *</Label>
           <Controller
@@ -118,6 +416,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           {errors.price && <ErrorMessage>{errors.price.message}</ErrorMessage>}
         </FormGroup>
 
+        {/* Склад */}
         <FormGroup>
           <Label htmlFor="stock">Количество на складе *</Label>
           <Controller
@@ -130,6 +429,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           {errors.stock && <ErrorMessage>{errors.stock.message}</ErrorMessage>}
         </FormGroup>
 
+        {/* Категория */}
         <FormGroup>
           <Label htmlFor="categoryId">Категория *</Label>
           <Controller
@@ -150,24 +450,100 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           {error && <ErrorMessage>{error}</ErrorMessage>}
         </FormGroup>
 
+        {/* Картинка */}
         <FormGroup>
-          <Label htmlFor="imageUrl">URL изображения</Label>
+          <Label>Главное изображение товара</Label>
+          <ProductImageUpload
+            value={watch('mainImageId') || ''}
+            currentImageUrl={watch('imageUrl') || ''}
+            onChange={handleMainImageChange}
+            onError={handleMainImageError}
+            disabled={loading || false}
+            label="Главное изображение"
+            size="sm"
+            containerMinHeight={40}
+            previewMaxHeight={90}
+            previewWidth={120}
+            previewHeight={90}
+            borderRadius={12}
+          />
+
+          {/* Уведомления о загрузке */}
+          {uploadNotifications.mainImage && (
+            <div
+              style={{
+                marginTop: '8px',
+                padding: '8px 12px',
+                borderRadius: '4px',
+                fontSize: '14px',
+                background:
+                  uploadNotifications.mainImage.type === 'success' ? '#dcfce7' : '#fef2f2',
+                color: uploadNotifications.mainImage.type === 'success' ? '#16a34a' : '#dc2626',
+                border: `1px solid ${uploadNotifications.mainImage.type === 'success' ? '#bbf7d0' : '#fecaca'}`,
+              }}
+            >
+              {uploadNotifications.mainImage.message}
+            </div>
+          )}
+
+          {/* Старое поле URL (скрытое, для совместимости) */}
           <Controller
             name="imageUrl"
             control={control}
-            render={({ field }) => (
-              <Input
-                id="imageUrl"
-                type="url"
-                {...field}
-                placeholder="https://example.com/image.jpg"
-                disabled={loading}
-              />
-            )}
+            render={({ field }) => <Input {...field} type="hidden" />}
           />
-          {errors.imageUrl && <ErrorMessage>{errors.imageUrl.message}</ErrorMessage>}
         </FormGroup>
 
+        <FormGroup $fullWidth>
+          <Label htmlFor="dimensionsImageUrl">Изображение габаритов</Label>
+          <ProductImageUpload
+            value={watch('dimensionsImageId') || ''}
+            currentImageUrl={watch('dimensionsImageUrl') || ''}
+            onChange={handleDimensionsImageChange}
+            onError={handleDimensionsImageError}
+            disabled={loading || false}
+            label="Изображение габаритов"
+            size="sm"
+            containerMinHeight={70}
+            previewMaxHeight={90}
+            previewWidth={120}
+            previewHeight={90}
+            borderRadius={12}
+          />
+
+          {/* Уведомления о загрузке */}
+          {uploadNotifications.dimensionsImage && (
+            <div
+              style={{
+                marginTop: '8px',
+                padding: '8px 12px',
+                borderRadius: '4px',
+                fontSize: '14px',
+                background:
+                  uploadNotifications.dimensionsImage.type === 'success' ? '#dcfce7' : '#fef2f2',
+                color:
+                  uploadNotifications.dimensionsImage.type === 'success' ? '#16a34a' : '#dc2626',
+                border: `1px solid ${uploadNotifications.dimensionsImage.type === 'success' ? '#bbf7d0' : '#fecaca'}`,
+              }}
+            >
+              {uploadNotifications.dimensionsImage.message}
+            </div>
+          )}
+
+          {/* Скрытые поля для URL и ID */}
+          <Controller
+            name="dimensionsImageUrl"
+            control={control}
+            render={({ field }) => <Input {...field} type="hidden" />}
+          />
+          <Controller
+            name="dimensionsImageId"
+            control={control}
+            render={({ field }) => <Input {...field} type="hidden" />}
+          />
+        </FormGroup>
+
+        {/* Фича-флаг */}
         <FormGroup>
           <CheckboxWrapper>
             <Controller
@@ -185,6 +561,43 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             />
             Рекомендуемый продукт
           </CheckboxWrapper>
+        </FormGroup>
+
+        {/* Комплектация */}
+        <FormGroup $fullWidth>
+          <Label>Комплектация</Label>
+          {boxItems.map((f, index) => (
+            <BoxRow
+              key={f.id}
+              index={index}
+              control={control}
+              setValue={setValue}
+              // loading={loading}
+              remove={() => removeBox(index)}
+            />
+          ))}
+          <Button type="button" onClick={onAppenedBox}>
+            + Добавить аксессуар
+          </Button>
+        </FormGroup>
+
+        {/* Характеристики */}
+        <FormGroup $fullWidth>
+          <Label>Характеристики</Label>
+          {specs.map((spec, index) => (
+            <SpecRow
+              key={spec.id}
+              index={index}
+              control={control}
+              // loading={loading}
+              remove={() => removeSpec(index)}
+              setValue={setValue}
+              attributes={attributes}
+            />
+          ))}
+          <Button type="button" onClick={onAppenedSpec}>
+            + Добавить характеристику
+          </Button>
         </FormGroup>
       </FormGrid>
 

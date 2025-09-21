@@ -101,7 +101,7 @@ async function createCategoryWithChildren(
     data: {
       name: categoryData.name,
       slug: categoryData.slug,
-      image: categoryData.image,
+      // image: categoryData.image,
       parentId: parentId,
     },
   });

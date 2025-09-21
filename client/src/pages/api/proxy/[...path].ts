@@ -33,9 +33,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const init: RequestInit = {
       method: req.method || 'GET',
       headers,
-    };
+    } as RequestInit;
     if (req.method && !['GET', 'HEAD'].includes(req.method)) {
-      init.body = (req as any).body ? JSON.stringify(req.body) : null;
+      // Для всех небезтелесных запросов проксируем сырой поток и указываем duplex
+      (init as any).body = req;
+      (init as any).duplex = 'half';
     }
 
     const response = await fetch(targetUrl, init);
@@ -59,3 +61,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ message: error?.message || 'Proxy error' });
   }
 }
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};

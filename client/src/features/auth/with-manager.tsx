@@ -8,6 +8,7 @@ import {
   selectUser,
 } from '@/store/slices/auth-slice/auth.selectors';
 import { UserRole } from '@/types/models/user.model';
+import { LoadingSpinner } from '@/components/atoms/loading-spinner/loading-spinner';
 
 export function withManager<P extends object>(Component: NextPage<P>) {
   const Guarded: NextPage<P> = (props: P) => {
@@ -38,16 +39,16 @@ export function withManager<P extends object>(Component: NextPage<P>) {
       // Проверяем роли только когда пользователь загружен
       const allowed = user.role === UserRole.MANAGER || user.role === UserRole.DIRECTOR;
       if (!allowed) {
-        void router.replace('/');
+        void router.replace('/admin/login');
       }
     }, [ready, isAuthenticated, isLoading, user, router]);
 
-    if (!ready) return null;
-    if (isLoading) return null;
-    if (!isAuthenticated) return null;
-    if (!user) return null;
+    if (!ready) return <LoadingSpinner />;
+    if (isLoading) return <LoadingSpinner />;
+    if (!isAuthenticated) return <LoadingSpinner />;
+    if (!user) return <LoadingSpinner />;
     const allowed = user.role === UserRole.MANAGER || user.role === UserRole.DIRECTOR;
-    if (!allowed) return null;
+    if (!allowed) return <LoadingSpinner />;
 
     return <Component {...(props as P)} />;
   };

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import {
   CategoriesSection,
@@ -14,12 +14,17 @@ import {
   selectIsRootCategoriesLoading,
   selectRootCategories,
 } from '@/store/slices/categories-slice/categories.selectors';
+import { useIsOverflow } from '@/hooks/use-is-overflow';
 
 export const Categories: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const categories = useAppSelector(selectRootCategories);
   const isLoading = useAppSelector(selectIsRootCategoriesLoading);
+
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const isOverflow = useIsOverflow(scrollContainerRef);
+  const center = !isOverflow;
 
   useEffect(() => {
     dispatch(fetchRootCategories());
@@ -64,7 +69,7 @@ export const Categories: React.FC = () => {
           <CategoriesTitle>Категории товаров</CategoriesTitle>
         </CategoriesHeader>
 
-        <ScrollContainer>
+        <ScrollContainer ref={scrollContainerRef} $center={center}>
           {categories.map(category => (
             <div
               key={category.id}

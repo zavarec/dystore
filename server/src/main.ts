@@ -4,6 +4,7 @@ import { ConfigService } from "@nestjs/config";
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
 import helmet from "helmet";
+import * as express from "express";
 
 // import compression from "compression";
 import * as csrf from "csurf";
@@ -15,6 +16,33 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+
+  // ВАЖНО: Увеличиваем лимиты для загрузки файлов
+  // app.use(require("express").json({ limit: "50mb" }));
+  // app.use(
+  //   require("express").urlencoded({
+  //     limit: "50mb",
+  //     extended: true,
+  //     parameterLimit: 50000,
+  //   }),
+  // );
+
+  const isMultipart = (req: any) =>
+    typeof req.headers["content-type"] === "string" &&
+    req.headers["content-type"].startsWith("multipart/form-data");
+
+  app.use(
+    express.json({ limit: "50mb", type: (req: any) => !isMultipart(req) }),
+  );
+  app.use(
+    express.urlencoded({
+      limit: "50mb",
+      extended: true,
+      parameterLimit: 50000,
+      type: (req: any) => !isMultipart(req),
+    }),
+  );
+
   app.use(cookieParser()); // ← ОБЯЗАТЕЛЬНО до роутов
 
   app.use((req, res, next) => {
@@ -64,7 +92,7 @@ async function bootstrap() {
   // Global prefix
   app.setGlobalPrefix("api");
 
-  // Global pipes
+  // Global pipes с увеличенными лимитами
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -73,6 +101,10 @@ async function bootstrap() {
       transformOptions: {
         enableImplicitConversion: true,
       },
+      // Важно для загрузки файлов
+      skipMissingProperties: false,
+      skipNullProperties: false,
+      skipUndefinedProperties: false,
     }),
   );
 

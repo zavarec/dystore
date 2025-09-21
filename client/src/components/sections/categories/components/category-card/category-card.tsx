@@ -25,7 +25,7 @@ export const CategoryCard: React.FC<CategoryCardProps> = ({
         onClick={() => onClick(category.slug)}
         whileTap={{ scale: 0.95 }}
       >
-        <CategoryImage variant={variant} src={category.image} alt={category.name} />
+        <CategoryImage variant={variant} src={category.imageUrl} alt={category.name} />
       </CategoryCardWrapper>
       <CategoryName variant={variant}>{category.name}</CategoryName>
     </CategoryCardBox>

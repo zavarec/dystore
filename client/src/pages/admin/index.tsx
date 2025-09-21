@@ -162,5 +162,5 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
   };
 };
 
-import { withAdmin } from '@/features/auth/with-admin';
-export default withAdmin(AdminDashboard);
+import { withManager } from '@/features/auth/with-manager';
+export default withManager(AdminDashboard);

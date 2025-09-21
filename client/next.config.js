@@ -16,6 +16,14 @@ const nextConfig = {
 
   // Оптимизация изображений
   images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 's3.twcstorage.ru',
+        port: '',
+        pathname: '**',
+      },
+    ],
     domains: ['dyson-h.assetsadobe2.com', 'video-eu.assetsadobe.com', 'www.dyson.com'],
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],

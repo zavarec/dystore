@@ -29,7 +29,7 @@ export class SeedService {
         data: {
           name: "Test Category",
           slug: "test-category",
-          image: "https://example.com/test.jpg",
+          // image: "https://example.com/test.jpg",
         },
       });
       this.logger.log(
@@ -46,7 +46,7 @@ export class SeedService {
           description: "Full description of test product",
           price: 1000,
           stock: 10,
-          imageUrl: "https://example.com/product.jpg",
+          // imageUrl: "https://example.com/product.jpg",
           categoryId: category.id,
           isFeatured: true,
           popularity: 100,

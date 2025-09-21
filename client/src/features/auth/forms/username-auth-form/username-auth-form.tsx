@@ -13,7 +13,7 @@ import {
   Input,
   ErrorMessage,
   FormActions,
-  CloseButton,
+  // CloseButton,
   SwitchModeButton,
 } from './username-auth-form.style';
 import { loginWithPassword, registerWithPassword } from '@/store/slices/auth-slice/auth.thunks';
@@ -28,15 +28,23 @@ import {
 interface UsernameAuthFormProps {
   onClose?: () => void;
   showCloseButton?: boolean;
+  redirectTo?: string;
 }
 
 export const UsernameAuthForm: React.FC<UsernameAuthFormProps> = ({
   onClose,
-  showCloseButton = false,
+
+  redirectTo = '/',
 }) => {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { isLoading, error, isAuthenticated } = useAppSelector(state => state.authSlice);
+
+  const isAdminPath = router.pathname.startsWith('/admin');
+
+  useEffect(() => {
+    console.log(isAdminPath, 'isAdminPath');
+  }, [isAdminPath]);
 
   const [isLoginMode, setIsLoginMode] = useState(true);
 
@@ -67,14 +75,12 @@ export const UsernameAuthForm: React.FC<UsernameAuthFormProps> = ({
   useEffect(() => {
     if (isAuthenticated) {
       if (onClose) {
-        // Если есть обработчик закрытия (модальное окно), закрываем его
         onClose();
       } else {
-        // Если мы на странице авторизации, перенаправляем на главную
-        router.push('/');
+        router.push(redirectTo);
       }
     }
-  }, [isAuthenticated, onClose, router]);
+  }, [isAuthenticated, onClose, router, redirectTo]);
 
   const onLoginSubmit = async (data: LoginFormData) => {
     try {
@@ -240,10 +246,11 @@ export const UsernameAuthForm: React.FC<UsernameAuthFormProps> = ({
           </FormActions>
         </form>
       )}
-
-      <SwitchModeButton onClick={toggleMode} type="button">
-        {isLoginMode ? 'Нет аккаунта? Зарегистрироваться' : 'Уже есть аккаунт? Войти'}
-      </SwitchModeButton>
+      {!isAdminPath && (
+        <SwitchModeButton onClick={toggleMode} type="button">
+          {isLoginMode ? 'Нет аккаунта? Зарегистрироваться' : 'Уже есть аккаунт? Войти'}
+        </SwitchModeButton>
+      )}
     </div>
   );
 };

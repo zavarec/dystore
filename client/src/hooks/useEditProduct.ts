@@ -30,6 +30,8 @@ export const useEditProduct = (productId: string) => {
   }, [productId, router]);
 
   const handleSubmit = async (data: UpdateProductDto) => {
+    console.log(data, 'DATA');
+
     setLoading(true);
     try {
       const payload: Partial<UpdateProductDto> = {};
@@ -39,8 +41,12 @@ export const useEditProduct = (productId: string) => {
         (payload as any).shortDescription = (data as any).shortDescription;
       if (typeof data.price !== 'undefined') payload.price = Number(data.price);
       if (typeof data.stock !== 'undefined') payload.stock = Number(data.stock);
-      if (typeof data.imageUrl !== 'undefined') payload.imageUrl = data.imageUrl;
+      if (typeof data.mainImageId !== 'undefined') payload.mainImageId = data.mainImageId;
       if (typeof data.categoryId !== 'undefined') payload.categoryId = Number(data.categoryId);
+      if (typeof data.boxItems !== 'undefined') payload.boxItems = data.boxItems;
+      if (typeof data.specs !== 'undefined') payload.specs = data.specs;
+      if (typeof data.dimensionsImageId !== 'undefined')
+        payload.dimensionsImageId = data.dimensionsImageId;
 
       await ProductsService.updateProduct(parseInt(productId), payload as UpdateProductDto);
       toast.success('Продукт успешно обновлен');

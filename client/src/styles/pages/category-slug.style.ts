@@ -1,15 +1,17 @@
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
+
 import { commonStyles, tokens } from '../shared';
 
 export const Container = styled.div`
-  ${commonStyles.container};
+  /* ${commonStyles.container}; */
   padding: 40px 20px;
 `;
 
 export const Header = styled.section`
-  text-align: center;
-  margin-bottom: 60px;
+  text-align: left;
+  padding: 40px 0;
+  /* margin-bottom: 60px; */
 `;
 
 export const CategoryTitle = styled.h1`
@@ -25,8 +27,8 @@ export const CategoryTitle = styled.h1`
 export const CategoryDescription = styled.p`
   font-size: 1.2rem;
   color: #666;
-  max-width: 600px;
-  margin: 0 auto;
+  /* max-width: 600px; */
+  /* margin: 0 auto; */
   line-height: 1.6;
 `;
 

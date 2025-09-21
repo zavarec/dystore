@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Category, CreateCategoryDto, UpdateCategoryDto } from '@/types/models/category.model';
@@ -18,15 +18,18 @@ import {
   Button,
   HelpText,
 } from './category-form.style';
+import { ProductImageUpload, UploadedFile } from '@/components/FileUpload/product-file-upload';
+import { CategoryFormValues, mapFormToCategoryDto } from './category-forn.schema';
 
 // Схема валидации
 const categorySchema = yup.object({
   name: yup.string().required('Название обязательно'),
+  description: yup.string().nullable(),
   slug: yup
     .string()
     .required('Slug обязателен')
     .matches(/^[a-z0-9-]+$/, 'Slug может содержать только строчные буквы, цифры и дефис'),
-  image: yup.string().url('Введите корректный URL'),
+  // imageId: yup.string(),
   parentId: yup.number().nullable(),
 });
 
@@ -42,6 +45,9 @@ export const CategoryForm = <T extends CreateCategoryDto | UpdateCategoryDto>({
   loading = false,
 }: CategoryFormProps<T>) => {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [uploadNotice, setUploadNotice] = useState<
+    { type: 'success' | 'error'; msg: string } | undefined
+  >(undefined);
 
   const {
     register,
@@ -49,12 +55,15 @@ export const CategoryForm = <T extends CreateCategoryDto | UpdateCategoryDto>({
     formState: { errors },
     setValue,
     watch,
-  } = useForm({
-    resolver: yupResolver(categorySchema),
+    control,
+  } = useForm<CategoryFormValues>({
+    resolver: yupResolver(categorySchema as yup.ObjectSchema<CategoryFormValues>),
     defaultValues: {
       name: category?.name || '',
+      description: category?.description || '',
       slug: category?.slug || '',
-      image: category?.image || '',
+      imageId: (category as any)?.image?.id ?? undefined,
+      imageUrl: (category as any)?.image?.url ?? undefined,
       parentId: category?.parentId || null,
     },
   });
@@ -101,12 +110,42 @@ export const CategoryForm = <T extends CreateCategoryDto | UpdateCategoryDto>({
     }
   }, [nameValue, setValue, category]);
 
-  const handleFormSubmit = async (data: any) => {
+  // Аплоад главного изображения категории (через File API)
+  const handleImageChange = (fileId?: string | null, file?: UploadedFile) => {
+    const validId = fileId && fileId.trim() !== '' ? fileId : undefined;
+    setValue('imageId', validId, { shouldValidate: true });
+
+    console.log(file, 'file');
+    console.log(fileId, 'fileId');
+
+    if (file?.url) {
+      setValue('imageUrl', file.url, { shouldValidate: true });
+      setUploadNotice({ type: 'success', msg: 'Изображение категории загружено' });
+    } else if (file?.storedName) {
+      setValue('imageUrl', `/api/upload/files/${encodeURIComponent(file.storedName)}/view`, {
+        shouldValidate: true,
+      });
+      setUploadNotice({ type: 'success', msg: 'Изображение категории загружено' });
+    } else if (!fileId) {
+      // удаление
+      setValue('imageUrl', undefined, { shouldValidate: true });
+      setUploadNotice({ type: 'success', msg: 'Изображение категории удалено' });
+    }
+    // скрыть уведомление через 4 сек
+    setTimeout(() => setUploadNotice(undefined), 4000);
+  };
+
+  const handleImageError = (message: string) => {
+    setUploadNotice({ type: 'error', msg: message });
+    setTimeout(() => setUploadNotice(undefined), 5000);
+  };
+
+  const handleFormSubmit = async (values: CategoryFormValues) => {
     const formData = {
-      ...data,
-      parentId: data.parentId ? parseInt(data.parentId) : null,
-    } as T;
-    await onSubmit(formData);
+      ...values,
+      parentId: values.parentId ? Number(values.parentId) : null,
+    };
+    await onSubmit(mapFormToCategoryDto(formData) as T);
   };
 
   return (
@@ -138,31 +177,59 @@ export const CategoryForm = <T extends CreateCategoryDto | UpdateCategoryDto>({
         </FormGroup>
 
         <FormGroup>
-          <Label htmlFor="parentId">Родительская категория</Label>
-          <Select id="parentId" {...register('parentId')} disabled={loading}>
-            <option value="">Нет (корневая категория)</option>
-            {categories.map(cat => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </Select>
-          <HelpText>Оставьте пустым для создания корневой категории</HelpText>
-        </FormGroup>
-
-        <FormGroup>
-          <Label htmlFor="image">URL изображения</Label>
+          <Label htmlFor="description">Описание категории </Label>
           <Input
-            id="image"
-            type="url"
-            {...register('image')}
-            placeholder="https://example.com/category-image.jpg"
+            id="description"
+            type="text"
+            {...register('description')}
+            placeholder="Например: Пылесосы"
             disabled={loading}
           />
-          {errors.image && <ErrorMessage>{errors.image.message}</ErrorMessage>}
-          <HelpText>Изображение для отображения в каталоге</HelpText>
+          {errors.name && <ErrorMessage>{errors.name.message}</ErrorMessage>}
+        </FormGroup>
+
+        <FormGroup $fullWidth>
+          <Label>Изображение категории</Label>
+          <Controller
+            control={control}
+            name="imageId"
+            render={() => (
+              <ProductImageUpload
+                value={watch('imageId') || ''}
+                currentImageUrl={watch('imageUrl') || ''}
+                onChange={handleImageChange}
+                onError={handleImageError}
+                disabled={loading}
+                label="Изображение категории"
+                size="sm"
+                containerMinHeight={70}
+                previewMaxHeight={90}
+                previewWidth={120}
+                previewHeight={90}
+                borderRadius={12}
+              />
+            )}
+          />
+          {/* скрытое поле — только для превью */}
+          <Controller
+            name="imageUrl"
+            control={control}
+            render={({ field }) => <input type="hidden" {...field} />}
+          />
         </FormGroup>
       </FormGrid>
+      <FormGroup>
+        <Label htmlFor="parentId">Родительская категория</Label>
+        <Select id="parentId" {...register('parentId')} disabled={loading}>
+          <option value="">Нет (корневая категория)</option>
+          {categories.map(cat => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
+          ))}
+        </Select>
+        <HelpText>Оставьте пустым для создания корневой категории</HelpText>
+      </FormGroup>
 
       <FormActions>
         <Link href="/admin/categories" passHref legacyBehavior>

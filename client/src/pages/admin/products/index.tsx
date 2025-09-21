@@ -153,7 +153,7 @@ const AdminProductsPage: NextPage = () => {
                     <STd>{product.id}</STd>
                     <STd>
                       <SProductImage
-                        src={product.imageUrl || '/images/placeholder.webp'}
+                        src={product.mainImage?.url || '/images/placeholder.webp'}
                         alt={product.name}
                       />
                     </STd>

@@ -9,6 +9,7 @@ import {
   selectIsLoading,
 } from '@/store/slices/auth-slice/auth.selectors';
 import { UserRole } from '@/types/models/user.model';
+import { LoadingSpinner } from '@/components/atoms/loading-spinner/loading-spinner';
 
 export function withAdmin<P extends object>(Component: NextPage<P>) {
   const Guarded: NextPage<P> = (props: P) => {
@@ -37,18 +38,18 @@ export function withAdmin<P extends object>(Component: NextPage<P>) {
       // 3) Профиль ещё не подгружен — ждём без редиректа
       if (!user) return;
 
-      // 4) Есть пользователь, но роль не директор — домой
+      // 4) Есть пользователь, но роль не директор — на страницу логина админки
       if (user.role !== UserRole.DIRECTOR) {
-        void router.replace('/');
+        void router.replace('/admin/login');
       }
     }, [ready, isAuthenticated, isLoading, user, router]);
 
-    // Пока проверяем или редиректим — ничего не рендерим
-    if (!ready) return null;
-    if (isLoading) return null;
-    if (!isAuthenticated) return null;
-    if (!user) return null;
-    if (user.role !== UserRole.DIRECTOR) return null;
+    // Пока проверяем или редиректим — показываем загрузку
+    if (!ready) return <LoadingSpinner />;
+    if (isLoading) return <LoadingSpinner />;
+    if (!isAuthenticated) return <LoadingSpinner />;
+    if (!user) return <LoadingSpinner />;
+    if (user.role !== UserRole.DIRECTOR) return <LoadingSpinner />;
 
     return <Component {...(props as P)} />;
   };

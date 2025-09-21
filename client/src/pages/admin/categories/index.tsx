@@ -76,7 +76,11 @@ const AdminCategoriesPage: NextPage = () => {
               <span>Подкатегорий: {category.children.length}</span>
             )}
             <ActionButtons>
-              <Link href={`/admin/categories/${category.id}/edit`} passHref legacyBehavior>
+              <Link
+                href={`/admin/categories/${category.id}/edit-category-page`}
+                passHref
+                legacyBehavior
+              >
                 <ActionButton as="a" $variant="edit">
                   <Pencil size={16} />
                   Изменить

@@ -7,8 +7,8 @@ const apiHost =
   process.env.INTERNAL_API_URL ||
   process.env.API_URL ||
   process.env.NEXT_PUBLIC_API_URL ||
-  'http://localhost:3001';
-const API_BASE_URL = apiHost + '/api';
+  'http://localhost:3001/api';
+const API_BASE_URL = apiHost;
 
 export const serverApiClient = axios.create({
   baseURL: API_BASE_URL,

@@ -44,7 +44,7 @@ export class SeedController {
         data: {
           name: 'Test Category',
           slug: 'test-' + Date.now(),
-          image: 'https://example.com/test.jpg',
+          // image: 'https://example.com/test.jpg',
         },
       });
       this.logger.log('Category created successfully');
