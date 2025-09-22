@@ -107,6 +107,29 @@ const globalStyles = css`
     }
   }
 
+  :root {
+    --ff-base: var(--font-inter);
+    --ff-accent: var(--font-nunito-sans);
+
+    --fs-h1: 2.5rem;
+    --fs-h2: 2rem;
+    --fs-h3: 1.5rem;
+    --fs-h4: 1.25rem;
+    --fs-body: 1rem;
+    --fs-body-sm: 0.875rem;
+    --fs-caption: 0.75rem;
+    --fs-button: 0.875rem;
+
+    --lh-heading: 1.25;
+    --lh-body: 1.6;
+    --lh-button: 1.2;
+
+    --fw-regular: 400;
+    --fw-medium: 500;
+    --fw-semibold: 600;
+    --fw-bold: 700;
+  }
+
   /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 8px;

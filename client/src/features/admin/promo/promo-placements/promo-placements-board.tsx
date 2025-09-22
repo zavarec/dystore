@@ -37,7 +37,6 @@ import { selectPromoPlacements } from '@/store/slices/promo/promo.selectors';
 import { applyLocalReorder } from '@/store/slices/promo/promo.slice';
 import {
   deletePlacement,
-  deletePromoSection,
   listPlacements,
   listPromoSections,
   reorderPlacements,
@@ -202,10 +201,8 @@ export function PromoPlacementsBoard() {
     // тут можно открыть свою модалку редактирования секции
   };
 
-  const onDeleteSection = async (item: PromoPlacement) => {
-    const id = (item as any).promoSectionId ?? item.promoSection?.id;
-    if (!id) return;
-    await dispatch(deletePromoSection(id));
+  const onDetachPlacement = async (item: PromoPlacement) => {
+    await dispatch(deletePlacement(item.id));
   };
 
   return (
@@ -313,7 +310,7 @@ export function PromoPlacementsBoard() {
                         sortMode
                         onEdit={() => setEditing(item)}
                         onEditSection={() => onEditSection(item)}
-                        onDelete={() => onDeleteSection(item)}
+                        onDelete={() => onDetachPlacement(item)}
                         onChangeSlot={(s: PromoSlot) => {
                           dispatch(updatePlacement({ id: item.id, dto: { slot: s } }));
                         }}

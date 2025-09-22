@@ -194,6 +194,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     appendBox({ customName: '', customImageId: '', qty: 1, order: boxItems.length });
 
   const handleFormSubmit = async (data: ProductFormValues) => {
+    console.log(data, 'data');
+
     const specsList = data.specs ?? [];
     const existingByName = new Map<string, SpecAttributeDto>(
       (attributes ?? []).map(attr => [norm(attr.label), attr]),

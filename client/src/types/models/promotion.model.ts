@@ -50,10 +50,10 @@ export interface Promotion {
   isPublished: boolean;
 
   /** Дата и время начала активности */
-  startAt: string; // ISO string
+  startAt?: string; // ISO string
 
   /** Дата и время окончания активности */
-  endAt: string; // ISO string
+  endAt?: string; // ISO string
 
   /** Порядок сортировки внутри слота (чем меньше число, тем выше элемент) */
   position: number;

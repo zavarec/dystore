@@ -23,7 +23,7 @@ export const Card = styled(motion.div)`
   }
 
   @media (max-width: 480px) {
-    max-width: 100%;
+    /* max-width: 100%; */
   }
 `;
 

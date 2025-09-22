@@ -40,12 +40,6 @@ export const Heading = styled.header<{ $color?: string | undefined }>`
   }
 `;
 
-export const Card = styled.article`
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-`;
-
 export const CardTitle = styled.h3`
   margin: 0;
   font-size: clamp(18px, 2vw, 20px);
@@ -74,31 +68,6 @@ export const CardCta = styled.a`
   }
 `;
 
-// machine-highlights-section.style.ts
-export const Grid = styled.div<{ $variant: 'grid' | 'row' }>`
-  display: grid;
-  gap: clamp(28px, 3vw, 36px);
-
-  /* GRID режим: 1/2/4 (или заданные в JSON) */
-  ${({ $variant }) =>
-    $variant === 'grid'
-      ? `
-    grid-template-columns: repeat(var(--mh-cols-sm, 1), minmax(0, 1fr));
-    @media (min-width: 768px) {
-      grid-template-columns: repeat(var(--mh-cols-md, 2), minmax(0, 1fr));
-    }
-    @media (min-width: 1100px) {
-      grid-template-columns: repeat(var(--mh-cols-lg, 4), minmax(0, 1fr));
-    }
-  `
-      : `
-    /* ROW режим: крупные карточки в ряд (1 / 2 / 2) */
-    grid-template-columns: 1fr;
-    @media (min-width: 768px) { grid-template-columns: repeat(2, 1fr); }
-    @media (min-width: 1100px) { grid-template-columns: repeat(2, 1fr); }
-  `}
-`;
-
 export const Media = styled.div`
   position: relative;
   width: 100%;
@@ -115,5 +84,39 @@ export const Media = styled.div`
     height: 100%;
     object-fit: var(--mh-fit, cover); /* cover/contain из JSON */
     display: block;
+  }
+`;
+
+// machine-highlights-section.style.ts
+export const Grid = styled.div`
+  display: grid;
+  gap: clamp(28px, 3vw, 36px);
+  grid-auto-flow: dense;
+
+  /* 1 колонка на мобилке */
+  grid-template-columns: repeat(4, minmax(0, 1fr)); /* = 4 юнита на sm */
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(8, minmax(0, 1fr)); /* md = 8 юнитов */
+  }
+  @media (min-width: 1100px) {
+    grid-template-columns: repeat(12, minmax(0, 1fr)); /* lg = 12 юнитов */
+  }
+`;
+
+/* Карточка умеет “растягиваться” на N юнитов */
+export const Card = styled.article`
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  /* по умолчанию — во всю строку на sm */
+  grid-column: span var(--span-sm, 4) / auto;
+
+  @media (min-width: 768px) {
+    grid-column: span var(--span-md, 4) / auto; /* 8 юнитов -> 4 == половина (2 в ряд) */
+  }
+  @media (min-width: 1100px) {
+    grid-column: span var(--span-lg, 4) / auto; /* 12 юнитов -> 4 == треть (3 в ряд) */
   }
 `;

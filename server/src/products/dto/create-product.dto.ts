@@ -8,6 +8,7 @@ import {
   IsUrl,
   IsNotEmpty,
   ValidateNested,
+  IsBoolean,
 } from "class-validator";
 import { BoxItemDto } from "./save-box-items.dto";
 import { SpecItemDto } from "./save-specs.dto";
@@ -19,6 +20,10 @@ export class CreateProductDto {
   @IsString({ message: "Slug должно быть строкой" })
   @IsNotEmpty({ message: "Slug обязателен" })
   slug: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isFeatured?: boolean;
 
   @IsOptional()
   @IsString({ message: "Описание должно быть строкой" })

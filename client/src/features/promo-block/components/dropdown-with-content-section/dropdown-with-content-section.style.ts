@@ -83,7 +83,7 @@ export const Collapse = styled.div<{ $open?: boolean }>`
 
 export const CollapseInner = styled.div`
   /* Внутренние отступы белой секции как у Dyson */
-  padding: 40px 0 56px;
+  /* padding: 40px 0 56px; */
   @media (min-width: 960px) {
     padding: 48px 0 64px;
   }
@@ -101,7 +101,6 @@ export const CollapseInner = styled.div`
 
 export const Headline = styled.div<{ color?: string }>`
   text-align: center;
-  margin: 0 0 28px;
 
   h3 {
     margin: 0 0 10px;
@@ -119,10 +118,13 @@ export const Headline = styled.div<{ color?: string }>`
 
 export const Cards = styled.div`
   /* Сетка как на Dyson: 1 / 2 / 4 колонки + большие промежутки */
-  display: grid;
-  grid-template-columns: 1fr;
-  justify-items: center; /* все элементы по центру колонки */
-  align-items: start;
+  /* display: grid; */
+  /* grid-template-columns: 1fr; */
+  display: flex;
+
+  flex-wrap: wrap;
+  justify-content: center; /* центрируем по горизонтали */
+  align-items: flex-start;
   row-gap: 36px;
   column-gap: 32px;
 

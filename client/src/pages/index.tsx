@@ -1,22 +1,27 @@
 import React, { useMemo } from 'react';
-import { GetStaticProps, NextPage } from 'next';
+
+import type { GetStaticProps, NextPage } from 'next';
+
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
+import { SEOHead } from '@/components/atoms/seo-head/seo-head';
+import type { HeroSpotlightProps } from '@/components/hero-spotlight/hero-spotlight';
+import { HeroSpotlight } from '@/components/hero-spotlight/hero-spotlight';
+import { Benefits } from '@/components/sections/benefits';
+import { Categories } from '@/components/sections/categories';
+import { Hero } from '@/components/sections/hero';
+import { ProductSection } from '@/components/sections/product-section';
+import { Stats } from '@/components/sections/stats';
+import { Container, HeaderWithBenefitsWrapper } from '@/styles/pages/index.style';
+import { StorePanorama } from '@/components/sections/store-panorama';
+import HomeSections from '@/features/promotions/home-sections';
+import { PromoCard } from '@/features/promotions/promo-card/promo-card';
 import { useProducts } from '@/hooks/useProducts';
 import {
   adaptProductsForUI,
   getFeaturedProducts,
   getPopularProducts,
 } from '@/utils/product-adapters';
-import { Container, HeaderWithBenefitsWrapper } from '@/styles/pages/index.style';
-import { Stats } from '@/components/sections/stats';
-import { ProductSection } from '@/components/sections/product-section';
-import { Hero } from '@/components/sections/hero';
-import { Benefits } from '@/components/sections/benefits';
-import { Categories } from '@/components/sections/categories';
-import { StorePanorama } from '@/components/sections/store-panorama';
-import { SEOHead } from '@/components/atoms/seo-head/seo-head';
-import HomeSections from '@/features/promotions/home-sections';
 
 const HomePage: NextPage = () => {
   const { products, loading, error } = useProducts();
@@ -76,6 +81,38 @@ const HomePage: NextPage = () => {
     window.scrollTo({ top: 600, behavior: 'smooth' });
   };
 
+  const promo1: HeroSpotlightProps = {
+    title: 'Чистый воздух круглый год',
+    subtitle: 'комфорт и свежесть в любое время года.',
+    bgImage:
+      'https://s3.twcstorage.ru/49dbf9e8-45b07930-284b-4614-95f5-5a9bdcbd9f92/uploads/cd7c4937-07e2-42d6-8fb0-3954381fce1c-15-HP10-Gallery-Image-04.jpg',
+    buttonPrimary: {
+      label: 'Посмотреть',
+      href: '/product/dyson-purifier-hotcool-gen1-hp10-purifying-fan-heater-whitenickel',
+    },
+
+    motifImage: {
+      src: 'https://s3.twcstorage.ru/49dbf9e8-45b07930-284b-4614-95f5-5a9bdcbd9f92/uploads/652b9d34-b39f-46c2-8bfd-2d7bab1636ca-PH04 Motif.png',
+    },
+    align: 'right',
+  };
+
+  const promo2 = {
+    title: 'Многофункциональный стайлер нового поколения',
+    subtitle:
+      'Лучшие локоны. Более быстрая сушка. Более прямые укладки.² Без повреждений от высокой температуры.',
+    bgImage:
+      'https://s3.twcstorage.ru/49dbf9e8-45b07930-284b-4614-95f5-5a9bdcbd9f92/uploads/c65b32c1-63fc-43a9-8c28-3e9b83f45959-Web_590-Static-Banner-T3-T4.jpg',
+    buttonPrimary: {
+      label: 'Посмотреть',
+      href: '/product/dyson-airwrap-co-anda2x',
+    },
+
+    motifImage: {
+      src: 'https://s3.twcstorage.ru/49dbf9e8-45b07930-284b-4614-95f5-5a9bdcbd9f92/uploads/e1aab273-9c11-417d-a2db-ae840b945991-airwrap-co-anda-2x-light.png',
+    },
+  };
+
   return (
     <>
       <SEOHead {...seoProps} />
@@ -90,9 +127,10 @@ const HomePage: NextPage = () => {
 
       <Benefits />
 
-      <div style={{ padding: '0px' }}>
-        <HomeSections />
-      </div>
+      <HeroSpotlight {...promo1} />
+
+      <HeroSpotlight {...promo2} />
+      {/* <HomeSections /> */}
 
       <Container>
         {error ? (
@@ -108,13 +146,13 @@ const HomePage: NextPage = () => {
               loading={loading}
             />
 
-            <ProductSection
+            {/* <ProductSection
               title="Популярные товары"
               products={popularProducts}
               variant="outline"
               maxItems={3}
               loading={loading}
-            />
+            /> */}
           </>
         )}
       </Container>

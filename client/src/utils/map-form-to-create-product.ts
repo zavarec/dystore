@@ -87,6 +87,7 @@ export function mapFormToCreateDto(values: ProductFormValues): CreateProductDto 
     price: values.price,
     stock: values.stock,
     categoryId: values.categoryId,
+    isFeatured: values.isFeatured,
     // Передаем ID изображений только если они не пустые
     ...spreadIf(!!values.mainImageId?.trim(), { mainImageId: values.mainImageId!.trim() }),
     ...spreadIf(!!values.dimensionsImageId?.trim(), {

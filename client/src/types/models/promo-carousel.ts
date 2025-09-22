@@ -73,7 +73,12 @@ export interface PromoHighlightsItem {
   media?: PromoMedia;
   href?: string;
   ctaText?: string;
+  span?: SpanConfig; // <— НОВОЕ
+  ratio?: '1:1' | '4:3' | '3:2' | '16:9' | number; // индивидуальное соотношение
+  fit?: 'cover' | 'contain'; // индивидуальный object-fit
 }
+
+type SpanConfig = { sm?: number; md?: number; lg?: number };
 
 export interface PromoHighlightsContent {
   kind: 'highlights';

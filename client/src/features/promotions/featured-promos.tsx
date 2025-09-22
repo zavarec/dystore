@@ -13,6 +13,8 @@ export default function FeaturedPromos() {
   const selectFeatured = selectPromotionsBySlot(PromotionSlot.FEATURED);
   const promos = useAppSelector(selectFeatured);
 
+  console.log(promos, 'promos');
+
   useEffect(() => {
     if (!promos.length) {
       dispatch(fetchActivePromosBySlot(PromotionSlot.FEATURED));

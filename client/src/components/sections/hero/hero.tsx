@@ -1,10 +1,12 @@
-import React from 'react';
 import { motion } from 'framer-motion';
+
 import { Button } from '@/components/atoms/button';
-import { Carousel, CarouselSlide } from '@/components/atoms/carousel';
-import { HeroContainer, Container } from './hero.style';
 import { ButtonVariant } from '@/components/atoms/button/button.style';
+import type { CarouselSlide } from '@/components/atoms/carousel';
+import { Carousel } from '@/components/atoms/carousel';
 import { VideoBanner } from '@/components/atoms/video-banner';
+
+import { HeroContainer, Container } from './hero.style';
 
 interface HeroProps {
   onCatalogClick: () => void;
@@ -17,24 +19,6 @@ const heroSlides: CarouselSlide[] = [
     subtitle: 'Откройте для себя мир качественных товаров по доступным ценам',
     video:
       'https://video-eu.assetsadobe.com/dyson/_renditions_/526/5261034a-d1bc-40a2-a45c-9125ef7c693a/avs/Dyson_EMEA_Summer%20Promo_Social_1280x600_6s_XCAT_DEALPAGE-BANNER.mp4_master-0x540-2000k.mp4?',
-  },
-  {
-    id: '2',
-    title: 'Эксклюзивные предложения',
-    subtitle: 'Специальные скидки и акции только для наших клиентов',
-    background: '/images/hero/2.webp',
-  },
-  {
-    id: '3',
-    title: 'Быстрая доставка',
-    subtitle: 'Получите свои заказы в кратчайшие сроки по всей стране',
-    background: '/images/hero/3.webp',
-  },
-  {
-    id: '4',
-    title: 'Гарантия качества',
-    subtitle: 'Мы гарантируем высокое качество всех представленных товаров',
-    background: '/images/hero/1.webp',
   },
 ];
 

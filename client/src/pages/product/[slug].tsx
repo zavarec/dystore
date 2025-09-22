@@ -255,12 +255,6 @@ const ProductPage: NextPage<ProductPageProps> = ({ product, placements }) => {
               <CurrentPrice>{formatPriceRub(product.price)}</CurrentPrice>
             </ProductPrice>
 
-            {isInStock ? (
-              <InStockBadge>✓ В наличии ({product.stock} шт.)</InStockBadge>
-            ) : (
-              <OutOfStockBadge>⚠ Нет в наличии</OutOfStockBadge>
-            )}
-
             <ProductActions>
               <AddToCartButton
                 productId={product.id}
@@ -376,61 +370,4 @@ export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
     return { notFound: true, revalidate: 60 };
   }
 };
-
-// // ✅ Забираем продукт по SLUG (а не по id)
-// export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
-//   try {
-//     const slug = String(params?.slug || '');
-//     // Диагностика SSR запроса
-//     console.log('[GSP] slug =', slug);
-//     console.log('[GSP] bySlug.id =', bySlug?.id);
-
-//     // 1) Определяем id по slug
-//     const bySlug: Product = await ServerProductsService.getProductBySlug(slug);
-
-//     if (!bySlug?.id) {
-//       console.log(bySlug, 'bySlug');
-
-//       return { notFound: true, revalidate: 60 };
-//     }
-//     let productRaw = bySlug;
-
-//     try {
-//       // 2) Грузим товар по id (как просили)
-//       const productRaw: Product = await ServerProductsService.getProductById(Number(bySlug.id));
-
-//       // const placements = await PromoService.getForPage(PromoPageType.PRODUCT, String(product.id));
-
-//       const product = adaptProductForUI(productRaw || bySlug);
-
-//       const placements = await fetchPromoForPageSSR(PromoPageType.PRODUCT, String(product.id));
-//       console.log(product, 'product');
-//       return {
-//         props: {
-//           ...(await serverSideTranslations(locale ?? 'ru', ['common'])),
-//           product,
-//           placements,
-//         },
-//         revalidate: 3600,
-//       };
-//     } catch (err: any) {
-//       console.error(
-//         '[product/[slug]] fetch error for slug',
-//         slug,
-//         err?.response?.status,
-//         err?.response?.data || err?.message,
-//       );
-//       throw err;
-//     }
-//   } catch (e) {
-//     console.error(
-//       '[product/[slug]] getStaticProps failed, returning notFound. Slug:',
-//       params?.slug,
-//       'Error:',
-//       (e as any)?.message,
-//     );
-//     return { notFound: true, revalidate: 60 };
-//   }
-// };
-
 export default ProductPage;

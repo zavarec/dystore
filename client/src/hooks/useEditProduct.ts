@@ -37,8 +37,8 @@ export const useEditProduct = (productId: string) => {
       const payload: Partial<UpdateProductDto> = {};
       if (typeof data.name !== 'undefined') payload.name = data.name;
       if (typeof data.description !== 'undefined') payload.description = data.description;
-      if (typeof (data as any).shortDescription !== 'undefined')
-        (payload as any).shortDescription = (data as any).shortDescription;
+      if (typeof data.shortDescription !== 'undefined')
+        payload.shortDescription = data.shortDescription;
       if (typeof data.price !== 'undefined') payload.price = Number(data.price);
       if (typeof data.stock !== 'undefined') payload.stock = Number(data.stock);
       if (typeof data.mainImageId !== 'undefined') payload.mainImageId = data.mainImageId;
@@ -47,6 +47,8 @@ export const useEditProduct = (productId: string) => {
       if (typeof data.specs !== 'undefined') payload.specs = data.specs;
       if (typeof data.dimensionsImageId !== 'undefined')
         payload.dimensionsImageId = data.dimensionsImageId;
+      if (typeof data.isFeatured !== 'undefined' && data.isFeatured)
+        payload.isFeatured = Boolean(data.isFeatured);
 
       await ProductsService.updateProduct(parseInt(productId), payload as UpdateProductDto);
       toast.success('Продукт успешно обновлен');

@@ -1,12 +1,14 @@
 'use client';
 
 import { useEffect, useMemo } from 'react';
+
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { fetchHomeLayoutSections } from '@/store/slices/promotion-slice/promotion.thunk';
 import { selectHomeSections } from '@/store/slices/promotion-slice/promotions.selectors';
-import ProductOfDay from './product-of-day';
-import FeaturedPromos from './featured-promos';
+
 import CustomPromos from './custom-promos';
+import FeaturedPromos from './featured-promos';
+import ProductOfDay from './product-of-day';
 
 export default function HomeSections() {
   const dispatch = useAppDispatch();

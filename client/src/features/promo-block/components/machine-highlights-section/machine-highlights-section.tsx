@@ -67,7 +67,7 @@ export const MachineHighlightsSection: React.FC<Props> = ({ section, content }) 
           '--mh-cols-sm': colsSm,
           '--mh-cols-md': colsMd,
           '--mh-cols-lg': colsLg,
-          '--mh-ratio': `${ratio * 100}%`,
+          '--mh-ratio': `${ratio !== undefined && ratio * 100}%`,
           '--mh-fit': fit,
         } as React.CSSProperties
       }
@@ -81,19 +81,52 @@ export const MachineHighlightsSection: React.FC<Props> = ({ section, content }) 
         )}
 
         <Grid $variant={layout}>
-          {content.items.map(item => (
-            <Card key={item.id}>
-              {item.media && <Media>{renderMedia(item)}</Media>}
-              {item.title && <CardTitle>{item.title}</CardTitle>}
-              {item.description && <CardDescription>{item.description}</CardDescription>}
-              {item.ctaText && item.href && (
-                <CardCta href={item.href} aria-label={item.ctaText}>
-                  {item.ctaText}
-                  <span aria-hidden>→</span>
-                </CardCta>
-              )}
-            </Card>
-          ))}
+          {content.items.map(item => {
+            // цифры-спаны в юнитах сетки: 4/8/12
+            const spanSm = item.span?.sm ?? 4; // вся строка на sm
+            const spanMd = item.span?.md ?? 4; // 1/2 на md (2 в ряд)
+            const spanLg = item.span?.lg ?? 4; // 1/3 на lg (3 в ряд)
+
+            const ratioMap = { '1:1': 1, '4:3': 3 / 4, '3:2': 2 / 3, '16:9': 9 / 16 };
+            const ratio =
+              typeof item.ratio === 'number'
+                ? item.ratio
+                : item.ratio
+                  ? ratioMap[item.ratio]
+                  : typeof content.mediaRatio === 'number'
+                    ? content.mediaRatio
+                    : content.mediaRatio
+                      ? ratioMap[content.mediaRatio]
+                      : 0.66;
+
+            const fit = item.fit ?? content.mediaFit ?? 'cover';
+            return (
+              <Card
+                key={item.id}
+                style={
+                  {
+                    // ширины в юнитах
+                    '--span-sm': spanSm,
+                    '--span-md': spanMd,
+                    '--span-lg': spanLg,
+                    // индивидуальные медиа-настройки
+                    '--mh-ratio': `${ratio * 100}%`,
+                    '--mh-fit': fit,
+                  } as React.CSSProperties
+                }
+              >
+                {item.media && <Media>{renderMedia(item)}</Media>}
+                {item.title && <CardTitle>{item.title}</CardTitle>}
+                {item.description && <CardDescription>{item.description}</CardDescription>}
+                {item.ctaText && item.href && (
+                  <CardCta href={item.href} aria-label={item.ctaText}>
+                    {item.ctaText}
+                    <span aria-hidden>→</span>
+                  </CardCta>
+                )}
+              </Card>
+            );
+          })}
         </Grid>
       </Wrapper>
     </Section>
