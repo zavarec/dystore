@@ -27,7 +27,6 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
-    container_name: dystore_api
     env_file:
       - ./server/.env
     depends_on:
@@ -42,7 +41,6 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
-    container_name: dystore_web
     env_file:
       - ./client/.env.local
     depends_on:
