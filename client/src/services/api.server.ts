@@ -2,12 +2,7 @@ import axios from 'axios';
 
 // Серверный axios-клиент для использования в getStaticProps/getStaticPaths/SSR
 // Ходит напрямую в бэкенд (минуя Next API proxy). На сервере используем внутренний URL.
-const apiHost =
-  process.env.API_URL_INTERNAL ||
-  process.env.INTERNAL_API_URL ||
-  process.env.API_URL ||
-  process.env.NEXT_PUBLIC_API_URL ||
-  'http://localhost:3001/api';
+const apiHost = process.env.API_URL_SERVER || 'http://localhost:3001/api';
 const API_BASE_URL = apiHost;
 
 export const serverApiClient = axios.create({

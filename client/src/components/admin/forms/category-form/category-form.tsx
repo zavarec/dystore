@@ -115,9 +115,6 @@ export const CategoryForm = <T extends CreateCategoryDto | UpdateCategoryDto>({
     const validId = fileId && fileId.trim() !== '' ? fileId : undefined;
     setValue('imageId', validId, { shouldValidate: true });
 
-    console.log(file, 'file');
-    console.log(fileId, 'fileId');
-
     if (file?.url) {
       setValue('imageUrl', file.url, { shouldValidate: true });
       setUploadNotice({ type: 'success', msg: 'Изображение категории загружено' });

@@ -1,11 +1,12 @@
-// client/src/pages/admin/index.tsx
-import React, { useEffect, useState } from 'react';
-import { GetServerSideProps, NextPage } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useEffect, useState } from 'react';
+
+import type { GetServerSideProps, NextPage } from 'next';
 
 import { Package, FolderOpen, ShoppingCart, TrendUp } from '@phosphor-icons/react';
-import { ProductsService, CategoriesService } from '@/services';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
 import { AdminLayout } from '@/components/admin/layout/admin-layout';
+import { ProductsService, CategoriesService } from '@/services';
 import {
   DashboardGrid,
   RecentSection,

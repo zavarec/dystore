@@ -2,10 +2,12 @@
 'use client';
 
 import { useEffect } from 'react';
+
 import { useAppDispatch, useAppSelector } from '@/hooks';
 import { fetchActivePromosBySlot } from '@/store/slices/promotion-slice/promotion.thunk';
 import { selectPromotionsBySlot } from '@/store/slices/promotion-slice/promotions.selectors';
 import { PromotionSlot } from '@/types/models/promotion.model';
+
 import { PromoCard } from './promo-card/promo-card';
 
 export default function FeaturedPromos() {

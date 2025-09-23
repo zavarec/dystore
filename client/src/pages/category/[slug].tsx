@@ -1,17 +1,19 @@
-import React, { useState, useMemo } from 'react';
-import { GetStaticProps, GetStaticPaths, NextPage } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useState, useMemo } from 'react';
+
+import type { GetStaticProps, GetStaticPaths, NextPage, GetServerSideProps } from 'next';
+
 import Link from 'next/link';
+
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
 // import { useRouter } from 'next/router';
 import { SEOHead } from '@/components/atoms/seo-head/seo-head';
-import { ProductSortBy } from '@/types/models/product.model';
+import { VideoBanner } from '@/components/atoms/video-banner';
+import { ProductSection } from '@/components/sections/product-section';
+import { categoryVideoMap } from '@/constants/category-video-map';
+import { PromoSlotRenderer } from '@/features/promo-block/promo-slot-renderer';
 import { useCategoryBySlug } from '@/hooks';
 import { useCategoryProductsDeep } from '@/hooks/use-category-products-deep';
-import { adaptProductsForUI } from '@/utils/product-adapters';
-import { ProductSection } from '@/components/sections/product-section';
-
-import { VideoBanner } from '@/components/atoms/video-banner';
-
 import {
   Container,
   Header,
@@ -27,20 +29,18 @@ import {
   EmptyTitle,
   EmptyDescription,
 } from '@/styles/pages/category-slug.style';
+import { ProductSortBy } from '@/types/models/product.model';
+import type { PromoPlacement } from '@/types/models/promo-placement.model';
+import { PromoSlot } from '@/types/models/promo-section.model';
+import type { SeoMeta } from '@/types/models/seo-meta.model';
+import { groupBySlot } from '@/utils/page-promo';
+import { adaptProductsForUI } from '@/utils/product-adapters';
 
 // import { HorizontalScroller } from '@/components/atoms/horizontal-scroller/horizontal-scroller';
 // import { CategoryCard } from '@/components/sections/categories/components';
 
-import { categoryVideoMap } from '@/constants/category-video-map';
 import { buildSEOFromMeta, fetchSeoMetaSSR } from '@/utils/seo';
 // import { allCategoriesPreviewImage } from '@/constants/category.constnat';
-
-import { SeoMeta } from '@/types/models/seo-meta.model';
-
-import { PromoSlot } from '@/types/models/promo-section.model';
-import { groupBySlot } from '@/utils/page-promo';
-import { PromoPlacement } from '@/types/models/promo-placement.model';
-import { PromoSlotRenderer } from '@/features/promo-block/promo-slot-renderer';
 
 interface CategoryPageProps {
   slug: string;
@@ -76,12 +76,6 @@ const CategoryPage: NextPage<CategoryPageProps> = ({ slug, seoMeta, locale, plac
     return adapted;
   }, [fetchedProducts]);
 
-  // // Адаптируем продукты для UI
-  // const categoryProducts = useMemo(() => {
-  //   return adaptProductsForUI(rawCategoryProducts);
-  // }, [rawCategoryProducts]);
-
-  // Сортировка продуктов
   const sortedProducts = useMemo(() => {
     const sorted = [...rawProducts];
 
@@ -93,14 +87,6 @@ const CategoryPage: NextPage<CategoryPageProps> = ({ slug, seoMeta, locale, plac
       case ProductSortBy.POPULARITY:
       default:
         return sorted;
-      // case ProductSortBy.RATING:
-      //   return sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-      // case ProductSortBy.NEWEST:
-      //   return sorted.sort(
-      //     (a, b) => new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime(),
-      //   );
-      // case ProductSortBy.NAME:
-      //   return sorted.sort((a, b) => a.name.localeCompare(b.name));
     }
   }, [rawProducts, sortBy]);
 
@@ -108,37 +94,6 @@ const CategoryPage: NextPage<CategoryPageProps> = ({ slug, seoMeta, locale, plac
   const categoryName = category?.name || 'Категория';
   const categoryDescription = `Товары категории ${categoryName}${totalProducts > 0 ? ` (${totalProducts} товаров)` : ''}`;
   const categoryVideoSrc = categoryVideoMap[slug];
-
-  // const subcategoryItems = useMemo(() => {
-  //   const children = category?.children || [];
-  //   if (!category) return children;
-
-  //   const viewAll = {
-  //     id: -1,
-  //     name: 'Смотреть всё',
-  //     slug,
-  //     image:
-  //       (allCategoriesPreviewImage as Record<string, string>)[slug] ||
-  //       category.imageUrl ||
-  //       '/images/placeholder.webp',
-  //   };
-
-  //   return [...children, viewAll];
-  // }, [category, slug]);
-
-  // const handleCategoryClick = useCallback(
-  //   (subcategorySlug: string) => {
-  //     router.push(`/category/${subcategorySlug}`);
-  //   },
-  //   [router],
-  // );
-
-  // const scrollToSubcategories = useCallback(() => {
-  //   const el = document.getElementById('subcategories');
-  //   if (el) {
-  //     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  //   }
-  // }, []);
 
   const bySlot = useMemo(() => groupBySlot(placements ?? []), [placements]);
 
@@ -305,36 +260,27 @@ const CategoryPage: NextPage<CategoryPageProps> = ({ slug, seoMeta, locale, plac
   );
 };
 
-export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
-  // Возможные slug'и категорий
-  const categorySlugs = ['vacuum-cleaners', 'hair-care', 'climate-tech', 'hand-dryers'];
-
-  const paths = categorySlugs.flatMap(slug =>
-    (locales || ['ru']).map(locale => ({
-      params: { slug },
-      locale,
-    })),
-  );
-
-  return {
-    paths,
-    fallback: 'blocking', // Генерируем страницы на лету для новых категорий
-  };
-};
-
-export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
+export const getServerSideProps: GetServerSideProps = async ({ params, locale }) => {
   const slug = params?.slug as string;
 
-  const seoMeta: SeoMeta | null = await fetchSeoMetaSSR('CATEGORY', slug, locale ?? 'ru');
+  const lng = locale ?? 'ru';
+
+  // Безопасный фетч SEO: не валим страницу при недоступности API
+  let seoMeta: SeoMeta | null = null;
+  try {
+    seoMeta = await fetchSeoMetaSSR('CATEGORY', slug, lng);
+  } catch (e: unknown) {
+    // лог при желании
+    seoMeta = null;
+  }
 
   return {
     props: {
-      ...(await serverSideTranslations(locale ?? 'ru', ['common'])),
+      ...(await serverSideTranslations(lng, ['common'])),
       slug,
       seoMeta,
-      locale,
+      locale: lng,
     },
-    revalidate: 3600, // Перегенерация каждый час
   };
 };
 

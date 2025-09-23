@@ -1,6 +1,5 @@
-// utils/map-form-to-create-product.ts
-import type { CreateProductDto, SpecItemDto } from '@/types/models/product.model';
 import type { ProductFormValues } from '@/components/admin/forms/product-form/product-form.schema';
+import type { CreateProductDto, SpecItemDto } from '@/types/models/product.model';
 
 const spreadIf = <T extends object>(c: boolean, o: T) => (c ? o : {});
 

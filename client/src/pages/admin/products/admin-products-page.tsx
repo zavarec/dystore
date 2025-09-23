@@ -1,14 +1,18 @@
 // client/src/pages/admin/products/index.tsx
 import React, { useEffect, useState } from 'react';
-import { GetServerSideProps, NextPage } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
+import type { GetServerSideProps, NextPage } from 'next';
+
 import Link from 'next/link';
 
-import { ProductsService } from '@/services';
-import { Product } from '@/types/models/product.model';
 import { Pencil, Trash, Plus } from '@phosphor-icons/react';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { toast } from 'react-toastify';
+
 import { AdminLayout } from '@/components/admin/layout/admin-layout';
+import { ProductsService } from '@/services';
+import type { Product } from '@/types/models/product.model';
+
 import {
   ActionsBar,
   SearchInput,
@@ -24,7 +28,7 @@ import {
   EmptyState,
   Pagination,
   PageButton,
-} from './admin-products-page.style';
+} from '../../../styles/pages/admin/admin-products-page.style';
 
 const AdminProductsPage: NextPage = () => {
   const [products, setProducts] = useState<Product[]>([]);

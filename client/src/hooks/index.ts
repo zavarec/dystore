@@ -8,6 +8,5 @@ export * from './useCategoryProducts';
 
 // Custom hooks
 export * from './useNewProduct';
-export * from './useProducts';
 export * from './useEditProduct';
 export * from './useAuthGuard';

@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { requireCsrf } from '@/lib/csrf';
 
-const BACKEND_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const BACKEND_API_URL = process.env.API_URL_SERVER || 'http://localhost:3001/api';
 
 function buildCookie(name: string, value: string, maxAgeSeconds: number) {
   const isProd = process.env.NODE_ENV === 'production';

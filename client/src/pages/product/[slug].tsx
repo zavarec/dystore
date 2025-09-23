@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 import type { GetStaticPaths, GetStaticProps, NextPage } from 'next';
 
@@ -31,7 +31,6 @@ import {
   ProductPrice,
   CurrentPrice,
   ProductActions,
-  InStockBadge,
   OutOfStockBadge,
   ProductInfoWithImageWrapperStyled,
 } from '@/styles/pages/product-slug.style';
@@ -309,65 +308,121 @@ function getCategoryName(category: any): string {
   return 'Товары';
 }
 
+// export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
+//   try {
+//     const products = await ServerProductsService.getAllProducts();
+//     const slugs = (products || []).map(p => p.slug).filter(Boolean);
+
+//     const paths = slugs.flatMap(slug =>
+//       (locales || ['ru']).map(locale => ({ params: { slug }, locale })),
+//     );
+
+//     return { paths, fallback: 'blocking' };
+//   } catch {
+//     return { paths: [], fallback: 'blocking' };
+//   }
+// };
+
+// export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
+//   const slug = String(params?.slug || '');
+//   console.log('[GSP] slug =', slug);
+
+//   try {
+//     // 1) Берём товар по slug
+//     const bySlug = await ServerProductsService.getProductBySlug(slug);
+//     console.log('[GSP] bySlug.id =', bySlug?.id);
+
+//     if (!bySlug?.id) {
+//       return { notFound: true, revalidate: 60 };
+//     }
+
+//     // 2) Пробуем добрать по id (если эндпоинт отличается)
+//     let productRaw = bySlug;
+//     try {
+//       productRaw = await ServerProductsService.getProductById(Number(bySlug.id));
+//     } catch (e: any) {
+//       console.warn(
+//         '[GSP] getById failed, fallback to bySlug',
+//         e?.response?.status,
+//         e?.response?.data || e?.message,
+//       );
+//     }
+
+//     const product = adaptProductForUI(productRaw);
+//     const placements = await fetchPromoForPageSSR(PromoPageType.PRODUCT, String(product.id));
+
+//     return {
+//       props: {
+//         ...(await serverSideTranslations(locale ?? 'ru', ['common'])),
+//         product,
+//         placements,
+//       },
+//       revalidate: 3600,
+//     };
+//   } catch (e: any) {
+//     console.error(
+//       '[GSP] failed for slug',
+//       slug,
+//       e?.response?.status,
+//       e?.response?.data || e?.message,
+//     );
+//     return { notFound: true, revalidate: 60 };
+//   }
+// };
 export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
-  try {
-    const products = await ServerProductsService.getAllProducts();
-    const slugs = (products || []).map(p => p.slug).filter(Boolean);
-
-    const paths = slugs.flatMap(slug =>
-      (locales || ['ru']).map(locale => ({ params: { slug }, locale })),
-    );
-
-    return { paths, fallback: 'blocking' };
-  } catch {
-    return { paths: [], fallback: 'blocking' };
-  }
+  // На билде не ходим в API: пусто + fallback
+  return { paths: [], fallback: 'blocking' };
 };
 
 export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
   const slug = String(params?.slug || '');
-  console.log('[GSP] slug =', slug);
+  const apiBase = process.env.API_URL_SERVER || 'http://api:3001/api'; // <— ключевое
 
   try {
-    // 1) Берём товар по slug
-    const bySlug = await ServerProductsService.getProductBySlug(slug);
-    console.log('[GSP] bySlug.id =', bySlug?.id);
+    // 1) по slug
+    const r1 = await fetch(`${apiBase}/products/slug/${encodeURIComponent(slug)}`);
+    if (!r1.ok) return { notFound: true, revalidate: 60 };
+    const bySlug = await r1.json();
 
-    if (!bySlug?.id) {
-      return { notFound: true, revalidate: 60 };
-    }
-
-    // 2) Пробуем добрать по id (если эндпоинт отличается)
+    // 2) по id (если нужно)
     let productRaw = bySlug;
     try {
-      productRaw = await ServerProductsService.getProductById(Number(bySlug.id));
-    } catch (e: any) {
-      console.warn(
-        '[GSP] getById failed, fallback to bySlug',
-        e?.response?.status,
-        e?.response?.data || e?.message,
-      );
+      const r2 = await fetch(`${apiBase}/products/id/${encodeURIComponent(bySlug.id)}`);
+      if (r2.ok) productRaw = await r2.json();
+    } catch {}
+
+    const entitySlug = (bySlug.slug ?? slug) as string;
+    const entityId = String(bySlug.id ?? '');
+
+    let placements: PromoPlacement[] = [];
+
+    const placementsBySlugRes = await fetch(
+      `${apiBase}/promo?pageType=PRODUCT&entityId=${encodeURIComponent(entitySlug)}`,
+    );
+    if (placementsBySlugRes.ok) {
+      placements = await placementsBySlugRes.json();
     }
 
-    const product = adaptProductForUI(productRaw);
-    const placements = await fetchPromoForPageSSR(PromoPageType.PRODUCT, String(product.id));
+    if ((!placements || placements.length === 0) && entityId) {
+      const placementsByIdRes = await fetch(
+        `${apiBase}/promo?pageType=PRODUCT&entityId=${encodeURIComponent(entityId)}`,
+      );
+      if (placementsByIdRes.ok) {
+        placements = await placementsByIdRes.json();
+      }
+    }
 
     return {
       props: {
         ...(await serverSideTranslations(locale ?? 'ru', ['common'])),
-        product,
+        product: adaptProductForUI(productRaw),
         placements,
       },
       revalidate: 3600,
     };
-  } catch (e: any) {
-    console.error(
-      '[GSP] failed for slug',
-      slug,
-      e?.response?.status,
-      e?.response?.data || e?.message,
-    );
+  } catch (e) {
     return { notFound: true, revalidate: 60 };
   }
 };
+
 export default ProductPage;

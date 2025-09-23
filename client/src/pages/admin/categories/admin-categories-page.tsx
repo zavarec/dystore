@@ -1,13 +1,17 @@
 // client/src/pages/admin/categories/index.tsx
 import React, { useEffect, useState } from 'react';
-import { GetServerSideProps, NextPage } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
+import type { GetServerSideProps, NextPage } from 'next';
+
 import Link from 'next/link';
+
+import { Pencil, Trash, Plus, FolderOpen } from '@phosphor-icons/react';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { toast } from 'react-toastify';
+
 import { AdminLayout } from '@/components/admin/layout/admin-layout';
 import { CategoriesService } from '@/services';
-import { Category } from '@/types/models/category.model';
-import { Pencil, Trash, Plus, FolderOpen } from '@phosphor-icons/react';
-import { toast } from 'react-toastify';
+import type { Category } from '@/types/models/category.model';
 
 import {
   ActionsBar,
@@ -21,7 +25,7 @@ import {
   ActionButtons,
   ActionButton,
   EmptyState,
-} from './admin-categories-page.style';
+} from '../../../styles/pages/admin/admin-categories-page.style';
 
 const AdminCategoriesPage: NextPage = () => {
   const [categories, setCategories] = useState<Category[]>([]);

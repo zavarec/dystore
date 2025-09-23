@@ -1,14 +1,14 @@
-// client/src/pages/admin/login.tsx
-import React, { useEffect } from 'react';
-import { GetServerSideProps, NextPage } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useEffect } from 'react';
+
+import type { GetServerSideProps, NextPage } from 'next';
+
 import { useRouter } from 'next/router';
+
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
+import { UsernameAuthForm } from '@/features/auth/forms/username-auth-form';
 import { useAppSelector } from '@/hooks/redux';
 import { selectIsAuthenticated, selectUser } from '@/store/slices/auth-slice/auth.selectors';
-import { UserRole } from '@/types/models/user.model';
-import { UsernameAuthForm } from '@/features/auth/forms/username-auth-form';
-
-// Перенос стилей из pages в styles
 import {
   LoginContainer as SLoginContainer,
   LoginCard as SLoginCard,
@@ -16,6 +16,9 @@ import {
   LoginTitle as SLoginTitle,
   LoginSubtitle as SLoginSubtitle,
 } from '@/styles/pages/admin/admin-login-page.style';
+import { UserRole } from '@/types/models/user.model';
+
+// Перенос стилей из pages в styles
 
 const AdminLoginPage: NextPage = () => {
   const router = useRouter();

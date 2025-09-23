@@ -83,8 +83,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const { categories, error } = useCategories();
   const { attributes } = useSpecAttributes();
 
-  console.log(attributes, 'ATTRIBUTES');
-
   const {
     control,
     handleSubmit,
@@ -144,7 +142,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   // нормализация входящих значений из API
   useEffect(() => {
     if (initialValues) {
-      console.log('Initial values for form:', initialValues);
       // Обрабатываем boxItems с изображениями
       const normalizedBoxItems = (
         (initialValues as PartialCreateWithUpdateProductDto).boxItems ?? []
@@ -178,14 +175,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           (initialValues as PartialCreateWithUpdateProductDto).dimensionsImageId ||
           '',
       };
-      console.log('Normalized values for form:', norm);
+
       reset(norm);
     }
   }, [initialValues, reset]);
-
-  useEffect(() => {
-    console.log(errors, 'ERRORS');
-  }, [errors]);
 
   const onAppenedSpec = () =>
     appendSpec({ attributeId: 0, label: '', value: '', unit: '', order: specs.length });
@@ -194,8 +187,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     appendBox({ customName: '', customImageId: '', qty: 1, order: boxItems.length });
 
   const handleFormSubmit = async (data: ProductFormValues) => {
-    console.log(data, 'data');
-
     const specsList = data.specs ?? [];
     const existingByName = new Map<string, SpecAttributeDto>(
       (attributes ?? []).map(attr => [norm(attr.label), attr]),
@@ -294,9 +285,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
   // Обработчики загрузки изображений
   const handleMainImageChange = (fileId?: string | null, file?: UploadedFile) => {
-    console.log(file, 'handleMainImageChange');
-    console.log(fileId, 'fileId');
-
     // Если fileId пустой или null, устанавливаем undefined вместо пустой строки
     const validFileId = fileId && fileId.trim() !== '' ? fileId : undefined;
     setValue('mainImageId', validFileId, { shouldValidate: true });

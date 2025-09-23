@@ -38,6 +38,3 @@ export function requireCsrf(req: NextApiRequest, res: NextApiResponse): boolean 
   }
   return true;
 }
-
-
-

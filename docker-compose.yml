@@ -10,7 +10,7 @@ services:
       - pgdata:/var/lib/postgresql/data
     restart: always
     ports:
-      - "5432:5432"   # чтобы подключаться с Mac-клиентов (TablePlus/psql)
+      - "5432:5432" # чтобы подключаться с Mac-клиентов (TablePlus/psql)
 
   redis:
     image: redis:7-alpine
@@ -34,7 +34,7 @@ services:
       - redis
     restart: always
     ports:
-      - "3001:3001"   # http://localhost:3001
+      - "3001:3001" # http://localhost:3001
 
   web:
     build:
@@ -47,7 +47,7 @@ services:
       - api
     restart: always
     ports:
-      - "3002:3002"   # http://localhost:3000
+      - "3000:3000" # http://localhost:3000
 
 volumes:
   pgdata:

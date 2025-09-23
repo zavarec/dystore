@@ -32,11 +32,11 @@ const UploaderCol = styled.div`
 
 export const BoxRow: React.FC<BoxRowProps> = ({ index, control, loading, setValue, remove }) => {
   // Отладочная информация
-  const watchCustomImageUrl = control._formValues?.boxItems?.[index]?.customImageUrl;
-  const watchCustomImageId = control._formValues?.boxItems?.[index]?.customImageId;
+  // const watchCustomImageUrl = control._formValues?.boxItems?.[index]?.customImageUrl;
+  // const watchCustomImageId = control._formValues?.boxItems?.[index]?.customImageId;
 
-  console.log(`BoxRow ${index} - customImageUrl:`, watchCustomImageUrl);
-  console.log(`BoxRow ${index} - customImageId:`, watchCustomImageId);
+  // console.log(`BoxRow ${index} - customImageUrl:`, watchCustomImageUrl);
+  // console.log(`BoxRow ${index} - customImageId:`, watchCustomImageId);
 
   return (
     <Row>

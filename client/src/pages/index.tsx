@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 
 import type { GetStaticProps, NextPage } from 'next';
 
@@ -12,11 +12,9 @@ import { Categories } from '@/components/sections/categories';
 import { Hero } from '@/components/sections/hero';
 import { ProductSection } from '@/components/sections/product-section';
 import { Stats } from '@/components/sections/stats';
-import { Container, HeaderWithBenefitsWrapper } from '@/styles/pages/index.style';
 import { StorePanorama } from '@/components/sections/store-panorama';
-import HomeSections from '@/features/promotions/home-sections';
-import { PromoCard } from '@/features/promotions/promo-card/promo-card';
 import { useProducts } from '@/hooks/useProducts';
+import { Container, HeaderWithBenefitsWrapper } from '@/styles/pages/index.style';
 import {
   adaptProductsForUI,
   getFeaturedProducts,

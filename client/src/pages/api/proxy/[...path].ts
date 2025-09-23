@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { requireCsrf } from '@/lib/csrf';
 
-const BACKEND_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+import { requireCsrf } from '../../../lib/csrf';
+
+const BACKEND_API_URL = process.env.API_URL_SERVER || 'http://api:3001/api';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method || '')) {
@@ -58,7 +59,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const buffer = Buffer.from(await response.arrayBuffer());
     return res.send(buffer);
   } catch (error: any) {
-    return res.status(500).json({ message: error?.message || 'Proxy error' });
+    return res.status(500).json('proxy error');
   }
 }
 
