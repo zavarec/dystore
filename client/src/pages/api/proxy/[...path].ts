@@ -59,7 +59,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const buffer = Buffer.from(await response.arrayBuffer());
     return res.send(buffer);
   } catch (error: any) {
-    return res.status(500).json('proxy error');
+    console.error('Proxy error', {
+      targetUrl,
+      method: req.method,
+      message: error?.message,
+      code: error?.code,
+      cause: String(error?.cause || ''),
+    });
+    return res.status(502).json({ message: 'proxy error', targetUrl });
   }
 }
 

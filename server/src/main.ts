@@ -53,6 +53,7 @@ async function bootstrap() {
   const whitelist: (string | RegExp)[] = [
     process.env.FRONTEND_ORIGIN || "",
     "http://localhost:3000",
+    "https://dyson-group.ru",
     "http://127.0.0.1:3000",
     /^https?:\/\/194\.87\.76\.238(?::\d+)?$/, // твой сервер по IP и любому порту
     /^http?:\/\/194\.87\.76\.238(?::\d+)?$/,
