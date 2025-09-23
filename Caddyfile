@@ -1,0 +1,18 @@
+dyson-group.ru, www.dyson-group.ru {
+    encode zstd gzip
+
+    # Проксируем API на NestJS
+    @api path /api* /swagger* /docs*
+    handle @api {
+        reverse_proxy dystore_api:3001
+    }
+
+    # Всё остальное — на Next.js
+    handle {
+        reverse_proxy dystore_web:3000
+    }
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    }
+}
