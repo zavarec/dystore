@@ -53,7 +53,7 @@ services:
     #   - "3000:3000"
 
   caddy:
-    image: ghcr.io/caddyserver/caddy:2.8.4
+    image: caddy:2.8.4
     restart: unless-stopped
     ports:
       - "80:80"
