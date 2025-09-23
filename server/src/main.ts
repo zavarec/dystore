@@ -136,7 +136,7 @@ async function bootstrap() {
   // Graceful shutdown
   app.enableShutdownHooks();
 
-  const port = configService.get<number>("PORT", 3000);
+  const port = configService.get<number>("PORT", 3001);
   await app.listen(port, "0.0.0.0");
 
   logger.log(`Application is running on: http://localhost:${port}/api`);
