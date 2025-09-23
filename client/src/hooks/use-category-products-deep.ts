@@ -2,7 +2,7 @@
 import useSWR from 'swr';
 import { ProductSortBy, type Product } from '@/types/models/product.model';
 
-const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+const API = process.env.NEXT_PUBLIC_API_URL;
 
 type Resp = { total: number; page: number; pages: number; items: Product[] };
 
