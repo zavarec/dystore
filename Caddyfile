@@ -1,19 +1,19 @@
 dyson-group.ru, www.dyson-group.ru {
     encode zstd gzip
 
-    # 1) Next API routes (твой прокси) — остаются на фронте
-    @next_api path /api/proxy/* swagger*/docs*
+    # Next API routes (прокси фронта)
+    @next_api path /api/proxy/*
     handle @next_api {
         reverse_proxy web:3000
     }
 
-    # 2) Остальной backend API — в Nest
+    # Остальной backend API
     @backend_api path /api/*
     handle @backend_api {
         reverse_proxy api:3001
     }
 
-    # 3) Всё остальное — фронт
+    # Всё остальное — фронт (Next)
     handle {
         reverse_proxy web:3000
     }
