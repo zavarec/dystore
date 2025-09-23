@@ -105,6 +105,25 @@ export const PromoCarouselSection = (section: PromoSection) => {
   const currentSlide = payload.slides[index];
   const currentBg = currentSlide?.bgColor ?? section.bgColor ?? '';
 
+  const startX = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    startX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (startX.current === null) return;
+    const deltaX = e.changedTouches[0].clientX - startX.current;
+    if (Math.abs(deltaX) > 50) {
+      if (deltaX > 0) {
+        prev(); // свайп вправо → предыдущий
+      } else {
+        next(); // свайп влево → следующий
+      }
+    }
+    startX.current = null;
+  };
+
   const renderSlide = (slide: PromoCarouselSlide) => (
     <>
       <Media>{renderMedia(slide.media)}</Media>
@@ -146,7 +165,7 @@ export const PromoCarouselSection = (section: PromoSection) => {
   );
 
   return (
-    <Wrap bg={currentBg}>
+    <Wrap bg={currentBg} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
       <Viewport>
         <Slides $index={index}>
           {payload.slides.map(slide => (
