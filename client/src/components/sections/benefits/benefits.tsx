@@ -21,21 +21,23 @@ interface Benefit {
 const benefits: Benefit[] = [
   {
     id: '3',
-    iconUrl: 'https://www.dyson.com/content/dam/dyson/adobetarget/icons/money-back-dollar2.png',
+    iconUrl:
+      'https://s3.twcstorage.ru/49dbf9e8-45b07930-284b-4614-95f5-5a9bdcbd9f92/uploads/658c6873-1180-4064-bbf5-7b345cc60006-money-back-dollar2 (2).png',
     title: 'Гарантия лучшей цены',
     description: 'Мы гарантируем лучшую цену на рынке',
   },
   {
     id: '1',
     iconUrl:
-      'https://www.dyson.com/content/dam/dyson/oe-team-email-assets/market-icons/jp/jp_free-shipping_black.png',
+      'https://s3.twcstorage.ru/49dbf9e8-45b07930-284b-4614-95f5-5a9bdcbd9f92/uploads/6a332e26-0e36-4952-a846-97b1ca09e184-jp_free-shipping_black.png',
     title: 'Бесплатная доставка',
     description:
       'Курьерская доставка по Москве осуществляется бесплатно до Вашей двери. Бесплатная доставка до двери в регионы РФ транспортной компанией.',
   },
   {
     id: '2',
-    iconUrl: ' https://www.dyson.com/content/dam/dyson/icons/reasons-to-buy/Price%20Promise.png',
+    iconUrl:
+      'https://s3.twcstorage.ru/49dbf9e8-45b07930-284b-4614-95f5-5a9bdcbd9f92/uploads/aa142c89-5287-411c-8f98-fe2282ca6873-Price Promise.png',
     title: 'Гарантия на товар',
     description:
       'Возврат товара осуществляется в строгом соответствии с законодательством Российской Федерации. Чтобы избежать возможных недоразумений, мы рекомендуем тщательно осмотреть товар перед оплатой: проверить его комплектацию, наличие документов и убедиться в отсутствии повреждений или дефектов.\nДля оформления возврата или обмена, пожалуйста, свяжитесь с нашей службой поддержки и передайте товар для проверки. Для оформления возврата или обмена, пожалуйста, свяжитесь с нашей службой поддержки и передайте товар для проверки.',
@@ -43,7 +45,7 @@ const benefits: Benefit[] = [
   {
     id: '4',
     iconUrl:
-      'https://www.dyson.com/content/dam/dyson/oe-team-email-assets/email-images/2-year-lifecycle/icon-warranty%20information.png',
+      'https://s3.twcstorage.ru/49dbf9e8-45b07930-284b-4614-95f5-5a9bdcbd9f92/uploads/7d2215b2-7ea7-4f50-99dc-1d91aff62c1b-icon-warranty information.png',
     title: 'Безопасная оплата',
     description:
       'При доставке техники Dyson вы имеете возможность осмотреть товар перед оплатой. Оплата может быть произведена любым из следующих способов: наличными, картой или онлайн переводом.',

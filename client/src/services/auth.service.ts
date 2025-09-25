@@ -74,6 +74,7 @@ export class AuthService {
   }
 
   // Получение профиля пользователя (кука добавится автоматически сервером)
+  // todo надо переписать а иначе не приходит профиль
   static async getProfile(): Promise<User> {
     const response = await apiClient.get<User>('/auth/profile', { withCredentials: true });
     return response.data;

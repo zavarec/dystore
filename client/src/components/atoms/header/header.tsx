@@ -124,7 +124,7 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
         <HeaderLeft>
           <Logo href="/">
             <Image
-              src="https://www.dyson.com/etc.clientlibs/dyson/clientlibs/clientlib-main/resources/images/dyson-logo.svg"
+              src="https://s3.twcstorage.ru/49dbf9e8-45b07930-284b-4614-95f5-5a9bdcbd9f92/uploads/2fa45b9c-691a-4027-aa83-3e800e2a35a4-dyson-logo.svg"
               alt="DysonGroup"
               width={100}
               height={24}
