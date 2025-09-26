@@ -6,6 +6,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Res,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -61,8 +62,29 @@ export class AuthController {
   @ApiResponse({ status: 401, description: "Invalid credentials" })
   @Post("login")
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) res: any,
+  ) {
+    const { access_token, user } = await this.authService.login(loginDto);
+
+    const isProd = process.env.NODE_ENV === "production";
+    const domain =
+      isProd && process.env.FRONTEND_ORIGIN
+        ? new URL(process.env.FRONTEND_ORIGIN).hostname // dyson-group.ru
+        : undefined;
+
+    res.cookie("access_token", access_token, {
+      httpOnly: true,
+      secure: isProd, // HTTPS на проде
+      sameSite: "lax",
+      path: "/",
+      domain, // можно НЕ указывать, тогда хост-онли
+      maxAge: 24 * 60 * 60 * 1000, // 1 день
+    });
+
+    // В теле ответа токен уже не нужен
+    return { user };
   }
 
   @ApiOperation({ summary: "Get current user profile" })

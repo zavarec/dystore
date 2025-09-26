@@ -17,6 +17,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
+  (app.getHttpAdapter().getInstance() as any).set("trust proxy", 1);
+
   // ВАЖНО: Увеличиваем лимиты для загрузки файлов
   // app.use(require("express").json({ limit: "50mb" }));
   // app.use(

@@ -148,6 +148,7 @@ export class AuthService {
       email: user.email || undefined,
     };
 
+
     const access_token = this.jwtService.sign(payload);
 
     this.logger.log(`Пользователь ${user.email} успешно авторизован`);
