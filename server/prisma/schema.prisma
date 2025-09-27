@@ -100,6 +100,9 @@ model Product {
   updatedAt          DateTime @updatedAt
   dimensionsImageUrl String? // картинка габаритов (одна, со “стиком” и “щеткой”)
 
+  motifId     String?  // FK на files.id (uuid)
+  motif       File?    @relation("ProductMotif", fields: [motifId], references: [id], onDelete: SetNull)
+
   // Заменить imageUrl на связь с файлами
   mainImageId       String?
   mainImage         File?   @relation("ProductImages", fields: [mainImageId], references: [id], onDelete: SetNull)
@@ -120,6 +123,8 @@ model Product {
   @@index([categoryId])
   @@index([isFeatured])
   @@index([popularity])
+  @@index([motifId])
+
 }
 
 model Accessory {
@@ -560,6 +565,8 @@ model File {
   productImages  Product[]  @relation("ProductImages")
   userAvatars    User[]     @relation("UserAvatars")
 
+  
+
   // ПРОМО (исправлено)
   promotionBgImage Promotion[] @relation("PromotionBgImage")
   promotionBgVideo Promotion[] @relation("PromotionBgVideo")
@@ -570,6 +577,8 @@ model File {
   accessoryImages    Accessory[]      @relation("AccessoryImages")
   productDimensions  Product[]        @relation("ProductDimensionsImages")
   productBoxItemImgs ProductBoxItem[] @relation("ProductBoxItemImages")
+  productMotifs Product[] @relation("ProductMotif")
+
   productMedia       ProductMedia[]
 
   createdAt DateTime @default(now())

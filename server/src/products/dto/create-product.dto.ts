@@ -9,6 +9,7 @@ import {
   IsNotEmpty,
   ValidateNested,
   IsBoolean,
+  IsUUID,
 } from "class-validator";
 import { BoxItemDto } from "./save-box-items.dto";
 import { SpecItemDto } from "./save-specs.dto";
@@ -74,4 +75,9 @@ export class CreateProductDto {
   @IsOptional()
   @IsString()
   dimensionsImageId?: string;
+
+  @IsOptional()
+  @IsString()
+  @IsUUID()
+  motifId?: string; // id файла
 }

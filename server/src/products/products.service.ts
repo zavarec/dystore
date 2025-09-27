@@ -15,6 +15,7 @@ import { isUUID } from "class-validator";
 
 type ProductWithDetails = Prisma.ProductGetPayload<{
   include: {
+    motif: true;
     category: true;
     boxItems: { include: { accessory: true; customImage: true } };
     specs: { include: { attribute: true } };
@@ -39,6 +40,7 @@ export class ProductsService {
       include: {
         mainImage: true,
         dimensionsImage: true,
+        motif: true,
         category: true,
         boxItems: {
           include: { accessory: true, customImage: true },
@@ -58,6 +60,7 @@ export class ProductsService {
       include: {
         mainImage: true,
         dimensionsImage: true,
+        motif: true,
         category: true,
         boxItems: {
           include: { accessory: true, customImage: true },
@@ -95,16 +98,20 @@ export class ProductsService {
       customImage: b.customImage,
     }));
 
-    return {
+    const productRow = {
       ...product,
       boxItems: boxItems,
+      motifUrl: product.motif?.url ?? null,
     };
+
+    return productRow;
   }
 
   async findBySlug(slug: string): Promise<ProductWithDetails | null> {
     return this.prisma.product.findUnique({
       where: { slug },
       include: {
+        motif: true,
         mainImage: true,
         dimensionsImage: true,
         category: true,
@@ -124,6 +131,7 @@ export class ProductsService {
     return this.prisma.product.findMany({
       where: { categoryId },
       include: {
+        motif: true,
         mainImage: true,
         dimensionsImage: true,
         category: true,
@@ -193,6 +201,14 @@ export class ProductsService {
           uniqueSlug = `${baseSlug}-${counter++}`;
         }
 
+        if (productData.motifId) {
+          const motifExists = await transaction.file.findUnique({
+            where: { id: productData.motifId },
+          });
+          if (!motifExists)
+            throw new BadRequestException("Файл motif не найден");
+        }
+
         // Создание товара
         const productRecord = await transaction.product.create({
           data: { ...productData, slug: uniqueSlug },
@@ -258,6 +274,7 @@ export class ProductsService {
         const full = await transaction.product.findUnique({
           where: { id: productRecord.id },
           include: {
+            motif: true, // <— ДОбАВЛЕНО
             category: true,
             boxItems: {
               include: { accessory: true },
@@ -325,11 +342,27 @@ export class ProductsService {
         nextSlug = candidate;
       }
 
+      // ✅ motif: если передали строку — проверим файл; если null — позволим снять
+      if (Object.prototype.hasOwnProperty.call(updateProductDto, "motifId")) {
+        const v = updateProductDto.motifId;
+        if (typeof v === "string") {
+          const exists = await this.prisma.file.findUnique({
+            where: { id: v },
+          });
+          if (!exists) throw new BadRequestException("Файл motif не найден");
+        }
+      }
+
+      const data: Prisma.ProductUpdateInput = {
+        ...productPatch,
+        slug: nextSlug,
+        ...(Object.prototype.hasOwnProperty.call(updateProductDto, "motifId")
+          ? { motifId: (updateProductDto as any).motifId ?? null }
+          : {}),
+      };
+
       // 3) апдейт самого продукта
-      const productRecord = await tx.product.update({
-        where: { id },
-        data: { ...productPatch, slug: nextSlug },
-      });
+      const productRecord = await tx.product.update({ where: { id }, data });
 
       // ---------- Комплектация ----------
       if (boxItems !== undefined) {
@@ -425,6 +458,7 @@ export class ProductsService {
       const full = await tx.product.findUnique({
         where: { id: productRecord.id },
         include: {
+          motif: true,
           mainImage: true,
           dimensionsImage: true,
           category: true,
