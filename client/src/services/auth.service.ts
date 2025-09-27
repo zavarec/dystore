@@ -1,4 +1,6 @@
-import {
+import Cookies from 'js-cookie';
+
+import type {
   AuthResponse,
   LoginRequest,
   RegisterRequest,
@@ -7,12 +9,16 @@ import {
   VerifyCodeRequest,
   VerifyCodeResponse,
 } from '@/types/models/auth.model';
-import { apiClient } from './api';
-import { User } from '@/types/models/user.model';
+import type { User } from '@/types/models/user.model';
 import { isServer } from '@/utils/ssr';
-import Cookies from 'js-cookie';
+
+import { apiClient } from './api';
+
+export type ApiError = Error & { status?: number; details?: unknown };
 
 export class AuthService {
+  static apiAuthUrl = 'api/auth'; // твой базовый URL
+
   private static async getOrInitCsrfToken(): Promise<string | undefined> {
     let token = Cookies.get('XSRF-TOKEN');
     if (!token) {
@@ -24,9 +30,46 @@ export class AuthService {
     return token;
   }
   // Отправка кода подтверждения
-  static async sendCode(data: SendCodeRequest): Promise<SendCodeResponse> {
-    const response = await apiClient.post<SendCodeResponse>('/auth/send-code', data);
-    return response.data;
+  static async sendCode(
+    data: SendCodeRequest,
+    opts?: { signal?: AbortSignal | null },
+  ): Promise<SendCodeResponse> {
+    const token = await this.getOrInitCsrfToken();
+
+    // Заголовки типизируем широко
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      ...(token ? { 'X-CSRF-Token': token } : {}),
+    };
+
+    // Формируем init без signal
+    const init: RequestInit = {
+      method: 'POST',
+      credentials: 'include',
+      headers,
+      body: JSON.stringify(data),
+    };
+
+    // Добавляем signal ТОЛЬКО если он есть (не undefined)
+    if (opts?.signal ?? null) {
+      (init as RequestInit & { signal: AbortSignal | null }).signal = opts.signal!;
+    }
+
+    const res = await fetch(`${this.apiAuthUrl}/send-code`, init);
+
+    const ct = res.headers.get('content-type') ?? '';
+    const isJson = ct.includes('application/json');
+    const json = isJson ? await res.json().catch(() => null) : null;
+
+    if (!res.ok) {
+      const err: ApiError = new Error(json?.message || `HTTP ${res.status}`);
+      err.status = res.status;
+      err.details = json;
+      throw err;
+    }
+
+    return (json ?? ({} as SendCodeResponse)) as SendCodeResponse;
   }
 
   // Проверка кода и получение токена
@@ -45,7 +88,7 @@ export class AuthService {
       const err = await res.json().catch(() => ({}));
       throw new Error(err?.message || 'Ошибка подтверждения кода');
     }
-    return { access_token: '' } as any;
+    return { access_token: '' };
   }
 
   // Логин по username/password через внутренний API (установит httpOnly cookie)
