@@ -77,6 +77,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   const [uploadNotifications, setUploadNotifications] = useState<{
     mainImage?: { type: 'success' | 'error'; message: string };
     dimensionsImage?: { type: 'success' | 'error'; message: string };
+    motifImage?: { type: 'success' | 'error'; message: string };
   }>({});
   const dispatch = useAppDispatch();
 
@@ -113,7 +114,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   } = useFieldArray({ control, name: 'specs' });
 
   const showUploadNotification = (
-    field: 'mainImage' | 'dimensionsImage',
+    field: 'mainImage' | 'dimensionsImage' | 'motifImage',
     type: 'success' | 'error',
     message: string,
   ) => {
@@ -173,6 +174,14 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         dimensionsImageId:
           (initialValues as PartialCreateWithUpdateProductDto).dimensionsImage?.id ||
           (initialValues as PartialCreateWithUpdateProductDto).dimensionsImageId ||
+          '',
+        motifImageUrl:
+          (initialValues as Partial<CreateProductDto | UpdateProductDto>).motif?.url ||
+          (initialValues as PartialCreateWithUpdateProductDto).motifUrl ||
+          '',
+        motifImageId:
+          (initialValues as Partial<CreateProductDto | UpdateProductDto>).motif?.id ||
+          (initialValues as PartialCreateWithUpdateProductDto).motifId ||
           '',
       };
 
@@ -321,6 +330,22 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
   const handleDimensionsImageError = (error: string) => {
     showUploadNotification('dimensionsImage', 'error', error);
+  };
+
+  const handleMotifImageChange = (fileId?: string | null, file?: UploadedFile) => {
+    const validFileId = fileId && fileId.trim() !== '' ? fileId : undefined;
+    setValue('motifImageId', validFileId, { shouldValidate: true });
+
+    if (file && file.url) {
+      setValue('motifImageUrl', file.url, { shouldValidate: true });
+      showUploadNotification('motifImage', 'success', 'Motif изображение загружено');
+    } else {
+      setValue('motifImageUrl', '', { shouldValidate: true });
+    }
+  };
+
+  const handleMotifImageError = (error: string) => {
+    showUploadNotification('motifImage', 'error', error);
   };
 
   return (
@@ -528,6 +553,55 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           />
           <Controller
             name="dimensionsImageId"
+            control={control}
+            render={({ field }) => <Input {...field} type="hidden" />}
+          />
+        </FormGroup>
+
+        <FormGroup $fullWidth>
+          <Label htmlFor="motifImageId">Motif изображение</Label>
+          <ProductImageUpload
+            value={watch('motifImageId') || ''}
+            currentImageUrl={watch('motifImageUrl') || ''}
+            onChange={handleMotifImageChange}
+            onError={handleMotifImageError}
+            disabled={loading || false}
+            label="Motif изображение"
+            size="sm"
+            containerMinHeight={70}
+            previewMaxHeight={90}
+            previewWidth={120}
+            previewHeight={90}
+            borderRadius={12}
+          />
+
+          {uploadNotifications.motifImage && (
+            <div
+              style={{
+                marginTop: '8px',
+                padding: '8px 12px',
+                borderRadius: '4px',
+                fontSize: '14px',
+                background:
+                  uploadNotifications.motifImage.type === 'success' ? '#dcfce7' : '#fef2f2',
+                color:
+                  uploadNotifications.motifImage.type === 'success' ? '#16a34a' : '#dc2626',
+                border: `1px solid ${
+                  uploadNotifications.motifImage.type === 'success' ? '#bbf7d0' : '#fecaca'
+                }`,
+              }}
+            >
+              {uploadNotifications.motifImage.message}
+            </div>
+          )}
+
+          <Controller
+            name="motifImageUrl"
+            control={control}
+            render={({ field }) => <Input {...field} type="hidden" />}
+          />
+          <Controller
+            name="motifImageId"
             control={control}
             render={({ field }) => <Input {...field} type="hidden" />}
           />

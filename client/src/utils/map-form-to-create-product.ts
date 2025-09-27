@@ -92,6 +92,7 @@ export function mapFormToCreateDto(values: ProductFormValues): CreateProductDto 
     ...spreadIf(!!values.dimensionsImageId?.trim(), {
       dimensionsImageId: values.dimensionsImageId!.trim(),
     }),
+    ...spreadIf(!!values.motifImageId?.trim(), { motifId: values.motifImageId!.trim() }),
     // ...spreadIf(!!values.imageUrl?.trim(), { imageUrl: values.imageUrl!.trim() }),
     // ...spreadIf(!!values.dimensionsImageUrl?.trim(), {
     //   dimensionsImageUrl: values.dimensionsImageUrl!.trim(),

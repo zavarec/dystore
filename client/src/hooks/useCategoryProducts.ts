@@ -1,6 +1,7 @@
 import useSWR from 'swr';
+
 import { ProductsService } from '@/services/products.service';
-import { Product } from '@/types/models/product.model';
+import type { Product } from '@/types/models/product.model';
 
 interface UseCategoryProductsProps {
   categoryId?: number | undefined;

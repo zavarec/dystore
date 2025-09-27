@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
+
 import { useRouter } from 'next/router';
-import { useAppDispatch, useAppSelector } from './redux';
+
 import { selectIsAuthenticated, selectUser } from '@/store/slices/auth-slice/auth.selectors';
 import { loadUserProfile } from '@/store/slices/auth-slice/auth.thunks';
-import { UserRole } from '@/types/models/user.model';
+import type { User, UserRole } from '@/types/models/user.model';
+
+import { useAppDispatch, useAppSelector } from './redux';
 
 interface UseAuthGuardOptions {
   allowedRoles?: UserRole[];
@@ -14,7 +17,7 @@ interface UseAuthGuardOptions {
 interface AuthGuardState {
   isLoading: boolean;
   isAuthorized: boolean;
-  user: any;
+  user: User | null;
   error: string | null;
 }
 
@@ -91,12 +94,13 @@ export const useAuthGuard = (options: UseAuthGuardOptions = {}): AuthGuardState 
             error: null,
           }));
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'Ошибка проверки авторизации';
         setState(prev => ({
           ...prev,
           isLoading: false,
           isAuthorized: false,
-          error: error.message || 'Ошибка проверки авторизации',
+          error: errorMessage,
         }));
 
         if (requireAuth) {

@@ -33,6 +33,8 @@ export type ProductFormValues = {
   dimensionsImageId?: string;
   imageUrl?: string;
   dimensionsImageUrl?: string;
+  motifImageId?: string;
+  motifImageUrl?: string;
 
   isFeatured?: boolean;
 

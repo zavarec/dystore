@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
+
 import { useRouter } from 'next/router';
+
 import { toast } from 'react-toastify';
+
 import { ProductsService } from '@/services';
-import { Product, UpdateProductDto } from '@/types/models/product.model';
+import type { Product, UpdateProductDto } from '@/types/models/product.model';
 
 export const useEditProduct = (productId: string) => {
   const router = useRouter();
@@ -53,9 +56,9 @@ export const useEditProduct = (productId: string) => {
       await ProductsService.updateProduct(parseInt(productId), payload as UpdateProductDto);
       toast.success('Продукт успешно обновлен');
       router.push('/admin/products');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error updating product:', error);
-      toast.error(error.response?.data?.message || 'Ошибка при обновлении продукта');
+      toast.error(error?.response?.data?.message || 'Ошибка при обновлении продукта');
     } finally {
       setLoading(false);
     }

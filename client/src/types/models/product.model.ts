@@ -48,6 +48,9 @@ export interface Product {
     storedName: string;
   } | null;
   dimensionsImage?: { id: string; url: string; mimetype: string; storedName: string } | null;
+  motif?: { id: string; url: string; mimetype: string; storedName: string } | null;
+  motifId?: string | null;
+  motifUrl?: string | null;
 }
 
 // Расширенный тип продукта для UI (с дополнительными полями для SEO и отображения)
@@ -110,6 +113,9 @@ export interface ProductWithDetails extends Product {
     storedName: string;
   } | null;
   dimensionsImage?: { id: string; url: string; mimetype: string; storedName: string } | null;
+  motif?: { id: string; url: string; mimetype: string; storedName: string } | null;
+  motifId?: string | null;
+  motifUrl?: string | null;
 }
 
 export interface CreateProductDto {
@@ -139,6 +145,9 @@ export interface CreateProductDto {
   boxItems?: BoxItemDto[];
   /** Характеристики */
   specs?: SpecItemDto[];
+
+  /** ID motif-изображения */
+  motifId?: string;
 }
 
 export interface UpdateProductDto {
@@ -169,6 +178,9 @@ export interface UpdateProductDto {
 
   boxItems?: BoxItemDto[];
   specs?: SpecItemDto[];
+
+  /** ID motif-изображения */
+  motifId?: string;
 }
 
 export interface ProductImage {

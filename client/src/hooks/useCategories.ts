@@ -1,6 +1,7 @@
 import useSWR from 'swr';
+
 import { CategoriesService } from '@/services/categories.service';
-import { Category } from '@/types/models/category.model';
+import type { Category } from '@/types/models/category.model';
 
 export const useCategories = () => {
   const { data, error, isLoading, mutate } = useSWR<Category[]>(

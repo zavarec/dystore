@@ -1,5 +1,5 @@
-// src/hooks/useCategoryProductsDeep.ts
 import useSWR from 'swr';
+
 import { ProductSortBy, type Product } from '@/types/models/product.model';
 
 const API = process.env.NEXT_PUBLIC_API_URL || '/api/proxy';
@@ -100,7 +100,7 @@ export function useCategoryProductsDeep(params: {
     data,
     error,
     isValidating,
-    loading: Boolean(key) ? (!data && !error) || isValidating : false,
+    loading: key ? (!data && !error) || isValidating : false,
     products: data?.items ?? [],
     total: data?.total ?? 0,
   });
@@ -110,7 +110,7 @@ export function useCategoryProductsDeep(params: {
     products: data?.items ?? [],
     total: data?.total ?? 0,
     pages: data?.pages ?? 1,
-    loading: Boolean(key) ? (!data && !error) || isValidating : false,
+    loading: key ? (!data && !error) || isValidating : false,
     error,
     refresh: mutate,
   };
