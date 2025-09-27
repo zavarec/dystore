@@ -11,7 +11,7 @@ export const CategoriesContainer = styled.div`
   width: 100%;
   max-width: 1600px;
   margin: 0 auto;
-  padding-left: 40px;
+  /* padding-left: 40px; */
 `;
 
 export const CategoriesHeader = styled.div`
@@ -46,6 +46,7 @@ export const ScrollContainer = styled.div<{ $center?: boolean }>`
 
   padding-bottom: 10px;
   padding-right: 40px;
+  padding-left: 40px;
 
   -ms-overflow-style: none;
   scrollbar-width: none;

@@ -51,6 +51,7 @@ export const Accessuares: React.FC<AccessuaresProps> = ({
   productImageUrl,
   boxItems,
   defaultOpenId,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   columns = 2,
   className,
 }) => {

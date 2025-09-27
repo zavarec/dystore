@@ -1,6 +1,8 @@
 import styled from '@emotion/styled';
 import Link from 'next/link';
 
+import { media } from '@/styles/breakpoints';
+
 export const FooterContainer = styled.footer`
   background: #1a1a1a;
   color: white;
@@ -20,7 +22,7 @@ export const FooterGrid = styled.div`
   gap: 40px;
   margin-bottom: 30px;
 
-  @media (max-width: 768px) {
+  ${media.down('tablet')} {
     grid-template-columns: 1fr;
     gap: 30px;
   }
@@ -74,7 +76,7 @@ export const Logo = styled.div`
 export const LogoIcon = styled.div`
   width: 28px;
   height: 28px;
-  background: linear-gradient(135deg, #ffff,rgb(52, 52, 53));
+  background: linear-gradient(135deg, #ffff, rgb(52, 52, 53));
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -82,4 +84,11 @@ export const LogoIcon = styled.div`
   color: white;
   font-weight: 700;
   font-size: 1rem;
+`;
+
+export const FooterContentWrapper = styled.div`
+  ${media.down('tablet')} {
+    display: flex;
+    justify-content: space-between;
+  }
 `;

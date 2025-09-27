@@ -153,7 +153,7 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({ onClose, redirectT
   if (!codeSent) {
     // Форма ввода номера телефона
     return (
-      <div style={{ padding: '24px', position: 'relative', pointerEvents: 'none' }}>
+      <div style={{ padding: '24px', position: 'relative' }}>
         {onClose && (
           <CloseButton onClick={onClose} aria-label="Закрыть форму авторизации" type="button">
             <svg viewBox="0 0 24 24" aria-hidden="true">

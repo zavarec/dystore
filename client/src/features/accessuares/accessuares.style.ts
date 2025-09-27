@@ -1,13 +1,19 @@
+import { media } from '@/styles/breakpoints';
 import styled from '@emotion/styled';
 
 export const Section = styled.section`
   width: 100%;
   border-top: 2px solid #e0e0e0;
   background-color: #ffffff;
+  padding: 40px var(--page-gutter);
 
   @media (min-width: 992px) {
     padding: 40px var(--page-gutter);
     width: 100%;
+  }
+
+  ${media.down('tablet')} {
+    padding-bottom: 14px;
   }
 `;
 
@@ -173,6 +179,11 @@ export const Inner = styled.div`
   padding-right: 0;
   display: flex;
   /* без gap, чтобы 40% + 60% влезали ровно */
+
+  ${media.down('tablet')} {
+    flex-direction: column;
+    align-items: center;
+  }
 `;
 
 export const LeftCol = styled.div`
@@ -181,6 +192,10 @@ export const LeftCol = styled.div`
   width: 40%;
   min-width: 0;
   margin-right: 12px;
+  ${media.down('tablet')} {
+    width: 100%;
+    padding-bottom: 14px;
+  }
 `;
 
 export const RightCol = styled.div`
@@ -189,6 +204,10 @@ export const RightCol = styled.div`
   min-width: 0;
   gap: 16px; /* расстояние между двумя списками */
   align-items: flex-start;
+  ${media.down('tablet')} {
+    flex-direction: column;
+    width: 90%;
+  }
 `;
 
 export const Col = styled.div`

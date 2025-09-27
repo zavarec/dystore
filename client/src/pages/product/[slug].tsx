@@ -308,67 +308,6 @@ function getCategoryName(category: any): string {
   return 'Товары';
 }
 
-// export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
-//   try {
-//     const products = await ServerProductsService.getAllProducts();
-//     const slugs = (products || []).map(p => p.slug).filter(Boolean);
-
-//     const paths = slugs.flatMap(slug =>
-//       (locales || ['ru']).map(locale => ({ params: { slug }, locale })),
-//     );
-
-//     return { paths, fallback: 'blocking' };
-//   } catch {
-//     return { paths: [], fallback: 'blocking' };
-//   }
-// };
-
-// export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
-//   const slug = String(params?.slug || '');
-//   console.log('[GSP] slug =', slug);
-
-//   try {
-//     // 1) Берём товар по slug
-//     const bySlug = await ServerProductsService.getProductBySlug(slug);
-//     console.log('[GSP] bySlug.id =', bySlug?.id);
-
-//     if (!bySlug?.id) {
-//       return { notFound: true, revalidate: 60 };
-//     }
-
-//     // 2) Пробуем добрать по id (если эндпоинт отличается)
-//     let productRaw = bySlug;
-//     try {
-//       productRaw = await ServerProductsService.getProductById(Number(bySlug.id));
-//     } catch (e: any) {
-//       console.warn(
-//         '[GSP] getById failed, fallback to bySlug',
-//         e?.response?.status,
-//         e?.response?.data || e?.message,
-//       );
-//     }
-
-//     const product = adaptProductForUI(productRaw);
-//     const placements = await fetchPromoForPageSSR(PromoPageType.PRODUCT, String(product.id));
-
-//     return {
-//       props: {
-//         ...(await serverSideTranslations(locale ?? 'ru', ['common'])),
-//         product,
-//         placements,
-//       },
-//       revalidate: 3600,
-//     };
-//   } catch (e: any) {
-//     console.error(
-//       '[GSP] failed for slug',
-//       slug,
-//       e?.response?.status,
-//       e?.response?.data || e?.message,
-//     );
-//     return { notFound: true, revalidate: 60 };
-//   }
-// };
 export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
   // На билде не ходим в API: пусто + fallback
   return { paths: [], fallback: 'blocking' };

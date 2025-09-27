@@ -1,11 +1,15 @@
 import styled from '@emotion/styled';
 
 import { tokens, commonStyles } from '../shared';
+import { media } from '../breakpoints';
 
 export const ProductPageContainer = styled.div`
   ${commonStyles.container};
   padding-top: 40px;
   padding-right: 0;
+  ${media.down('tablet')} {
+    padding-left: 0;
+  }
 `;
 
 export const ProductBreadcrumbs = styled.nav`
@@ -14,14 +18,19 @@ export const ProductBreadcrumbs = styled.nav`
   color: #666;
 
   a {
-    color: ${tokens.colors.primary};
+    color: black;
     text-decoration: none;
     transition: color 0.2s ease;
 
     &:hover {
-      color: #0056b3;
+      color: ${tokens.colors.primary};
       text-decoration: underline;
     }
+  }
+
+  ${media.down('tablet')} {
+    border-bottom: 1px solid #ebebeb;
+    padding-left: 20px;
   }
 `;
 

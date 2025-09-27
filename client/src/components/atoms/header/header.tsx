@@ -171,14 +171,15 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
 
         <HeaderRight>
           <SearchContainer>
-            <form onSubmit={handleSearch}>
+            {/* todo: test and add search products in all categories functionality */}
+            {/* <form onSubmit={handleSearch}>
               <SearchInput
                 type="text"
                 placeholder="Поиск товаров..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
               />
-            </form>
+            </form> */}
 
             {/* ✅ ИСПРАВЛЕНИЕ: Информация о пользователе безопасно рендерится */}
             <NoSSR

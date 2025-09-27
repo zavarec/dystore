@@ -74,7 +74,6 @@ export const Media = styled.div`
   padding-top: var(--mh-ratio, 66%); /* управляемое ratio */
   border: 1px solid #e0e0e0;
   overflow: hidden;
-  background: #f1f5f9;
 
   > img,
   > video {

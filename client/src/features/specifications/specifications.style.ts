@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 
 import { tokens } from '@/styles/shared';
+import { media } from '@/styles/breakpoints';
 
 export const SpecsSection = styled.section`
   margin-top: 48px;
@@ -22,9 +23,11 @@ export const SpecsWrapper = styled.ul`
   @media (max-width: 1100px) {
     flex-direction: column;
   }
-  @media (max-width: 640px) {
+
+  ${media.down('tablet')} {
+    display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
   }
 `;
 
@@ -95,9 +98,11 @@ export const BottomRow = styled.div`
   @media (max-width: 1100px) {
     grid-template-columns: 260px 1fr; /* одна фотка на средних экранах */
   }
-  @media (max-width: 640px) {
+
+  ${media.down('tablet')} {
     grid-template-columns: 1fr;
     gap: 24px;
+    margin-top: 0;
   }
 `;
 

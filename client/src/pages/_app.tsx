@@ -21,6 +21,8 @@ import { fontClassNames } from '@/styles/fonts';
 
 import 'react-toastify/dist/ReactToastify.css';
 import { GlobalGutters } from '@/styles/global-gutters';
+import { FirstVisitFadeStyles } from '@/styles/first-visit/first-visit-fade';
+import { FirstVisitBoot } from '@/styles/first-visit/firts-visit-boot';
 
 // Глобальные стили - чистые как после уборки Dyson
 const globalStyles = css`
@@ -184,6 +186,9 @@ function MyApp({ Component, ...rest }: AppProps) {
   return (
     <Provider store={store}>
       <div className={fontClassNames}>
+        <FirstVisitFadeStyles />
+        {/* Оверлей и прелоад только на клиенте при первом визите */}
+        <FirstVisitBoot maxDelayMs={1200} />
         <Global styles={globalStyles} />
 
         <GlobalGutters />
