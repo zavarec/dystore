@@ -1,6 +1,12 @@
 # ---------- builder ----------
     FROM node:20-bookworm-slim AS builder
     WORKDIR /app
+
+    ARG NEXT_PUBLIC_AMO_ID
+    ARG NEXT_PUBLIC_AMO_HASH
+    ENV NEXT_PUBLIC_AMO_ID=${NEXT_PUBLIC_AMO_ID}
+    ENV NEXT_PUBLIC_AMO_HASH=${NEXT_PUBLIC_AMO_HASH}
+    ENV NODE_ENV=production
     
     COPY package*.json ./
     RUN npm ci --no-audit --no-fund
@@ -13,11 +19,7 @@
     # ---------- runner ----------
     FROM node:20-bookworm-slim
     WORKDIR /app
-    ARG NEXT_PUBLIC_AMO_ID
-    ARG NEXT_PUBLIC_AMO_HASH
-    ENV NEXT_PUBLIC_AMO_ID=${NEXT_PUBLIC_AMO_ID}
-    ENV NEXT_PUBLIC_AMO_HASH=${NEXT_PUBLIC_AMO_HASH}
-    ENV NODE_ENV=production
+
     
     COPY --from=builder /app/package*.json ./
     RUN npm ci --omit=dev --no-audit --no-fund

@@ -41,21 +41,20 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
-      args:
+      args: # <-- только args здесь
         NEXT_PUBLIC_AMO_ID: ${NEXT_PUBLIC_AMO_ID}
         NEXT_PUBLIC_AMO_HASH: ${NEXT_PUBLIC_AMO_HASH}
-      environment:
-        NODE_ENV: production
-        NEXT_PUBLIC_AMO_ID: ${NEXT_PUBLIC_AMO_ID} # на рантайм не помешает
-        NEXT_PUBLIC_AMO_HASH: ${NEXT_PUBLIC_AMO_HASH}
+    environment: # <-- а это уже на уровне сервиса
+      NODE_ENV: production
+      NEXT_PUBLIC_AMO_ID: ${NEXT_PUBLIC_AMO_ID}
+      NEXT_PUBLIC_AMO_HASH: ${NEXT_PUBLIC_AMO_HASH}
+    # env_file влияет на РАНТАЙМ контейнера (на build-args не влияет)
+    # можно оставить, но значения для build всё равно возьмутся из .env или --env-file
     env_file:
       - ./client/.env.local
     depends_on:
       - api
     restart: always
-    # ⚠️ порт наружу больше не публикуем
-    # ports:
-    #   - "3000:3000"
 
   caddy:
     image: caddy:2.8.4
