@@ -25,6 +25,11 @@ export function AmoCrmWidget({
   locale = 'ru',
   inline = false,
 }: Props) {
+  console.log({
+    id,
+    hash,
+  });
+
   useEffect(() => {
     // чтобы не вставлять скрипт дважды
     if (document.getElementById('amo-crm-button-js')) return;
