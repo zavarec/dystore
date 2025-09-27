@@ -14,6 +14,8 @@ const cookieParser = require("cookie-parser");
 async function bootstrap() {
   const logger = new Logger("Bootstrap");
 
+  const isProd = process.env.NODE_ENV === "production";
+
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
 
@@ -75,7 +77,7 @@ async function bootstrap() {
       key: "_csrf", // ❗ другое имя, не XSRF-TOKEN
       httpOnly: true, // секрет фронту не нужен
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+      secure: isProd,
       path: "/",
     },
     // где брать ТОКЕН при проверке (мы будем слать в заголовке)
@@ -86,7 +88,17 @@ async function bootstrap() {
       (req.body && req.body._csrf),
   });
 
-  app.use("/api/csrf", csrfProtection);
+  app.use("/api/csrf", csrfProtection, (req: any, res: any) => {
+    const token = req.csrfToken();
+    res.cookie("XSRF-TOKEN", token, {
+      httpOnly: false, // фронту надо прочитать
+      sameSite: "lax",
+      secure: isProd,
+      path: "/",
+      maxAge: 12 * 60 * 60 * 1000,
+    });
+    res.json({ csrfToken: token });
+  });
 
   // Security & performance
   app.use(helmet());
