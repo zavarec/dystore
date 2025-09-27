@@ -93,7 +93,7 @@ export type ApiSpec = {
 };
 
 export function specsToForm(specs: ApiSpec[]) {
-  return specs.map((s): any => {
+  return specs.map(s => {
     // берём значение из того поля, которое не null
     let value: any = '';
     if (s.valueString != null) value = s.valueString;

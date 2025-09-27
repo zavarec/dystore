@@ -148,6 +148,7 @@ export interface CreateProductDto {
 
   /** ID motif-изображения */
   motifId?: string;
+  motifUrl?: string;
 }
 
 export interface UpdateProductDto {

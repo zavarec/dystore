@@ -53,6 +53,8 @@ export const useEditProduct = (productId: string) => {
       if (typeof data.isFeatured !== 'undefined' && data.isFeatured)
         payload.isFeatured = Boolean(data.isFeatured);
 
+      if (typeof data.motifId !== 'undefined' && data.motifId) payload.motifId = data.motifId;
+
       await ProductsService.updateProduct(parseInt(productId), payload as UpdateProductDto);
       toast.success('Продукт успешно обновлен');
       router.push('/admin/products');
