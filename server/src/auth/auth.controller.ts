@@ -45,8 +45,36 @@ export class AuthController {
   @ApiResponse({ status: 400, description: "Invalid code" })
   @Post("verify-code")
   @HttpCode(HttpStatus.OK)
-  async verifyCode(@Body() verifyCodeDto: VerifyCodeDto) {
-    return this.authService.verifyCode(verifyCodeDto);
+  async verifyCode(
+    @Body() verifyCodeDto: VerifyCodeDto,
+    @Res({ passthrough: true }) res: any,
+  ) {
+    const { accessToken, refreshToken } =
+      await this.authService.verifyCode(verifyCodeDto);
+    const isProd = process.env.NODE_ENV === "production";
+    const domain =
+      isProd && process.env.FRONTEND_ORIGIN
+        ? new URL(process.env.FRONTEND_ORIGIN).hostname
+        : undefined;
+
+    res.cookie("access_token", accessToken, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: "lax",
+      path: "/",
+      domain,
+      maxAge: 15 * 60 * 1000, // как у тебя в issueTokens
+    });
+    res.cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: "lax",
+      path: "/",
+      domain,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return { ok: true };
   }
 
   @ApiOperation({ summary: "Register new user" })
@@ -85,6 +113,30 @@ export class AuthController {
 
     // В теле ответа токен уже не нужен
     return { user };
+  }
+
+  @Post("logout")
+  @HttpCode(HttpStatus.OK)
+  logout(@Res({ passthrough: true }) res: any) {
+    const isProd = process.env.NODE_ENV === "production";
+    const domain =
+      isProd && process.env.FRONTEND_ORIGIN
+        ? new URL(process.env.FRONTEND_ORIGIN).hostname
+        : undefined;
+
+    res.clearCookie("access_token", {
+      path: "/",
+      domain,
+      secure: isProd,
+      sameSite: "lax",
+    });
+    res.clearCookie("refresh_token", {
+      path: "/",
+      domain,
+      secure: isProd,
+      sameSite: "lax",
+    });
+    return { ok: true };
   }
 
   @ApiOperation({ summary: "Get current user profile" })
