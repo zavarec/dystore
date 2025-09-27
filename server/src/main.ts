@@ -88,18 +88,7 @@ async function bootstrap() {
       (req.body && req.body._csrf),
   });
 
-  app.use("/api/csrf", csrfProtection, (req: any, res: any) => {
-    const token = req.csrfToken();
-    res.cookie("XSRF-TOKEN", token, {
-      httpOnly: false, // фронту надо прочитать
-      sameSite: "lax",
-      secure: isProd,
-      path: "/",
-      maxAge: 12 * 60 * 60 * 1000,
-    });
-    res.json({ csrfToken: token });
-  });
-
+  app.use("/api/csrf", csrfProtection);
   // Security & performance
   app.use(helmet());
   // app.use(compression());
