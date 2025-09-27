@@ -36,7 +36,7 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
             <FooterText>
               📞 8 (800) 555-35-35
               <br />
-              📧 info@dyson-group.ru
+              📧 dyson-group@yandex.com
             </FooterText>
           </FooterSection>
 
