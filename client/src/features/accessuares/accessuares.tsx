@@ -1,4 +1,8 @@
-import React, { useCallback, useEffect, useId, useMemo, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useState } from 'react';
+
+import UploadsService from '@/services/uploads.service';
+import type { BoxItemDto } from '@/types/models/product.model';
+
 import {
   Section,
   Inner,
@@ -16,7 +20,6 @@ import {
   ThumbStub,
   HeaderText,
   ItemTitle,
-  QtyBadge,
   Chevron,
   ItemBody,
   Muted,
@@ -24,8 +27,6 @@ import {
   ItemCartWrapper,
   Col,
 } from './accessuares.style';
-import { BoxItemDto } from '@/types/models/product.model';
-import UploadsService from '@/services/uploads.service';
 
 // type BoxItemView = {
 //   id: string | number;

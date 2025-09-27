@@ -17,9 +17,15 @@ type Props = {
   inline?: boolean; // соответствует параметру inline из скрипта
 };
 
-export function AmoCrmWidget({ id, hash, color = '#000', userId, locale = 'ru', inline = false }: Props) {
+export function AmoCrmWidget({
+  id,
+  hash,
+  color = '#000',
+  userId,
+  locale = 'ru',
+  inline = false,
+}: Props) {
   useEffect(() => {
-
     // чтобы не вставлять скрипт дважды
     if (document.getElementById('amo-crm-button-js')) return;
 

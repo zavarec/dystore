@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { createCSRFToken } from '@/lib/csrf';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {

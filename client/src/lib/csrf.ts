@@ -1,5 +1,6 @@
-import csrf from 'csrf';
 import type { NextApiRequest, NextApiResponse } from 'next';
+
+import csrf from 'csrf';
 
 const tokens = new csrf();
 
@@ -35,13 +36,30 @@ export function extractCSRFFromRequest(req: NextApiRequest) {
   })();
   const secret = (req.cookies &&
     (req.cookies['csrf-secret'] || req.cookies['XSRF-TOKEN-SECRET'])) as string | undefined;
-  return { token, secret };
+  const cookieTokenRaw = (req.cookies && req.cookies['XSRF-TOKEN']) as string | undefined;
+  const cookieToken = (() => {
+    if (typeof cookieTokenRaw !== 'string') return cookieTokenRaw;
+    try {
+      return decodeURIComponent(cookieTokenRaw);
+    } catch {
+      return cookieTokenRaw;
+    }
+  })();
+  return { token, secret, cookieToken };
 }
 
 export function requireCsrf(req: NextApiRequest, res: NextApiResponse): boolean {
   if (['GET', 'HEAD', 'OPTIONS'].includes(req.method || '')) return true;
-  const { token, secret } = extractCSRFFromRequest(req);
-  if (!verifyCSRFToken(secret, token)) {
+  const { token, secret, cookieToken } = extractCSRFFromRequest(req);
+
+  const isValid =
+    verifyCSRFToken(secret, token) ||
+    (!!token &&
+      typeof token === 'string' &&
+      typeof cookieToken === 'string' &&
+      token === cookieToken);
+
+  if (!isValid) {
     res.status(403).json({ error: 'Invalid CSRF token' });
     return false;
   }

@@ -12,9 +12,6 @@ export const ContactSupportSection = styled.section`
 `;
 
 export const ContactSupportContainer = styled.div`
-  /* max-width: 1120px; */
-  /* margin: 0 auto; */
-  /* width: 100%; */
   padding: 0 var(--page-gutter);
 `;
 
