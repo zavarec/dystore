@@ -1,4 +1,5 @@
-import React from 'react';
+import { ContactSupport } from '@/components/sections/support/contact-support';
+
 import {
   FooterContainer,
   FooterContent,
@@ -19,6 +20,8 @@ interface FooterProps {
 export const Footer: React.FC<FooterProps> = ({ className }) => {
   return (
     <FooterContainer className={className}>
+      {/* <ContactSupport /> */}
+
       <FooterContent>
         <FooterGrid>
           <FooterSection>

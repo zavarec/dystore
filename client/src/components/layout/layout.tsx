@@ -1,14 +1,12 @@
-import React from 'react';
 import { useRouter } from 'next/router';
 
-import { PageContainer, Main } from './layout.style';
-import { Header } from '../atoms/header';
-import { Footer } from '../atoms/footer';
-
-import { NoSSR } from '../atoms/no-ssr/no-ssr';
-import { AmoCrmWidget } from '../integrations/amo-crm-widget';
 import { AuthModal } from '@/features/auth/modals/auth-modal';
 
+import { PageContainer, Main } from './layout.style';
+import { Footer } from '../atoms/footer';
+import { Header } from '../atoms/header';
+import { NoSSR } from '../atoms/no-ssr/no-ssr';
+import { AmoCrmWidget } from '../integrations/amo-crm-widget';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -32,10 +30,12 @@ export const Layout: React.FC<LayoutProps> = ({ children, className }) => {
           locale="ru"
           color="#111827"
         />
+
         {!isAdminRoute && <Footer />}
       </PageContainer>
+
       <NoSSR fallback={null}>
-        <AuthModal/>
+        <AuthModal />
       </NoSSR>
     </>
   );

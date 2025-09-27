@@ -23,7 +23,16 @@ export function extractCSRFFromRequest(req: NextApiRequest) {
     | undefined;
   const bodyToken = (req.body && (req.body._csrf || req.body.csrfToken)) as string | undefined;
   const queryToken = (req.query && (req.query._csrf || req.query.csrfToken)) as string | undefined;
-  const token = headerToken || bodyToken || queryToken;
+
+  const token = (() => {
+    const source = headerToken || bodyToken || queryToken;
+    if (typeof source !== 'string') return source;
+    try {
+      return decodeURIComponent(source);
+    } catch {
+      return source;
+    }
+  })();
   const secret = (req.cookies &&
     (req.cookies['csrf-secret'] || req.cookies['XSRF-TOKEN-SECRET'])) as string | undefined;
   return { token, secret };
