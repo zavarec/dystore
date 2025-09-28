@@ -15,6 +15,7 @@ import { isUUID } from "class-validator";
 
 type ProductWithDetails = Prisma.ProductGetPayload<{
   include: {
+    keyFeatures: true;
     motif: true;
     category: true;
     boxItems: { include: { accessory: true; customImage: true } };
@@ -38,6 +39,7 @@ export class ProductsService {
   async findAll(): Promise<ProductWithDetails[]> {
     return this.prisma.product.findMany({
       include: {
+        keyFeatures: true,
         mainImage: true,
         dimensionsImage: true,
         motif: true,
@@ -62,6 +64,7 @@ export class ProductsService {
         dimensionsImage: true,
         motif: true,
         category: true,
+        keyFeatures: true,
         boxItems: {
           include: { accessory: true, customImage: true },
           orderBy: { order: "asc" },
@@ -115,6 +118,7 @@ export class ProductsService {
         mainImage: true,
         dimensionsImage: true,
         category: true,
+        keyFeatures: true,
         boxItems: {
           include: { accessory: true, customImage: true },
           orderBy: { order: "asc" },
@@ -131,6 +135,7 @@ export class ProductsService {
     return this.prisma.product.findMany({
       where: { categoryId },
       include: {
+        keyFeatures: true,
         motif: true,
         mainImage: true,
         dimensionsImage: true,
@@ -503,6 +508,7 @@ export class ProductsService {
       const full = await tx.product.findUnique({
         where: { id: productRecord.id },
         include: {
+          keyFeatures: true,
           motif: true,
           mainImage: true,
           dimensionsImage: true,
