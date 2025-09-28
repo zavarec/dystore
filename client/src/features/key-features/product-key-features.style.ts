@@ -1,11 +1,12 @@
 import styled from '@emotion/styled';
 
-/* ================= styles ================= */
+import { tokens } from '@/styles/shared';
 
 export const Section = styled.section`
   display: grid;
   gap: clamp(12px, 1.8vw, 20px);
-  color: #111827;
+  color: ${tokens.colors.primary};
+  padding-left: 20px;
 
   .visually-hidden {
     position: absolute !important;

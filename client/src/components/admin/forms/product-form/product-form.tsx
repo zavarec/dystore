@@ -100,6 +100,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       boxItems: (initialValues as ProductFormValues)?.boxItems ?? [],
       specs: (initialValues as ProductFormValues)?.specs ?? [],
       keyFeatures: (initialValues as ProductFormValues)?.keyFeatures ?? [''],
+      shortDescription: (initialValues as ProductFormValues)?.shortDescription ?? '',
     } as ProductFormValues,
   });
 
@@ -199,6 +200,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           const filtered = normalized.filter(Boolean);
           return filtered.length > 0 ? filtered : [''];
         })(),
+        shortDescription:
+          (initialValues as PartialCreateWithUpdateProductDto).shortDescription ?? '',
       };
 
       reset(norm);
@@ -438,6 +441,27 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             )}
           />
           {errors.description && <ErrorMessage>{errors.description.message}</ErrorMessage>}
+        </FormGroup>
+
+        <FormGroup $fullWidth>
+          <Label htmlFor="shortDescription">Короткое описание</Label>
+          <Controller
+            name="shortDescription"
+            control={control}
+            render={({ field }) => (
+              <Textarea
+                id="shortDescription"
+                {...field}
+                placeholder="Короткий текст для карточки товара"
+                disabled={loading}
+                maxLength={280}
+                style={{ minHeight: '120px' }}
+              />
+            )}
+          />
+          {errors.shortDescription && (
+            <ErrorMessage>{errors.shortDescription.message}</ErrorMessage>
+          )}
         </FormGroup>
 
         {/* Цена */}

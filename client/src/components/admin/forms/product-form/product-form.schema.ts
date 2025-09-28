@@ -24,6 +24,7 @@ export type ProductFormValues = {
   slug: string;
   name: string;
   description: string;
+  shortDescription?: string;
   price: number;
   stock: number;
   categoryId: number;
@@ -63,6 +64,7 @@ export const productSchema = object({
     .matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/i, 'Только латиница, цифры и дефисы'),
   name: string().optional(),
   description: string().optional(),
+  shortDescription: string().max(280, 'Максимум 280 символов').optional(),
   price: number()
     .optional()
     .positive('Цена должна быть положительной')

@@ -94,6 +94,7 @@ export function mapFormToCreateDto(values: ProductFormValues): CreateProductDto 
     slug: values.slug,
     name: values.name,
     description: values.description,
+    shortDescription: normalizeToString(values.shortDescription),
     price: values.price,
     stock: values.stock,
     categoryId: values.categoryId,

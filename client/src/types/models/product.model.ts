@@ -161,6 +161,7 @@ export interface CreateProductDto {
 
   /** Ключевые особенности */
   keyFeatures?: KeyFeatureDto[];
+  shortDescription?: string;
 }
 
 export interface UpdateProductDto {

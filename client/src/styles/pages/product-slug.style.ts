@@ -10,6 +10,8 @@ export const ProductPageContainer = styled.div`
   ${media.down('tablet')} {
     padding-left: 0;
   }
+
+  color: ${tokens.colors.primary};
 `;
 
 export const ProductBreadcrumbs = styled.nav`
@@ -54,13 +56,12 @@ export const ProductImageSection = styled.div`
 export const ProductMainImage = styled.div`
   width: 100%;
   height: 600px;
-  // background: #f8f9fa;
   border-radius: 12px;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  // border: 1px solid #e5e5e5;
+
   object-fit: contain;
 `;
 
@@ -92,19 +93,20 @@ export const ProductInfoSection = styled.div`
   display: flex;
   flex-direction: column;
   gap: 24px;
+  color: ${tokens.colors.primary};
 `;
 
 export const ProductTitle = styled.h1`
   font-size: 32px;
-  font-weight: 700;
-  color: #1a1a1a;
+  font-weight: 400;
   line-height: 1.2;
   margin: 0;
+  color: ${tokens.colors.primary};
 `;
 
 export const ProductDescription = styled.p`
   font-size: 16px;
-  color: #666;
+  color: ${tokens.colors.primary};
   line-height: 1.6;
   margin: 0;
 `;
@@ -303,6 +305,7 @@ export const ProductInfoWithImageWrapperStyled = styled.div`
     flex-direction: column;
     padding: 40px var(--page-gutter);
   }
+  color: ${tokens.colors.primary};
 `;
 
 export const ProductMotifMobileWrapper = styled.div`
