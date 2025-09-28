@@ -13,6 +13,8 @@ import { Benefits } from '@/components/sections/benefits';
 import { Accessuares } from '@/features/accessuares/accessuares';
 import { AddToCartButton } from '@/features/cart/add-to-cart-button';
 import { AddToCartButtonVariant } from '@/features/cart/add-to-cart-button/add-to-cart-button';
+import { ProductKeyFeatures } from '@/features/key-features/product-key-features';
+import { ProductDescription as ProductDescriptionBlock } from '@/features/product-description/product-description';
 import { PromoSlotRenderer } from '@/features/promo-block/promo-slot-renderer';
 import { Specifications } from '@/features/specifications/specifications';
 import { useAppDispatch } from '@/hooks/redux';
@@ -25,7 +27,7 @@ import {
   ProductBreadcrumbs,
   BreadcrumbLink,
   ProductTitle,
-  ProductDescription,
+  ProductDescription as ProductDescriptionText,
   ProductPrice,
   CurrentPrice,
   ProductActions,
@@ -39,7 +41,6 @@ import type { PromoPlacement } from '@/types/models/promo-placement.model';
 import { PromoSlot } from '@/types/models/promo-section.model';
 import { formatPriceRub } from '@/utils/format';
 import { adaptProductForUI } from '@/utils/product-adapters';
-import { ProductKeyFeatures } from '@/features/key-features/product-key-features';
 
 interface ProductPageProps {
   product: ProductWithDetails;
@@ -256,16 +257,10 @@ const ProductPage: NextPage<ProductPageProps> = ({ product, placements }) => {
             <ProductTitle>{product.name}</ProductTitle>
 
             {product.shortDescription && (
-              <ProductDescription>{product.shortDescription}</ProductDescription>
+              <ProductDescriptionText>{product.shortDescription}</ProductDescriptionText>
             )}
 
             {product.keyFeatures && <ProductKeyFeatures features={product.keyFeatures} />}
-
-            {product.description && product.description !== product.shortDescription && (
-              <ProductDescription style={{ marginTop: '16px', opacity: 0.8 }}>
-                {product.description}
-              </ProductDescription>
-            )}
 
             <ProductPrice>
               <CurrentPrice>{formatPriceRub(product.price)}</CurrentPrice>
@@ -283,6 +278,10 @@ const ProductPage: NextPage<ProductPageProps> = ({ product, placements }) => {
           </ProductInfoSection>
         </ProductInfoWithImageWrapperStyled>
       </ProductPageContainer>
+
+      {product.description && (
+        <ProductDescriptionBlock title="Подробное описание" description={product.description} />
+      )}
 
       <Specifications
         specs={product.specs ?? []}

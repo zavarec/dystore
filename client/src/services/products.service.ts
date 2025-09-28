@@ -1,6 +1,6 @@
+import type { CreateProductDto, UpdateProductDto, Product } from '@/types/models/product.model';
+
 import { apiClient } from './api';
-import { CreateProductDto, UpdateProductDto } from '@/types/models/product.model';
-import { Product } from '@/types/models/product.model';
 
 export class ProductsService {
   // Получить все продукты

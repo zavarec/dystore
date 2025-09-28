@@ -3,6 +3,31 @@ import type { CreateProductDto, KeyFeatureDto, SpecItemDto } from '@/types/model
 
 const spreadIf = <T extends object>(c: boolean, o: T) => (c ? o : {});
 
+const isRemovable = (v: unknown): boolean => {
+  if (v === null || v === undefined) return true;
+  if (typeof v === 'string' && v.trim() === '') return true;
+  if (Array.isArray(v)) return v.length === 0;
+  if (typeof v === 'object') return Object.keys(v as object).length === 0;
+  return false;
+};
+
+const compactDeep = <T>(input: T): T => {
+  if (Array.isArray(input)) {
+    const arr = input.map(compactDeep).filter(v => !isRemovable(v));
+    // @ts-expect-error
+    return arr;
+  }
+  if (input && typeof input === 'object') {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(input)) {
+      const vv = compactDeep(v as any);
+      if (!isRemovable(vv)) out[k] = vv;
+    }
+    return out as T;
+  }
+  return input;
+};
+
 function parseSmartNumber(raw: string): number {
   const s = (raw ?? '').trim();
   const norm = s
@@ -90,7 +115,7 @@ export function mapFormToCreateDto(values: ProductFormValues): CreateProductDto 
       } as KeyFeatureDto;
     })
     .filter((x): x is KeyFeatureDto => !!x);
-  const dto = {
+  const dtoRaw = {
     slug: values.slug,
     name: values.name,
     description: values.description,
@@ -100,23 +125,21 @@ export function mapFormToCreateDto(values: ProductFormValues): CreateProductDto 
     categoryId: values.categoryId,
     isFeatured: values.isFeatured,
     motifId: values.motifImageId,
+    ...(values.isFeatured ? { isFeatured: true } : {}),
     // Передаем ID изображений только если они не пустые
-    ...spreadIf(!!values.mainImageId?.trim(), { mainImageId: values.mainImageId!.trim() }),
-    ...spreadIf(!!values.dimensionsImageId?.trim(), {
-      dimensionsImageId: values.dimensionsImageId!.trim(),
-    }),
-    ...spreadIf(!!values.motifImageId?.trim(), { motifId: values.motifImageId!.trim() }),
-    // ...spreadIf(!!values.imageUrl?.trim(), { imageUrl: values.imageUrl!.trim() }),
-    // ...spreadIf(!!values.dimensionsImageUrl?.trim(), {
-    //   dimensionsImageUrl: values.dimensionsImageUrl!.trim(),
-    // }),
-    ...spreadIf(!!values.isFeatured, { isFeatured: true }),
-    ...spreadIf((values.boxItems ?? []).length > 0, { boxItems }),
-    ...spreadIf(specs.length > 0, { specs }),
-    keyFeatures,
+    ...(values.mainImageId?.trim() ? { mainImageId: values.mainImageId.trim() } : {}),
+    ...(values.dimensionsImageId?.trim()
+      ? { dimensionsImageId: values.dimensionsImageId.trim() }
+      : {}),
+
+    ...(values.motifImageId?.trim() ? { motifId: values.motifImageId.trim() } : {}),
+    ...(boxItems && boxItems.length ? { boxItems } : {}),
+    ...(specs && specs.length ? { specs } : {}),
+    ...(keyFeatures && keyFeatures.length ? { keyFeatures } : {}),
   };
 
-  console.log(dto, 'DTO');
+  const dto = compactDeep(dtoRaw) as CreateProductDto;
 
-  return dto as CreateProductDto;
+  console.log(dto, 'DTO');
+  return dto;
 }

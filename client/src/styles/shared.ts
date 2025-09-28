@@ -8,6 +8,7 @@ export const tokens = {
     danger: '#dc3545',
     warning: '#ffc107',
     info: '#17a2b8',
+    bgSecondary: '#fbfbfb',
   },
   spacing: {
     xs: '8px',

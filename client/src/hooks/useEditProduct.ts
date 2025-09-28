@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 
 import { useRouter } from 'next/router';
 
+import { isAxiosError } from 'axios';
 import { toast } from 'react-toastify';
 
 import { ProductsService } from '@/services';
@@ -61,7 +62,10 @@ export const useEditProduct = (productId: string) => {
       router.push('/admin/products');
     } catch (error: unknown) {
       console.error('Error updating product:', error);
-      toast.error(error?.response?.data?.message || 'Ошибка при обновлении продукта');
+
+      toast.error(
+        isAxiosError(error) ? error?.response?.statusText : 'Ошибка при обновлении продукта',
+      );
     } finally {
       setLoading(false);
     }

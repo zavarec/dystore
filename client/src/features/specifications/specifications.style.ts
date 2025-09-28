@@ -1,10 +1,9 @@
 import styled from '@emotion/styled';
 
-import { tokens } from '@/styles/shared';
 import { media } from '@/styles/breakpoints';
+import { tokens } from '@/styles/shared';
 
 export const SpecsSection = styled.section`
-  margin-top: 48px;
   width: 100%;
   padding: 40px var(--page-gutter);
   background: #fbfbfb;

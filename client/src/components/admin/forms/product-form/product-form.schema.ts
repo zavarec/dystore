@@ -62,11 +62,11 @@ export const productSchema = object({
   slug: string()
     .required('Укажи slug')
     .matches(/^[a-z0-9]+(?:-[a-z0-9]+)*$/i, 'Только латиница, цифры и дефисы'),
-  name: string().optional(),
-  description: string().optional(),
+  name: string().required('Обязательное поле'),
+  description: string().required('Обязательное поле'),
   shortDescription: string().max(280, 'Максимум 280 символов').optional(),
   price: number()
-    .optional()
+    .required('Обязательное поле')
     .positive('Цена должна быть положительной')
     .typeError('Цена должна быть числом'),
   stock: number()
@@ -75,7 +75,7 @@ export const productSchema = object({
     .integer('Количество должно быть целым числом')
     .typeError('Количество должно быть числом'),
   categoryId: number()
-    .optional()
+    .required('Обязательное поле')
     .positive('Выберите категорию')
     .typeError('Категория должна быть числом'),
   imageUrl: urlOrRelative.optional(),

@@ -120,7 +120,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     fields: keyFeaturesFields,
     append: appendKeyFeature,
     remove: removeKeyFeature,
-  } = useFieldArray({ control, name: 'keyFeatures' });
+  } = useFieldArray<ProductFormValues>({ control, name: 'keyFeatures' });
 
   const showUploadNotification = (
     field: 'mainImage' | 'dimensionsImage' | 'motifImage',
