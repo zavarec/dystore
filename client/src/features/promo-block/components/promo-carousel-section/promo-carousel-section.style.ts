@@ -119,6 +119,17 @@ export const Arrow = styled.button<{ side: 'left' | 'right' }>`
   &:hover {
     background: rgba(255, 255, 255, 0.6);
   }
+
+  svg {
+    width: 24px;
+    height: 24px;
+    fill: #333; // цвет можно менять в зависимости от темы
+    transition: fill 0.4s linear;
+  }
+
+  &:hover svg {
+    fill: #666;
+  }
 `;
 
 export const Title = styled.h3<{

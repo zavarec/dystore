@@ -176,10 +176,22 @@ export const PromoCarouselSection = (section: PromoSection) => {
         {(payload.showArrows ?? true) && (
           <>
             <Arrow side="left" aria-label="Previous slide" onClick={prev}>
-              ‹
+              <svg
+                viewBox="0 0 31.656 18.657"
+                xmlns="http://www.w3.org/2000/svg"
+                style={{ transform: 'rotate(90deg)' }}
+              >
+                <path d="M15.828 18.657L2.829 2.828h25.999L15.828 18.657z" />
+              </svg>
             </Arrow>
             <Arrow side="right" aria-label="Next slide" onClick={next}>
-              ›
+              <svg
+                viewBox="0 0 31.656 18.657"
+                xmlns="http://www.w3.org/2000/svg"
+                style={{ transform: 'rotate(270deg)' }}
+              >
+                <path d="M15.828 18.657L2.829 2.828h25.999L15.828 18.657z" />
+              </svg>
             </Arrow>
           </>
         )}
