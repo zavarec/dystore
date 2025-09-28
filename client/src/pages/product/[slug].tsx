@@ -39,6 +39,7 @@ import type { PromoPlacement } from '@/types/models/promo-placement.model';
 import { PromoSlot } from '@/types/models/promo-section.model';
 import { formatPriceRub } from '@/utils/format';
 import { adaptProductForUI } from '@/utils/product-adapters';
+import { ProductKeyFeatures } from '@/features/key-features/product-key-features';
 
 interface ProductPageProps {
   product: ProductWithDetails;
@@ -257,6 +258,8 @@ const ProductPage: NextPage<ProductPageProps> = ({ product, placements }) => {
             {product.shortDescription && (
               <ProductDescription>{product.shortDescription}</ProductDescription>
             )}
+
+            {product.keyFeatures && <ProductKeyFeatures features={product.keyFeatures} />}
 
             {product.description && product.description !== product.shortDescription && (
               <ProductDescription style={{ marginTop: '16px', opacity: 0.8 }}>

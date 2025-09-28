@@ -1,9 +1,16 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+
 import { toast } from 'react-toastify';
 
-import { Product, ProductWithDetails } from '@/types/models/product.model';
 import { Button } from '@/components/atoms/button';
 import { ButtonVariant } from '@/components/atoms/button/button.style';
+
+// Заменить импорты
+import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+import { selectCartItems } from '@/store/slices/cart-slice/cart.selectors';
+import { addToCart } from '@/store/slices/cart-slice/cart.thunks';
+import type { Product, ProductWithDetails } from '@/types/models/product.model';
+
 import { AddToCartButtonWrapper, QuantityBadge } from './add-to-cart-button.style';
 
 export enum AddToCartButtonVariant {
@@ -23,12 +30,6 @@ interface AddToCartButtonProps {
   disabled?: boolean;
   style?: React.CSSProperties;
 }
-
-// Заменить импорты
-import { useAppDispatch, useAppSelector } from '@/hooks/redux';
-
-import { addToCart } from '@/store/slices/cart-slice/cart.thunks';
-import { selectCartItems } from '@/store/slices/cart-slice/cart.selectors';
 
 // Заменить в компоненте AddToCartButton:
 export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
