@@ -54,6 +54,7 @@ export const useEditProduct = (productId: string) => {
         payload.isFeatured = Boolean(data.isFeatured);
 
       if (typeof data.motifId !== 'undefined' && data.motifId) payload.motifId = data.motifId;
+      if (typeof data.keyFeatures !== 'undefined') payload.keyFeatures = data.keyFeatures;
 
       await ProductsService.updateProduct(parseInt(productId), payload as UpdateProductDto);
       toast.success('Продукт успешно обновлен');

@@ -1,4 +1,4 @@
-import { Product, ProductWithDetails } from '@/types/models/product.model';
+import type { Product, ProductWithDetails } from '@/types/models/product.model';
 
 /**
  * Преобразует продукт из API в расширенный формат для UI
@@ -60,7 +60,16 @@ export const adaptProductForUI = (product: Product): ProductWithDetails => {
   ];
 
   // Базовые особенности
-  const features = ['Официальная гарантия', 'Быстрая доставка', 'Техподдержка 24/7'];
+  const keyFeatures = (product.keyFeatures ?? []).map((feature, idx) => ({
+    id: feature.id,
+    text: feature.text,
+    footnote: feature.footnote,
+    order: feature.order ?? idx,
+  }));
+
+  const features = keyFeatures.length
+    ? keyFeatures.map(feature => feature.text)
+    : ['Официальная гарантия', 'Быстрая доставка', 'Техподдержка 24/7'];
 
   // Создаем originalPrice для отображения скидки (15-25% скидка)
   const discountPercent = 0.15 + Math.random() * 0.1; // 15-25%
@@ -84,6 +93,7 @@ export const adaptProductForUI = (product: Product): ProductWithDetails => {
     metaDescription: `${product.shortDescription || product.name}. Официальная гарантия. Быстрая доставка. Лучшие цены.`,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    keyFeatures,
   };
 };
 

@@ -1,5 +1,12 @@
 import type { Category } from './category.model';
 
+export interface KeyFeatureDto {
+  id?: number;
+  text: string;
+  footnote?: string | null;
+  order?: number | null;
+}
+
 // Базовый тип продукта (соответствует серверному API)
 export interface Product {
   /** Уникальный идентификатор продукта */
@@ -51,6 +58,7 @@ export interface Product {
   motif?: { id: string; url: string; mimetype: string; storedName: string } | null;
   motifId?: string | null;
   motifUrl?: string | null;
+  keyFeatures?: KeyFeatureDto[];
 }
 
 // Расширенный тип продукта для UI (с дополнительными полями для SEO и отображения)
@@ -116,6 +124,7 @@ export interface ProductWithDetails extends Product {
   motif?: { id: string; url: string; mimetype: string; storedName: string } | null;
   motifId?: string | null;
   motifUrl?: string | null;
+  keyFeatures?: KeyFeatureDto[];
 }
 
 export interface CreateProductDto {
@@ -149,6 +158,9 @@ export interface CreateProductDto {
   /** ID motif-изображения */
   motifId?: string;
   motifUrl?: string;
+
+  /** Ключевые особенности */
+  keyFeatures?: KeyFeatureDto[];
 }
 
 export interface UpdateProductDto {
@@ -182,6 +194,9 @@ export interface UpdateProductDto {
 
   /** ID motif-изображения */
   motifId?: string;
+
+  /** Ключевые особенности */
+  keyFeatures?: KeyFeatureDto[];
 }
 
 export interface ProductImage {

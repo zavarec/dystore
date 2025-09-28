@@ -1,5 +1,5 @@
 import type { ProductFormValues } from '@/components/admin/forms/product-form/product-form.schema';
-import type { CreateProductDto, SpecItemDto } from '@/types/models/product.model';
+import type { CreateProductDto, KeyFeatureDto, SpecItemDto } from '@/types/models/product.model';
 
 const spreadIf = <T extends object>(c: boolean, o: T) => (c ? o : {});
 
@@ -79,6 +79,17 @@ export function mapFormToCreateDto(values: ProductFormValues): CreateProductDto 
     qty: typeof item.qty === 'number' ? item.qty : 1,
     order: typeof item.order === 'number' ? item.order : idx,
   }));
+
+  const keyFeatures: KeyFeatureDto[] = (values.keyFeatures ?? [])
+    .map((feature, idx) => {
+      const text = normalizeToString(feature);
+      if (!text) return null;
+      return {
+        text,
+        order: idx,
+      } as KeyFeatureDto;
+    })
+    .filter((x): x is KeyFeatureDto => !!x);
   const dto = {
     slug: values.slug,
     name: values.name,
@@ -101,6 +112,7 @@ export function mapFormToCreateDto(values: ProductFormValues): CreateProductDto 
     ...spreadIf(!!values.isFeatured, { isFeatured: true }),
     ...spreadIf((values.boxItems ?? []).length > 0, { boxItems }),
     ...spreadIf(specs.length > 0, { specs }),
+    keyFeatures,
   };
 
   console.log(dto, 'DTO');

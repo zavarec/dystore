@@ -86,6 +86,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
   const {
     control,
+    register,
     handleSubmit,
     getValues,
     setValue,
@@ -98,6 +99,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       slug: (initialValues as ProductFormValues)?.slug ?? '',
       boxItems: (initialValues as ProductFormValues)?.boxItems ?? [],
       specs: (initialValues as ProductFormValues)?.specs ?? [],
+      keyFeatures: (initialValues as ProductFormValues)?.keyFeatures ?? [''],
     } as ProductFormValues,
   });
 
@@ -112,6 +114,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     append: appendSpec,
     remove: removeSpec,
   } = useFieldArray({ control, name: 'specs' });
+
+  const {
+    fields: keyFeaturesFields,
+    append: appendKeyFeature,
+    remove: removeKeyFeature,
+  } = useFieldArray({ control, name: 'keyFeatures' });
 
   const showUploadNotification = (
     field: 'mainImage' | 'dimensionsImage' | 'motifImage',
@@ -183,6 +191,14 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           (initialValues as Partial<CreateProductDto | UpdateProductDto>).motif?.id ||
           (initialValues as PartialCreateWithUpdateProductDto).motifId ||
           '',
+        keyFeatures: (() => {
+          const source = (initialValues as PartialCreateWithUpdateProductDto).keyFeatures ?? [];
+          const normalized = (source as Array<string | { text?: string }>).map(feature =>
+            typeof feature === 'string' ? feature : (feature?.text ?? ''),
+          );
+          const filtered = normalized.filter(Boolean);
+          return filtered.length > 0 ? filtered : [''];
+        })(),
       };
 
       reset(norm);
@@ -194,6 +210,18 @@ export const ProductForm: React.FC<ProductFormProps> = ({
 
   const onAppenedBox = () =>
     appendBox({ customName: '', customImageId: '', qty: 1, order: boxItems.length });
+
+  const onAppendKeyFeature = () => appendKeyFeature('');
+
+  const handleRemoveKeyFeature = (index: number) => {
+    if (keyFeaturesFields.length <= 1) {
+      setValue(`keyFeatures.${index}` as `keyFeatures.${number}`, '', { shouldValidate: true });
+      return;
+    }
+    removeKeyFeature(index);
+  };
+
+  const keyFeaturesErrors = errors.keyFeatures as Array<{ message?: string }> | undefined;
 
   const handleFormSubmit = async (data: ProductFormValues) => {
     const specsList = data.specs ?? [];
@@ -285,6 +313,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     const nextData: ProductFormValues = {
       ...data,
       specs: patchedSpecs,
+      keyFeatures: (data.keyFeatures ?? []).map(feature => feature?.trim()).filter(Boolean),
     };
 
     await onSubmit(mapFormToCreateDto(nextData));
@@ -584,8 +613,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                 fontSize: '14px',
                 background:
                   uploadNotifications.motifImage.type === 'success' ? '#dcfce7' : '#fef2f2',
-                color:
-                  uploadNotifications.motifImage.type === 'success' ? '#16a34a' : '#dc2626',
+                color: uploadNotifications.motifImage.type === 'success' ? '#16a34a' : '#dc2626',
                 border: `1px solid ${
                   uploadNotifications.motifImage.type === 'success' ? '#bbf7d0' : '#fecaca'
                 }`,
@@ -642,6 +670,46 @@ export const ProductForm: React.FC<ProductFormProps> = ({
           ))}
           <Button type="button" onClick={onAppenedBox}>
             + Добавить аксессуар
+          </Button>
+        </FormGroup>
+
+        <FormGroup $fullWidth>
+          <Label>Ключевые особенности</Label>
+          {keyFeaturesFields.map((field, index) => {
+            const featureError = keyFeaturesErrors?.[index]?.message;
+
+            return (
+              <div
+                key={field.id}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px',
+                  marginBottom: '12px',
+                }}
+              >
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <Input
+                    {...register(`keyFeatures.${index}` as const)}
+                    placeholder="Например: До 60 минут автономной работы"
+                    disabled={loading}
+                    style={{ flex: 1 }}
+                  />
+                  <Button
+                    type="button"
+                    $variant="secondary"
+                    onClick={() => handleRemoveKeyFeature(index)}
+                    disabled={keyFeaturesFields.length <= 1}
+                  >
+                    Удалить
+                  </Button>
+                </div>
+                {featureError && <ErrorMessage>{featureError}</ErrorMessage>}
+              </div>
+            );
+          })}
+          <Button type="button" onClick={onAppendKeyFeature}>
+            + Добавить особенность
           </Button>
         </FormGroup>
 

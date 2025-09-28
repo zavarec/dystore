@@ -1,4 +1,4 @@
-import { boolean, number, object, string } from 'yup';
+import { array, boolean, number, object, string } from 'yup';
 
 // что реально редактируется в форме
 type BoxItemForm = {
@@ -40,6 +40,7 @@ export type ProductFormValues = {
 
   boxItems?: BoxItemForm[];
   specs?: SpecItemForm[];
+  keyFeatures?: string[];
 };
 
 const urlOrRelative = string()
@@ -78,6 +79,10 @@ export const productSchema = object({
   imageUrl: urlOrRelative.optional(),
   dimensionsImageUrl: string().url('Введите корректный URL').optional(),
   isFeatured: boolean().optional(),
+  keyFeatures: array()
+    .of(string().trim().max(200, 'Максимум 200 символов'))
+    .compact(value => !value || value.length === 0)
+    .optional(),
 });
 
 export type ApiSpec = {
@@ -95,7 +100,7 @@ export type ApiSpec = {
 export function specsToForm(specs: ApiSpec[]) {
   return specs.map(s => {
     // берём значение из того поля, которое не null
-    let value: any = '';
+    let value: string | number | boolean = '';
     if (s.valueString != null) value = s.valueString;
     else if (s.valueNumber != null) value = s.valueNumber;
     else if (s.valueBool != null) value = s.valueBool;
