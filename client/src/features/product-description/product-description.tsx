@@ -61,9 +61,9 @@ export const ProductDescription: React.FC<ProductDescriptionProps> = ({
         <Collapse id={regionId} aria-hidden={!isOpen} $open={isOpen} role="region">
           <CollapseInner isOpen={isOpen}>
             <Body>
-              {content.map((paragraph, idx) => (
-                <Paragraph key={idx}>{paragraph}</Paragraph>
-              ))}
+              {description
+                ? description
+                : content.map((paragraph, idx) => <Paragraph key={idx}>{paragraph}</Paragraph>)}
             </Body>
           </CollapseInner>
         </Collapse>

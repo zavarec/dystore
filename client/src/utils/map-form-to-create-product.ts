@@ -1,8 +1,6 @@
 import type { ProductFormValues } from '@/components/admin/forms/product-form/product-form.schema';
 import type { CreateProductDto, KeyFeatureDto, SpecItemDto } from '@/types/models/product.model';
 
-const spreadIf = <T extends object>(c: boolean, o: T) => (c ? o : {});
-
 const isRemovable = (v: unknown): boolean => {
   if (v === null || v === undefined) return true;
   if (typeof v === 'string' && v.trim() === '') return true;
@@ -14,13 +12,14 @@ const isRemovable = (v: unknown): boolean => {
 const compactDeep = <T>(input: T): T => {
   if (Array.isArray(input)) {
     const arr = input.map(compactDeep).filter(v => !isRemovable(v));
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-expect-error
     return arr;
   }
   if (input && typeof input === 'object') {
     const out: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(input)) {
-      const vv = compactDeep(v as any);
+      const vv = compactDeep(v as unknown);
       if (!isRemovable(vv)) out[k] = vv;
     }
     return out as T;
