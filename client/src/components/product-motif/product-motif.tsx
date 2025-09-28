@@ -1,6 +1,6 @@
-import React from 'react';
-import { Wrap } from './product-motif.style';
 import Image from 'next/image';
+
+import { Wrap } from './product-motif.style';
 
 type Props = {
   src?: string | null;

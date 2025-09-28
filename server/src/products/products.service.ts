@@ -179,7 +179,14 @@ export class ProductsService {
   async create(
     createProductDto: CreateProductDto,
   ): Promise<ProductWithDetails> {
-    const { boxItems, specs, slug, ...productData } = createProductDto;
+    const {
+      boxItems,
+      specs,
+      slug,
+      keyFeatures,
+      marketingNote,
+      ...productData
+    } = createProductDto;
 
     // Проверка категории
     const category = await this.categoriesService.findOne(
@@ -271,10 +278,27 @@ export class ProductsService {
           }
         }
 
+        if (Array.isArray(keyFeatures) && keyFeatures.length) {
+          const rows: Prisma.ProductKeyFeatureCreateManyInput[] = keyFeatures
+            .map((k, i) => ({
+              productId: productRecord.id,
+              text: (k.text ?? "").trim(),
+              footnote: k.footnote ?? null,
+              order: Number.isFinite(k.order as any) ? (k.order as number) : i,
+            }))
+            .filter((r) => r.text.length > 0); // отсекаем пустые строки
+
+          if (rows.length) {
+            await transaction.productKeyFeature.createMany({ data: rows });
+          }
+        }
+
         const full = await transaction.product.findUnique({
           where: { id: productRecord.id },
           include: {
             motif: true, // <— ДОбАВЛЕНО
+            keyFeatures: { orderBy: { order: "asc" } },
+
             category: true,
             boxItems: {
               include: { accessory: true },
@@ -294,7 +318,8 @@ export class ProductsService {
   }
 
   async update(id: number, updateProductDto: UpdateProductDto) {
-    const { boxItems, specs, slug, ...productPatch } = updateProductDto;
+    const { boxItems, specs, slug, keyFeatures, ...productPatch } =
+      updateProductDto;
 
     // валидируем категорию, если меняется
     if (typeof updateProductDto.categoryId === "number") {
@@ -452,6 +477,26 @@ export class ProductsService {
             await tx.productSpec.createMany({ data: toInsert });
           }
         }
+      }
+
+      if (keyFeatures !== undefined) {
+        // если поле присутствует в PATCH — полностью заменяем список
+        await tx.productKeyFeature.deleteMany({ where: { productId: id } });
+
+        if (Array.isArray(keyFeatures) && keyFeatures.length) {
+          const rows: Prisma.ProductKeyFeatureCreateManyInput[] = keyFeatures
+            .map((k, i) => ({
+              productId: id,
+              text: (k.text ?? "").trim(),
+              footnote: k.footnote ?? null,
+              order: Number.isFinite(k.order as any) ? (k.order as number) : i,
+            }))
+            .filter((r) => r.text.length > 0);
+
+          if (rows.length)
+            await tx.productKeyFeature.createMany({ data: rows });
+        }
+        // если пришёл пустой массив — просто остаёмся без буллетов
       }
 
       // 6) вернуть с релейшенами

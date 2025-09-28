@@ -4,21 +4,20 @@ export const Wrap = styled.div`
   display: inline-flex;
   align-items: center;
 
-  /* фиксируем высоту на брейкпоинтах, ширина авто */
   img {
-    display: block;
-    height: 20px; /* xs */
     width: auto;
+    height: 3.25rem;
   }
 
   @media (min-width: 768px) {
     img {
       height: 24px;
-    } /* md */
+    }
   }
   @media (min-width: 1200px) {
     img {
       height: 28px;
-    } /* lg (как у Dyson) */
+      height: 3.25rem;
+    }
   }
 `;

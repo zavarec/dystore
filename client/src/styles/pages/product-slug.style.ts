@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 
-import { tokens, commonStyles } from '../shared';
 import { media } from '../breakpoints';
+import { tokens, commonStyles } from '../shared';
 
 export const ProductPageContainer = styled.div`
   ${commonStyles.container};
@@ -297,4 +297,35 @@ export const ProductInfoWithImageWrapperStyled = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: 40px;
   align-items: start;
+
+  ${media.down('tablet')} {
+    display: flex;
+    flex-direction: column;
+    padding: 40px var(--page-gutter);
+  }
+`;
+
+export const ProductMotifMobileWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+  justify-content: flex-start;
+
+  img {
+    max-width: 90%;
+    height: auto;
+  }
+
+  ${media.up('tablet')} {
+    display: none;
+  }
+`;
+
+export const ProductMotifDesktopWrapper = styled.div`
+  display: none;
+
+  ${media.up('tablet')} {
+    display: flex;
+    margin-bottom: 12px;
+  }
 `;

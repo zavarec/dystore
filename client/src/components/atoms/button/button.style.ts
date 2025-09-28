@@ -121,7 +121,7 @@ export const StyledButton = styled(motion.button, {
 
           &:hover:not(:disabled) {
             background: rgb(107, 162, 36);
-            color: white;
+            color: black;
           }
 
           &:active:not(:disabled) {

@@ -8,16 +8,14 @@ import Image from 'next/image';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import { ButtonVariant } from '@/components/atoms/button/button.style';
+import { ProductMotif } from '@/components/product-motif/product-motif';
 import { Benefits } from '@/components/sections/benefits';
 import { Accessuares } from '@/features/accessuares/accessuares';
 import { AddToCartButton } from '@/features/cart/add-to-cart-button';
 import { AddToCartButtonVariant } from '@/features/cart/add-to-cart-button/add-to-cart-button';
-import { formatPriceRub } from '@/utils/format';
-import { Specifications } from '@/features/specifications/specifications';
-import { fetchPromoForPageSSR } from '@/services/server/promo.server.service';
 import { PromoSlotRenderer } from '@/features/promo-block/promo-slot-renderer';
+import { Specifications } from '@/features/specifications/specifications';
 import { useAppDispatch } from '@/hooks/redux';
-import { ServerProductsService } from '@/services';
 import { fetchCart } from '@/store/slices/cart-slice/cart.thunks';
 import {
   ProductPageContainer,
@@ -31,13 +29,15 @@ import {
   ProductPrice,
   CurrentPrice,
   ProductActions,
-  OutOfStockBadge,
   ProductInfoWithImageWrapperStyled,
+  ProductMotifDesktopWrapper,
+  ProductMotifMobileWrapper,
 } from '@/styles/pages/product-slug.style';
-import type { ProductWithDetails, Product } from '@/types/models/product.model';
+import type { Category } from '@/types/models/category.model';
+import type { ProductWithDetails } from '@/types/models/product.model';
 import type { PromoPlacement } from '@/types/models/promo-placement.model';
-import { PromoPageType } from '@/types/models/promo-placement.model';
 import { PromoSlot } from '@/types/models/promo-section.model';
+import { formatPriceRub } from '@/utils/format';
 import { adaptProductForUI } from '@/utils/product-adapters';
 
 interface ProductPageProps {
@@ -81,6 +81,10 @@ const ProductPage: NextPage<ProductPageProps> = ({ product, placements }) => {
   const categorySlug = getCategorySlug(product.category);
   const isInStock = product.stock > 0;
   const brand = 'Dyson'; // Все продукты Dyson согласно seed данным
+  // const motifSrc = product.motif?.url ?? product.motifUrl ?? null;
+  const motifSrc =
+    'https://s3.twcstorage.ru/49dbf9e8-45b07930-284b-4614-95f5-5a9bdcbd9f92/uploads/24b8f10c-8156-4d51-9b12-88ced0592f53-dyson_cyclone_v10_absolute_motif.png';
+  const motifAlt = product.motif?.storedName ?? `${product.name} motif`;
 
   const canonical = `https://dyson-group.ru/product/${encodeURIComponent(product.slug ?? product.id)}`;
 
@@ -211,7 +215,7 @@ const ProductPage: NextPage<ProductPageProps> = ({ product, placements }) => {
           <BreadcrumbLink href="/">Главная</BreadcrumbLink>
           <span> / </span>
           <BreadcrumbLink href={`/category/${product.category?.slug}`}>
-            {getCategoryName(product.category)}
+            {getCategoryName(product.category ?? '')}
           </BreadcrumbLink>
           <span> / </span>
           {/* <span>{product.name}</span> */}
@@ -219,6 +223,11 @@ const ProductPage: NextPage<ProductPageProps> = ({ product, placements }) => {
 
         <ProductInfoWithImageWrapperStyled>
           <ProductImageSection>
+            {motifSrc && (
+              <ProductMotifMobileWrapper>
+                <ProductMotif src={motifSrc} alt={motifAlt} />
+              </ProductMotifMobileWrapper>
+            )}
             <ProductMainImage>
               <Image
                 src={product.mainImage?.url || ''}
@@ -238,6 +247,11 @@ const ProductPage: NextPage<ProductPageProps> = ({ product, placements }) => {
           </ProductImageSection>
 
           <ProductInfoSection>
+            {motifSrc && (
+              <ProductMotifDesktopWrapper>
+                <ProductMotif src={motifSrc} alt={motifAlt} />
+              </ProductMotifDesktopWrapper>
+            )}
             <ProductTitle>{product.name}</ProductTitle>
 
             {product.shortDescription && (
@@ -258,7 +272,7 @@ const ProductPage: NextPage<ProductPageProps> = ({ product, placements }) => {
               <AddToCartButton
                 productId={product.id}
                 product={product}
-                variant={ButtonVariant.PRIMARY}
+                variant={ButtonVariant.GREEN}
                 size={AddToCartButtonVariant.LARGE}
                 showQuantity={true}
               />
@@ -289,7 +303,7 @@ const ProductPage: NextPage<ProductPageProps> = ({ product, placements }) => {
 };
 
 // Утилита для получения названия категории
-function getCategoryName(category: any): string {
+function getCategoryName(category: Category | string): string {
   if (typeof category === 'object' && category?.name) {
     return category.name;
   }
@@ -359,7 +373,7 @@ export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
       },
       revalidate: 3600,
     };
-  } catch (e) {
+  } catch {
     return { notFound: true, revalidate: 60 };
   }
 };

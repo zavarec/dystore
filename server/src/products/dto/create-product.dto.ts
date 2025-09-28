@@ -10,9 +10,11 @@ import {
   ValidateNested,
   IsBoolean,
   IsUUID,
+  IsArray,
 } from "class-validator";
 import { BoxItemDto } from "./save-box-items.dto";
 import { SpecItemDto } from "./save-specs.dto";
+import { KeyFeatureDto } from "./key-feature.dto";
 
 export class CreateProductDto {
   @IsString({ message: "Название должно быть строкой" })
@@ -80,4 +82,11 @@ export class CreateProductDto {
   @IsString()
   @IsUUID()
   motifId?: string; // id файла
+
+  @IsOptional() @IsString() marketingNote?: string;
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => KeyFeatureDto)
+  keyFeatures?: KeyFeatureDto[];
 }
