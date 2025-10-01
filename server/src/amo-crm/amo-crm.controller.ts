@@ -3,7 +3,7 @@ import { Controller, Get, Query } from "@nestjs/common";
 import { AmoAuthService } from "./amo-auth.service";
 
 @Controller("amocrm")
-export class AmocrmController {
+export class AmoCrmController {
   constructor(private readonly auth: AmoAuthService) {}
 
   @Get("oauth/callback")
