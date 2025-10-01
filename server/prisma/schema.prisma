@@ -101,6 +101,9 @@ model Product {
   marketingNote    String? // "Only from Dyson…"
   keyFeatures      ProductKeyFeature[] // буллеты
 
+  amoCatalogElementId Int?   @unique
+
+
   dimensionsImageUrl String? // картинка габаритов (одна, со “стиком” и “щеткой”)
 
   motifId String? // FK на files.id (uuid)
@@ -245,6 +248,14 @@ model CartItem {
   @@map("cart_items")
 }
 
+enum OrderSource {
+  WEBSITE
+  CHAT_WIDGET
+  TELEGRAM
+  CALL
+  OTHER
+}
+
 // Заказы
 model Order {
   id              Int         @id @default(autoincrement())
@@ -256,12 +267,27 @@ model Order {
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 
+  amoLeadId       Int?
+  amoContactId    Int?
+  amoPipelineId   Int?
+  amoStatusId     Int?
+
+  // Новое:
+  orderNumber     String      @unique
+  source          OrderSource @default(WEBSITE)
+
+  customerName    String?
+  customerEmail   String?
+  customerPhone   String?
+
   // Связи
   user  User        @relation(fields: [userId], references: [id])
   items OrderItem[]
 
   @@index([userId])
   @@index([status])
+  @@index([amoLeadId])
+  @@index([amoContactId])
   @@map("orders")
 }
 

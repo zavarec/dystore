@@ -2,26 +2,44 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  Logger,
 } from "@nestjs/common";
 import { PrismaService } from "../database/prisma.service";
-import { Order, OrderStatus, OrderItem } from "@prisma/client";
+import { Prisma, OrderStatus } from "@prisma/client";
 import { CreateOrderDto } from "./dto/create-order.dto";
 import { CartService } from "../cart/cart.service";
 import { TelegramService } from "../telegram/telegram.service";
+import { AmoOrdersService } from "src/amo-crm/amo-order.service";
 
-type OrderWithItems = Order & {
-  items: (OrderItem & {
-    product: any;
-  })[];
-  user?: any;
-};
+type OrderWithItems = Prisma.OrderGetPayload<{
+  include: {
+    items: {
+      include: {
+        product: true;
+      };
+    };
+    user: true;
+  };
+}>;
+
+function genOrderNumber() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  const rnd = Math.floor(Math.random() * 9000) + 1000;
+  return `${y}${m}${day}-${rnd}`;
+}
 
 @Injectable()
 export class OrdersService {
+  private readonly logger = new Logger(OrdersService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly cartService: CartService,
     private readonly telegramService: TelegramService,
+    private readonly amoOrdersService: AmoOrdersService,
   ) {}
 
   async createOrder(
@@ -67,9 +85,13 @@ export class OrdersService {
       data: {
         userId,
         totalPrice,
+        orderNumber: genOrderNumber(), // <-- обязательное поле
         status: OrderStatus.PENDING,
         deliveryAddress: createOrderDto.deliveryAddress,
         comment: createOrderDto.comment,
+        customerName: createOrderDto.name ?? undefined,
+        customerEmail: createOrderDto.email ?? undefined,
+        customerPhone: createOrderDto.phone ?? undefined,
         items: {
           create: orderItems,
         },
@@ -115,6 +137,42 @@ export class OrdersService {
     const message = lines.join("\n");
     this.telegramService.sendMessage(message).catch(() => undefined);
 
+    // 7) amoCRM (best effort)
+    try {
+      const { leadId, contactId } = await this.amoOrdersService.createOrderLead(
+        {
+          orderId: order.orderNumber,
+          total: order.totalPrice,
+          items: order.items.map((i) => ({
+            productId: String(i.productId),
+            name: i.product?.name ?? `#${i.productId}`,
+            quantity: i.quantity,
+            price: i.priceAtPurchase,
+          })),
+          customer: {
+            name: order.customerName ?? order.user?.name ?? undefined,
+            email: order.customerEmail ?? order.user?.email ?? undefined,
+            phone: order.customerPhone ?? order.user?.phone ?? undefined,
+          },
+          comment: order.comment ?? undefined,
+          deliveryAddress: order.deliveryAddress ?? undefined,
+          source: "website",
+        },
+      );
+
+      await this.prisma.order.update({
+        where: { id: order.id },
+        data: {
+          amoLeadId: leadId,
+          amoContactId: contactId ?? null,
+          amoPipelineId: Number(process.env.AMO_PIPELINE_ID) || null,
+          amoStatusId: Number(process.env.AMO_STATUS_ID) || null,
+        },
+      });
+    } catch (e) {
+      this.logger.error(`amoCRM error: ${(e as any)?.message ?? e}`);
+    }
+
     return order;
   }
 
@@ -127,6 +185,7 @@ export class OrdersService {
             product: true,
           },
         },
+        user: true,
       },
       orderBy: { createdAt: "desc" },
     });
@@ -176,6 +235,7 @@ export class OrdersService {
             product: true,
           },
         },
+        user: true,
       },
     });
 
