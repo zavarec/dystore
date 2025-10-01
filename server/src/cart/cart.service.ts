@@ -41,7 +41,16 @@ export class CartService {
       const guestCart = await this.prisma.cart.findFirst({
         where: { token: token, status: CartStatus.ACTIVE },
       });
-      if (guestCart) return { cart: guestCart, createdNew: false };
+      if (guestCart) {
+        if (userId && !guestCart.userId) {
+          const updated = await this.prisma.cart.update({
+            where: { id: guestCart.id },
+            data: { userId },
+          });
+          return { cart: updated, createdNew: false };
+        }
+        return { cart: guestCart, createdNew: false };
+      }
     }
     // 3) иначе создать новую (гостевую или юзерскую)
     const newCart = await this.prisma.cart.create({
@@ -57,7 +66,17 @@ export class CartService {
   }): Promise<CartWithItems | null> {
     return this.prisma.cart.findFirst({
       where: { ...where, status: CartStatus.ACTIVE },
-      include: { items: { include: { product: true } } },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: {
+                mainImage: true,
+              },
+            },
+          },
+        },
+      },
     }) as any;
   }
 
