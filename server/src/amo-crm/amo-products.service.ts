@@ -27,16 +27,16 @@ export class AmoProductsService {
     sku?: string;
     price?: number;
   }) {
+    const skuId = Number(this.cfg.get("AMO_CF_CATALOG_SKU_ID") || 0);
+    const priceId = Number(this.cfg.get("AMO_CF_CATALOG_PRICE_ID") || 0);
+
     const cf: any[] = [];
-    if (params.sku) {
-      cf.push({
-        field_id: 223344, // TODO: заменить на ID поля SKU в каталоге
-        values: [{ value: params.sku }],
-      });
+    if (skuId > 0 && params.sku) {
+      cf.push({ field_id: skuId, values: [{ value: params.sku }] });
     }
-    if (typeof params.price === "number") {
+    if (priceId > 0 && typeof params.price === "number") {
       cf.push({
-        field_id: 223345, // TODO: заменить на ID поля цены в каталоге (если используете кастомное)
+        field_id: priceId,
         values: [{ value: Math.round(params.price) }],
       });
     }
@@ -44,9 +44,10 @@ export class AmoProductsService {
     const payload = [
       {
         name: params.name,
-        custom_fields_values: cf.length ? cf : undefined,
+        ...(cf.length ? { custom_fields_values: cf } : {}), // <-- если cf пуст, ничего не шлём
       },
     ];
+
     const res = await this.http.request<any>({
       url: `catalogs/${this.catalogId}/elements`,
       method: "POST",
