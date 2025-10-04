@@ -1,6 +1,6 @@
+import type { CreateOrderRequest, Order } from '@/types/models/order.model';
+
 import { apiClient } from './api';
-import { CreateOrderRequest } from '@/types/models/order.model';
-import { Order } from '@/types/models/order.model';
 
 export class OrdersService {
   // Создать заказ (требует авторизации)

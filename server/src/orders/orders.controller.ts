@@ -41,7 +41,11 @@ export class OrdersController {
     @Body() createOrderDto: CreateOrderDto,
   ) {
     try {
-      return await this.ordersService.createOrder(user.id, createOrderDto);
+      const cart = await this.ordersService.createOrder(
+        user.id,
+        createOrderDto,
+      );
+      return cart;
     } catch (error) {
       if (error instanceof HttpException) {
         throw error;

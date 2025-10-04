@@ -7,7 +7,7 @@ import {
 import { PrismaService } from "../database/prisma.service";
 import { Prisma, OrderStatus } from "@prisma/client";
 import { CreateOrderDto } from "./dto/create-order.dto";
-import { CartService } from "../cart/cart.service";
+import { CartService, CartWithItems } from "../cart/cart.service";
 import { TelegramService } from "../telegram/telegram.service";
 import { AmoOrdersService } from "src/amo-crm/amo-order.service";
 
@@ -45,9 +45,31 @@ export class OrdersService {
   async createOrder(
     userId: string,
     createOrderDto: CreateOrderDto,
+    cartToken?: string | null,
   ): Promise<OrderWithItems> {
-    // Получаем корзину пользователя
-    const cart = await this.cartService.getCartWithItems({ userId });
+    let cart: CartWithItems | null = null;
+
+    if (userId) {
+      cart = await this.cartService.getCartWithItems({ userId });
+    }
+
+    if (!cart && cartToken) {
+      cart = await this.cartService.getCartWithItems({ token: cartToken });
+      if (cart && userId && !cart.userId) {
+        try {
+          await this.prisma.cart.update({
+            where: { id: cart.id },
+            data: { userId },
+          });
+
+          cart.userId = userId;
+        } catch (e) {
+          this.logger.error(
+            "Failed to attach cart to user: " + String(e?.message),
+          );
+        }
+      }
+    }
 
     if (!cart || !cart.items || cart.items.length === 0) {
       throw new BadRequestException("Корзина пуста");

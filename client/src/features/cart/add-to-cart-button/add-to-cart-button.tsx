@@ -9,6 +9,7 @@ import { ButtonVariant } from '@/components/atoms/button/button.style';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { selectCartItems } from '@/store/slices/cart-slice/cart.selectors';
 import { addToCart } from '@/store/slices/cart-slice/cart.thunks';
+import type { CartItem } from '@/types/models/cart.model';
 import type { Product, ProductWithDetails } from '@/types/models/product.model';
 
 import { AddToCartButtonWrapper, QuantityBadge } from './add-to-cart-button.style';
@@ -49,7 +50,7 @@ export const AddToCartButton: React.FC<AddToCartButtonProps> = ({
 
   // Вычисляем количество только после hydration
   const quantityInCart =
-    cartItems.find((item: any) => item.productId === product.id)?.quantity || 0;
+    cartItems.find((item: CartItem) => item.productId === product.id)?.quantity || 0;
 
   const handleAddToCart = async () => {
     const isInStock = product.stock > 0;

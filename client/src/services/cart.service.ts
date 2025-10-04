@@ -1,17 +1,31 @@
+import type { Cart, CartTotal, AddToCartRequest } from '@/types/models/cart.model';
+
 import { apiClient } from './api';
-import { Cart, CartTotal, AddToCartRequest } from '@/types/models/cart.model';
 
 class CartService {
   // Получить корзину (гость или пользователь)
   static async getCart(): Promise<Cart> {
     const { data } = await apiClient.get<Cart>('/cart');
+
+    console.log(data, 'cartData');
+
     return data;
   }
 
   // Добавить товар (гость или пользователь)
   static async addToCart(data: AddToCartRequest): Promise<Cart> {
-    const { data: res } = await apiClient.post<Cart>('/cart/add', data);
-    return res;
+    try {
+      const payload: AddToCartRequest = {
+        productId: data.productId,
+        quantity: data.quantity,
+      };
+      const response = await apiClient.post<Cart>('/cart/add', payload);
+
+      return response.data;
+    } catch (error) {
+      console.error('Cart add error:', error);
+      throw error;
+    }
   }
 
   // Удалить товар (гость или пользователь)

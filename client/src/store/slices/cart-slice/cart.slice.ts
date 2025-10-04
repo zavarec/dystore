@@ -1,8 +1,11 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
-import { LoadingState } from '@/types/common';
+import type { LoadingState } from '@/types/common';
+import type { Cart } from '@/types/models/cart.model';
+
+import type { PayloadAction } from '@reduxjs/toolkit';
+
 import { fetchCart, addToCart, removeFromCart, fetchCartTotal, clearCart } from './cart.thunks';
-import { Cart } from '@/types/models/cart.model';
 
 interface CartState extends LoadingState {
   cart: Cart | null;

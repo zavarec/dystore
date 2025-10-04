@@ -2,6 +2,7 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  Logger,
 } from "@nestjs/common";
 import { PrismaService } from "../database/prisma.service";
 import { Cart, CartItem } from "@prisma/client";
@@ -9,7 +10,7 @@ import { AddToCartDto } from "./dto/add-to-cart.dto";
 import { ProductsService } from "../products/products.service";
 import { CartStatus } from "@prisma/client";
 
-type CartWithItems = Cart & {
+export type CartWithItems = Cart & {
   items: (CartItem & {
     product: any;
   })[];
@@ -19,6 +20,8 @@ type Identity = { userId?: string | null; token?: string | null };
 
 @Injectable()
 export class CartService {
+  private readonly logger = new Logger(CartService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly productsService: ProductsService,
@@ -29,33 +32,62 @@ export class CartService {
   ): Promise<{ cart: Cart; createdNew: boolean }> {
     const { userId, token } = opts ?? {};
 
-    // 1) если есть userId — пробуем его активную корзину
-    if (userId) {
-      const userCart = await this.prisma.cart.findFirst({
-        where: { userId: userId, status: CartStatus.ACTIVE },
-      });
-      if (userCart) return { cart: userCart, createdNew: false };
-    }
-    // 2) если есть токен гостя — вернуть
     if (token) {
-      const guestCart = await this.prisma.cart.findFirst({
-        where: { token: token, status: CartStatus.ACTIVE },
+      const existingByToken = await this.prisma.cart.findFirst({
+        where: { token, status: CartStatus.ACTIVE },
+        include: {
+          items: { include: { product: { include: { mainImage: true } } } },
+        },
       });
-      if (guestCart) {
-        if (userId && !guestCart.userId) {
-          const updated = await this.prisma.cart.update({
-            where: { id: guestCart.id },
-            data: { userId },
-          });
-          return { cart: updated, createdNew: false };
+
+      if (existingByToken) {
+        // Если пользователь авторизован и корзина не привязана — привяжем
+        if (userId && !existingByToken.userId) {
+          try {
+            await this.prisma.cart.update({
+              where: { id: existingByToken.id },
+              data: { userId },
+            });
+            existingByToken.userId = userId;
+          } catch (e) {
+            this.logger.error(
+              "[cartService.getOrCreateCart] failed to attach cart",
+              e,
+            );
+          }
         }
-        return { cart: guestCart, createdNew: false };
+
+        return { cart: existingByToken, createdNew: false };
       }
     }
-    // 3) иначе создать новую (гостевую или юзерскую)
+
+    // 2) если есть userId — пробуем его активную корзину
+    if (userId) {
+      const existingByUser = await this.prisma.cart.findFirst({
+        where: { userId, status: CartStatus.ACTIVE },
+        include: {
+          items: { include: { product: { include: { mainImage: true } } } },
+        },
+      });
+      if (existingByUser) {
+        this.logger.log("[cartService.getOrCreateCart] found cart by userId", {
+          id: existingByUser.id,
+        });
+        return { cart: existingByUser, createdNew: false };
+      }
+    }
+    const newToken = token ?? ""; // genCartToken() — ваша функция генерации token
     const newCart = await this.prisma.cart.create({
-      data: { userId: userId ?? null }, // token сгенерируется автоматически
+      data: {
+        userId: userId ?? null,
+        token: newToken,
+        status: CartStatus.ACTIVE,
+      },
+      include: {
+        items: { include: { product: { include: { mainImage: true } } } },
+      },
     });
+
     return { cart: newCart, createdNew: true };
   }
 
@@ -64,20 +96,21 @@ export class CartService {
     token?: string;
     userId?: string;
   }): Promise<CartWithItems | null> {
-    return this.prisma.cart.findFirst({
+    const cart = await this.prisma.cart.findFirst({
       where: { ...where, status: CartStatus.ACTIVE },
       include: {
         items: {
           include: {
-            product: {
-              include: {
-                mainImage: true,
-              },
-            },
+            product: { include: { mainImage: true } },
           },
         },
       },
-    }) as any;
+    });
+
+    // Сериализуем в plain object — часто помогает если Prisma возвращает прокси
+    const plainCart = cart ? JSON.parse(JSON.stringify(cart)) : null;
+
+    return plainCart as any;
   }
 
   async addToCartByIdentity(

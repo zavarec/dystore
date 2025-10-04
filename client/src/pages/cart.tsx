@@ -1,16 +1,26 @@
 import { useState } from 'react';
+
 import dynamic from 'next/dynamic';
 import Head from 'next/head';
 import Image from 'next/image';
 import Link from 'next/link';
-import { toast } from 'react-toastify';
 import { useRouter } from 'next/router';
+
+import { toast } from 'react-toastify';
 
 import { Button } from '@/components/atoms/button';
 import { ButtonVariant } from '@/components/atoms/button/button.style';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { CartService, OrdersService } from '@/services';
-
+import { selectIsAuthenticated } from '@/store/slices/auth-slice/auth.selectors';
+import {
+  selectCartItems,
+  selectCartTotalItems,
+  selectCartTotalPrice,
+} from '@/store/slices/cart-slice/cart.selectors';
+import { setQuantity } from '@/store/slices/cart-slice/cart.slice';
+import { clearCart, removeFromCart } from '@/store/slices/cart-slice/cart.thunks';
+import { setAuthModalOpen } from '@/store/slices/uiSlice';
 import {
   CartPageContainer,
   CartHeader,
@@ -34,20 +44,8 @@ import {
   EmptyCartDescription,
   CartItem,
 } from '@/styles/pages/cart.style';
-
-import {
-  selectCartItems,
-  selectCartTotalItems,
-  selectCartTotalPrice,
-} from '@/store/slices/cart-slice/cart.selectors';
-
-import { clearCart, removeFromCart } from '@/store/slices/cart-slice/cart.thunks';
-
+import type { CartItem as CartItemType } from '@/types/models/cart.model';
 import { formatNumberRu } from '@/utils/format';
-import { CartItem as CartItemType } from '@/types/models/cart.model';
-import { setQuantity } from '@/store/slices/cart-slice/cart.slice';
-import { selectIsAuthenticated } from '@/store/slices/auth-slice/auth.selectors';
-import { setAuthModalOpen } from '@/store/slices/uiSlice';
 
 const CartPage: React.FC = () => {
   const router = useRouter();
@@ -106,7 +104,10 @@ const CartPage: React.FC = () => {
     try {
       await Promise.all(
         cartItems.map((item: CartItemType) =>
-          CartService.addToCart({ productId: item.productId, quantity: item.quantity }),
+          CartService.addToCart({
+            productId: item.productId,
+            quantity: item.quantity,
+          }),
         ),
       );
 
@@ -163,8 +164,6 @@ const CartPage: React.FC = () => {
       </>
     );
   }
-
-// const imageUrl = 
 
   return (
     <>

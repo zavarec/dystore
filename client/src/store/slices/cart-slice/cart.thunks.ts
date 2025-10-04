@@ -1,6 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
+
 import { CartService } from '@/services';
-import { AddToCartRequest } from '@/types/models/cart.model';
+import type { AddToCartRequest } from '@/types/models/cart.model';
 
 // Получить корзину
 export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, { rejectWithValue }) => {

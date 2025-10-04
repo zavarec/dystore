@@ -1,4 +1,3 @@
-// src/cart/cart.controller.ts
 import {
   Controller,
   Get,
@@ -22,6 +21,7 @@ import {
 import { CartService } from "./cart.service";
 import { AddToCartDto } from "./dto/add-to-cart.dto";
 import { JwtAuthGuard } from "../common/guards/jwt-auth.guard";
+import { OptionalJwtAuthGuard } from "../common/guards/optional-jwt-auth.guard";
 import { CurrentUser } from "../common/decorators/current-user.decorator";
 import { User } from "@prisma/client";
 import { CART_COOKIE, CART_COOKIE_OPTS } from "src/constants/cart.constant";
@@ -34,6 +34,7 @@ export class CartController {
   @ApiOperation({ summary: "Get cart (guest or user)" })
   @ApiResponse({ status: 200 })
   @Get()
+  @UseGuards(OptionalJwtAuthGuard)
   async getCart(
     @Req() req: any,
     @Res({ passthrough: true }) res: any,
@@ -53,6 +54,7 @@ export class CartController {
   @ApiOperation({ summary: "Add item (guest or user)" })
   @ApiResponse({ status: 200 })
   @Post("add")
+  @UseGuards(OptionalJwtAuthGuard)
   async addToCart(
     @Req() req: any,
     @Res({ passthrough: true }) res: any,
@@ -65,6 +67,7 @@ export class CartController {
         userId: user?.id,
         token,
       });
+
       if (!token || createdNew)
         res.cookie(CART_COOKIE, cart.token, CART_COOKIE_OPTS);
       return this.cartService.addToCartByIdentity(
@@ -83,6 +86,7 @@ export class CartController {
   @ApiOperation({ summary: "Remove item (guest or user)" })
   @ApiResponse({ status: 200 })
   @Delete("remove/:productId")
+  @UseGuards(OptionalJwtAuthGuard)
   async removeFromCart(
     @Req() req: any,
     @CurrentUser() user: User | undefined,
@@ -97,6 +101,7 @@ export class CartController {
 
   // total можно без авторизации
   @ApiOperation({ summary: "Get cart total (guest or user)" })
+  @UseGuards(OptionalJwtAuthGuard)
   @Get("total")
   async getCartTotal(@Req() req: any, @CurrentUser() user?: User) {
     const token: string | undefined = req.cookies?.[CART_COOKIE];
