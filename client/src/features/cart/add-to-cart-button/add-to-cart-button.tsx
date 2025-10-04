@@ -4,8 +4,6 @@ import { toast } from 'react-toastify';
 
 import { Button } from '@/components/atoms/button';
 import { ButtonVariant } from '@/components/atoms/button/button.style';
-
-// Заменить импорты
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { selectCartItems } from '@/store/slices/cart-slice/cart.selectors';
 import { addToCart } from '@/store/slices/cart-slice/cart.thunks';
