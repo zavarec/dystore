@@ -43,7 +43,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       getSetCookie?: () => string[];
       raw?: () => Record<string, string[]>;
     };
-    const setCookies = headersAny.getSetCookie?.() ?? headersAny.raw?.()['set-cookie'] ?? [];
+    const rawCookies = headersAny.raw?.();
+    const setCookies = headersAny.getSetCookie?.() ?? rawCookies?.['set-cookie'] ?? [];
 
     if (setCookies.length === 0) {
       const token: string | undefined = data?.access_token || data?.accessToken;

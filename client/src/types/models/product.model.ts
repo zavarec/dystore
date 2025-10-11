@@ -158,6 +158,7 @@ export interface CreateProductDto {
   /** ID motif-изображения */
   motifId?: string;
   motifUrl?: string;
+  motif?: { id: string; url: string; mimetype: string; storedName: string } | null;
 
   /** Ключевые особенности */
   keyFeatures?: KeyFeatureDto[];

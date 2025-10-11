@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { requireCsrf } from '@/lib/csrf';
 
 const BACKEND_API_URL = process.env.API_URL_SERVER || 'api/proxy';
@@ -42,7 +43,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       getSetCookie?: () => string[];
       raw?: () => Record<string, string[]>;
     };
-    const setCookies = headersAny.getSetCookie?.() ?? headersAny.raw?.()['set-cookie'] ?? [];
+    const rawCookies = headersAny.raw?.();
+    const setCookies = headersAny.getSetCookie?.() ?? rawCookies?.['set-cookie'] ?? [];
 
     if (setCookies.length === 0) {
       const token: string | undefined = data?.access_token;
@@ -57,7 +59,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     return res.status(200).json({ success: true });
-  } catch (error: any) {
-    return res.status(500).json({ message: error?.message || 'Internal Server Error' });
+  } catch (error: unknown) {
+    if (error instanceof Error)
+      return res.status(500).json({ message: error?.message || 'Internal Server Error' });
   }
 }

@@ -53,7 +53,7 @@ const getProductImage = (product: ProductWithDetails): string => {
   return product.images?.[0]?.url || '/images/placeholder.webp';
 };
 
-const getCategorySlug = (category: any): string => {
+const getCategorySlug = (category?: Category): string => {
   if (typeof category === 'object' && category?.name) {
     return category.name.toLowerCase().replace(/\s+/g, '-');
   }
@@ -136,7 +136,7 @@ const ProductPage: NextPage<ProductPageProps> = ({ product, placements }) => {
       {
         '@type': 'ListItem',
         position: 2,
-        name: getCategoryName(product.category),
+        name: getCategoryName(product.category ?? ''),
         item: `https://dyson-group.ru/category/${categorySlug}`,
       },
       {
@@ -319,7 +319,7 @@ function getCategoryName(category: Category | string): string {
   return 'Товары';
 }
 
-export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
+export const getStaticPaths: GetStaticPaths = async () => {
   // На билде не ходим в API: пусто + fallback
   return { paths: [], fallback: 'blocking' };
 };
@@ -339,7 +339,9 @@ export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
     try {
       const r2 = await fetch(`${apiBase}/products/id/${encodeURIComponent(bySlug.id)}`);
       if (r2.ok) productRaw = await r2.json();
-    } catch {}
+    } catch (error: unknown) {
+      console.error(error);
+    }
 
     const entitySlug = (bySlug.slug ?? slug) as string;
     const entityId = String(bySlug.id ?? '');

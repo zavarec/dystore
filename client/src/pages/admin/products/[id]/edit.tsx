@@ -1,10 +1,11 @@
-import React from 'react';
-import { GetServerSideProps, NextPage } from 'next';
+import type { GetServerSideProps, NextPage } from 'next';
+
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
-import { useEditProduct } from '@/hooks/useEditProduct';
-import { AdminLayout } from '@/components/admin/layout/admin-layout';
 import { ProductForm } from '@/components/admin/forms/product-form/product-form';
+import { AdminLayout } from '@/components/admin/layout/admin-layout';
+import { withManager } from '@/features/auth/with-manager';
+import { useEditProduct } from '@/hooks/useEditProduct';
 
 interface EditProductPageProps {
   productId: string;
@@ -34,6 +35,4 @@ export const getServerSideProps: GetServerSideProps = async ({ locale, params })
     },
   };
 };
-
-import { withManager } from '@/features/auth/with-manager';
 export default withManager<EditProductPageProps>(EditProductPage);
