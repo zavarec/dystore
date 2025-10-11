@@ -45,9 +45,11 @@ const cartSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(fetchCart.fulfilled, (state, action) => {
+      .addCase(fetchCart.fulfilled, (state, { payload }) => {
         state.isLoading = false;
-        state.cart = action.payload;
+        if (payload) {
+          state.cart = payload;
+        }
       })
       .addCase(fetchCart.rejected, (state, action) => {
         state.isLoading = false;

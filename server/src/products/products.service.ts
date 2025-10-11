@@ -23,11 +23,41 @@ type ProductWithDetails = Prisma.ProductGetPayload<{
   };
 }>;
 
+type ProductWithDetailsExtended = ProductWithDetails & {
+  motifUrl: string | null;
+};
+
 function toNull<T>(v: T | null | undefined): T | null {
   if (v == null) return null;
   if (typeof v === "string" && v.trim() === "") return null;
   return v as T;
 }
+
+const mapBoxItems = (
+  boxItems: ProductWithDetails["boxItems"],
+) =>
+  boxItems.map((b) => ({
+    id: b.id,
+    productId: b.productId,
+    accessoryId: b.accessoryId,
+    customName: b.customName,
+    description: b.description,
+    qty: b.qty,
+    order: b.order,
+    customImageId: b.customImageId,
+    customImageUrl: b.customImage?.url ?? null,
+    accessory: b.accessory
+      ? {
+          id: b.accessory.id,
+          name: b.accessory.name,
+          slug: b.accessory.slug,
+          description: b.accessory.description,
+          imageUrl: b.accessory.imageUrl,
+          imageId: b.accessory.imageId,
+        }
+      : null,
+    customImage: b.customImage,
+  }));
 
 @Injectable()
 export class ProductsService {
@@ -56,7 +86,7 @@ export class ProductsService {
     });
   }
 
-  async findOne(id: number): Promise<ProductWithDetails | null> {
+  async findOne(id: number): Promise<ProductWithDetailsExtended | null> {
     const product = await this.prisma.product.findUnique({
       where: { id },
       include: {
@@ -78,40 +108,17 @@ export class ProductsService {
 
     if (!product) return null;
 
-    const boxItems = product.boxItems.map((b) => ({
-      id: b.id,
-      productId: b.productId,
-      accessoryId: b.accessoryId,
-      customName: b.customName,
-      description: b.description,
-      qty: b.qty,
-      order: b.order,
-      customImageId: b.customImageId,
-      customImageUrl: b.customImage?.url ?? null, // <- вот сюда кладём URL из File
-      accessory: b.accessory
-        ? {
-            id: b.accessory.id,
-            name: b.accessory.name,
-            slug: b.accessory.slug,
-            description: b.accessory.description,
-            imageUrl: b.accessory.imageUrl,
-            imageId: b.accessory.imageId,
-          }
-        : null,
-      customImage: b.customImage,
-    }));
-
-    const productRow = {
+    return {
       ...product,
-      boxItems: boxItems,
+      boxItems: mapBoxItems(product.boxItems),
       motifUrl: product.motif?.url ?? null,
-    };
-
-    return productRow;
+    } satisfies ProductWithDetailsExtended;
   }
 
-  async findBySlug(slug: string): Promise<ProductWithDetails | null> {
-    return this.prisma.product.findUnique({
+  async findBySlug(
+    slug: string,
+  ): Promise<ProductWithDetailsExtended | null> {
+    const product = await this.prisma.product.findUnique({
       where: { slug },
       include: {
         motif: true,
@@ -129,6 +136,14 @@ export class ProductsService {
         },
       },
     });
+
+    if (!product) return null;
+
+    return {
+      ...product,
+      boxItems: mapBoxItems(product.boxItems),
+      motifUrl: product.motif?.url ?? null,
+    } satisfies ProductWithDetailsExtended;
   }
 
   async findByCategory(categoryId: number): Promise<ProductWithDetails[]> {

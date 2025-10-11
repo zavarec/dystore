@@ -1,10 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { useState, useEffect } from 'react';
+
 import { useRouter } from 'next/router';
-import { useAppDispatch, useAppSelector } from '@/hooks/redux';
-import { clearError } from '@/store/slices/auth-slice/auth.slice';
+
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Controller, useForm } from 'react-hook-form';
+
 import { Button } from '@/components/atoms/button';
+import { PhoneInput } from '@/components/atoms/phone-input/phone-input';
+import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+import {
+  selectCanResendCodeAt,
+  selectCodeSent,
+  selectCodeSentTo,
+  selectError,
+  selectIsAuthenticated,
+  selectIsLoading,
+} from '@/store/slices/auth-slice/auth.selectors';
+import { clearError } from '@/store/slices/auth-slice/auth.slice';
+import { sendCode, verifyCode } from '@/store/slices/auth-slice/auth.thunks';
+
+import { codeValidationSchema, phoneValidationSchema } from './phone-auth-form.schema';
 import {
   AuthFormTitle,
   AuthFormSubtitle,
@@ -16,18 +31,6 @@ import {
   ResendButton,
   TimerText,
 } from './phone-auth-form.style';
-import { codeValidationSchema, phoneValidationSchema } from './phone-auth-form.schema';
-import { sendCode, verifyCode } from '@/store/slices/auth-slice/auth.thunks';
-import {
-  selectCanResendCodeAt,
-  selectCodeSent,
-  selectCodeSentTo,
-  selectError,
-  selectIsAuthenticated,
-  selectIsLoading,
-} from '@/store/slices/auth-slice/auth.selectors';
-import { PhoneInput } from '@/components/atoms/phone-input/phone-input';
-import { CloseButton } from '../username-auth-form/username-auth-form.style';
 
 interface PhoneFormData {
   phone: string;
@@ -154,19 +157,6 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({ onClose, redirectT
     // Форма ввода номера телефона
     return (
       <div style={{ padding: '24px', position: 'relative' }}>
-        {onClose && (
-          <CloseButton onClick={onClose} aria-label="Закрыть форму авторизации" type="button">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M18 6L6 18M6 6l12 12"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-          </CloseButton>
-        )}
-
         <AuthFormTitle>Вход по номеру телефона</AuthFormTitle>
 
         <AuthFormSubtitle>Введите номер телефона для получения кода подтверждения</AuthFormSubtitle>

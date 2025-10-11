@@ -64,7 +64,6 @@ const ProductPage: NextPage<ProductPageProps> = ({ product, placements }) => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    // Загружаем корзину при монтировании
     dispatch(fetchCart());
   }, [dispatch]);
 
@@ -76,16 +75,12 @@ const ProductPage: NextPage<ProductPageProps> = ({ product, placements }) => {
     );
   }
 
-  // const bySlot = useMemo(() => groupBySlot(placements ?? []), [placements]);
-  // адаптер вынесен в PromoSlot
-
   const imageUrl = getProductImage(product);
   const categorySlug = getCategorySlug(product.category);
   const isInStock = product.stock > 0;
   const brand = 'Dyson'; // Все продукты Dyson согласно seed данным
   const motifSrc = product.motif?.url ?? product.motifUrl ?? null;
-  // const motifSrc =
-  //   'https://s3.twcstorage.ru/49dbf9e8-45b07930-284b-4614-95f5-5a9bdcbd9f92/uploads/24b8f10c-8156-4d51-9b12-88ced0592f53-dyson_cyclone_v10_absolute_motif.png';
+
   const motifAlt = product.motif?.storedName ?? `${product.name} motif`;
 
   const canonical = `https://dyson-group.ru/product/${encodeURIComponent(product.slug ?? product.id)}`;

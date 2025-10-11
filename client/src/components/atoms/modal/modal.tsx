@@ -1,7 +1,8 @@
-// modal.tsx
-import React, { useEffect, useId } from 'react';
-import { createPortal } from 'react-dom';
+import { useEffect, useId } from 'react';
+
 import { AnimatePresence } from 'framer-motion';
+import { createPortal } from 'react-dom';
+
 import {
   ModalOverlay,
   ModalContainer,
@@ -97,7 +98,7 @@ export const Modal: React.FC<ModalProps> = ({
             )}
             <ModalContent $padding={padding}>
               {!title && (
-                <div style={{ position: 'absolute', right: 16, top: 16 }}>
+                <div style={{ position: 'absolute', right: 16, top: 16, zIndex: 1000 }}>
                   <ModalCloseButton onClick={onClose} aria-label="Закрыть">
                     ✕
                   </ModalCloseButton>

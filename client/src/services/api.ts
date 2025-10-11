@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { toast } from 'react-toastify';
 // import { isServer } from '@/utils/ssr';
 
 // Базовый URL API
@@ -25,5 +26,17 @@ apiClient.interceptors.request.use(
 // // ✅ ИСПРАВЛЕНИЕ: Интерцептор для обработки ошибок авторизации с SSR проверками
 apiClient.interceptors.response.use(
   response => response,
-  error => Promise.reject(error),
+  error => {
+    const method = error.config?.method?.toUpperCase();
+    const isMutation = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method ?? '');
+
+    if (isMutation) {
+      const message =
+        error.response?.data?.message || error.message || 'Произошла ошибка при выполнении запроса';
+
+      toast.error(message);
+    }
+
+    return Promise.reject(error);
+  },
 );

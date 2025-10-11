@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { requireCsrf } from '@/lib/csrf';
 
 const BACKEND_API_URL = process.env.API_URL_SERVER || 'http://localhost:3001/api';
@@ -38,17 +39,28 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(response.status).json(data);
     }
 
-    const token: string | undefined = data?.access_token || data?.accessToken;
-    if (!token) {
-      return res.status(500).json({ message: 'Не удалось получить токен' });
+    const headersAny = response.headers as unknown as {
+      getSetCookie?: () => string[];
+      raw?: () => Record<string, string[]>;
+    };
+    const setCookies = headersAny.getSetCookie?.() ?? headersAny.raw?.()['set-cookie'] ?? [];
+
+    if (setCookies.length === 0) {
+      const token: string | undefined = data?.access_token || data?.accessToken;
+      if (!token) {
+        return res.status(500).json({ message: 'Не удалось получить токен' });
+      }
+
+      const maxAge = 60 * 15;
+      res.setHeader('Set-Cookie', buildCookie('access_token', token, maxAge));
+    } else {
+      res.setHeader('Set-Cookie', setCookies);
     }
 
-    // 15 минут по умолчанию
-    const maxAge = 60 * 15;
-    res.setHeader('Set-Cookie', buildCookie('access_token', token, maxAge));
-
     return res.status(200).json({ success: true });
-  } catch (error: any) {
-    return res.status(500).json({ message: error?.message || 'Internal Server Error' });
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ message: error?.message || 'Internal Server Error' });
+    }
   }
 }

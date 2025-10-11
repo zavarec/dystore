@@ -38,14 +38,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(response.status).json(data);
     }
 
-    const token: string | undefined = data?.access_token;
-    if (!token) {
-      return res.status(500).json({ message: 'Не удалось получить токен' });
-    }
+    const headersAny = response.headers as unknown as {
+      getSetCookie?: () => string[];
+      raw?: () => Record<string, string[]>;
+    };
+    const setCookies = headersAny.getSetCookie?.() ?? headersAny.raw?.()['set-cookie'] ?? [];
 
-    // 1 день
-    const maxAge = 60 * 60 * 24;
-    res.setHeader('Set-Cookie', buildCookie('access_token', token, maxAge));
+    if (setCookies.length === 0) {
+      const token: string | undefined = data?.access_token;
+      if (!token) {
+        return res.status(500).json({ message: 'Не удалось получить токен' });
+      }
+
+      const maxAge = 60 * 60 * 24;
+      res.setHeader('Set-Cookie', buildCookie('access_token', token, maxAge));
+    } else {
+      res.setHeader('Set-Cookie', setCookies);
+    }
 
     return res.status(200).json({ success: true });
   } catch (error: any) {
