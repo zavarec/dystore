@@ -4,7 +4,6 @@ import Document, { Html, Head, Main, NextScript } from 'next/document';
 import createEmotionServer from '@emotion/server/create-instance';
 
 import { createEmotionCache } from '@/utils/emotion';
-import { AppType } from 'next/app';
 
 interface MyDocumentProps extends DocumentInitialProps {
   emotionStyleTags: JSX.Element[];
@@ -76,9 +75,7 @@ export default class MyDocument extends Document<MyDocumentProps> {
     })
   `,
             }}
-          >
-            ;
-          </script>
+          />
           <noscript>
             <div>
               <img
