@@ -1,7 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
+
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Category } from '@/types/models/category.model';
+
+import type { Category } from '@/types/models/category.model';
+
 import {
   DropdownContainer,
   DropdownTrigger,

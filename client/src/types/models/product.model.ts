@@ -166,6 +166,8 @@ export interface CreateProductDto {
 }
 
 export interface UpdateProductDto {
+  /** Новый slug продукта */
+  slug?: string;
   /** Новое название продукта */
   name?: string;
   /** Новое описание продукта */

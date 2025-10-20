@@ -53,6 +53,7 @@ export const useEditProduct = (productId: string) => {
         payload.dimensionsImageId = data.dimensionsImageId;
       if (typeof data.isFeatured !== 'undefined' && data.isFeatured)
         payload.isFeatured = Boolean(data.isFeatured);
+      if (typeof data.slug !== 'undefined') payload.slug = data.slug;
 
       if (typeof data.motifId !== 'undefined' && data.motifId) payload.motifId = data.motifId;
       if (typeof data.keyFeatures !== 'undefined') payload.keyFeatures = data.keyFeatures;
@@ -60,6 +61,16 @@ export const useEditProduct = (productId: string) => {
       await ProductsService.updateProduct(parseInt(productId), payload as UpdateProductDto);
       toast.success('Продукт успешно обновлен');
       router.push('/admin/products');
+      const slug = data.slug ?? product?.slug;
+      if (slug) {
+        await fetch(`${process.env.NEXT_PUBLIC_WEB_URL}/api/revalidate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ secret: process.env.REVALIDATE_SECRET, slug }),
+        });
+      } else {
+        console.warn('Product slug is missing, skipping revalidation.');
+      }
     } catch (error: unknown) {
       console.error('Error updating product:', error);
 

@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { GetServerSideProps, NextPage } from 'next';
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { useEffect, useState } from 'react';
+
+import type { GetServerSideProps, NextPage } from 'next';
+
 import Link from 'next/link';
 
-import { ProductsService } from '@/services';
-import { Product } from '@/types/models/product.model';
 import { Pencil, Trash, Plus } from '@phosphor-icons/react';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { toast } from 'react-toastify';
-import { AdminLayout } from '@/components/admin/layout/admin-layout';
 
+import { AdminLayout } from '@/components/admin/layout/admin-layout';
+import { TableRowSkeleton } from '@/components/atoms/skeleton';
+import { withManager } from '@/features/auth/with-manager';
+import { ProductsService } from '@/services';
 import {
   ActionsBar as SActionsBar,
   SearchInput as SSearchInput,
@@ -25,7 +28,7 @@ import {
   Pagination as SPagination,
   PageButton as SPageButton,
 } from '@/styles/pages/admin/admin-products-page.style';
-import { TableRowSkeleton } from '@/components/atoms/skeleton';
+import type { Product } from '@/types/models/product.model';
 
 const AdminProductsPage: NextPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -226,6 +229,4 @@ export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
     },
   };
 };
-
-import { withManager } from '@/features/auth/with-manager';
 export default withManager(AdminProductsPage);
