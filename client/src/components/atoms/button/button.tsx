@@ -1,6 +1,6 @@
-import React from 'react';
+import type { MotionStyle } from 'framer-motion';
+
 import { StyledButton, LoadingSpinner, ButtonVariant } from './button.style';
-import { MotionStyle } from 'framer-motion';
 type NativeButtonProps = React.ComponentProps<typeof StyledButton>;
 
 interface ButtonProps extends Omit<NativeButtonProps, 'variant' | 'size'> {

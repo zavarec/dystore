@@ -2,13 +2,73 @@ import { css } from '@emotion/react';
 
 export const tokens = {
   colors: {
-    primary: '#333333',
-    secondary: '#ECECEC',
-    success: '#28a745',
-    danger: '#dc3545',
-    warning: '#ffc107',
-    info: '#17a2b8',
-    bgSecondary: '#fbfbfb',
+    palette: {
+      black: '#000000',
+      white: '#FFFFFF',
+      gray: {
+        100: '#F9F9F9',
+        200: '#ECECEC',
+        300: '#CCCCCC',
+        400: '#999999',
+        500: '#666666',
+        600: '#333333',
+        700: '#1A1A1A',
+      },
+      green: '#28a745',
+      red: '#dc3545',
+      yellow: '#ffc107',
+      blue: '#17a2b8',
+    },
+
+    semantic: {
+      text: {
+        primary: '#333333',
+        secondary: '#555555',
+        inverse: '#FFFFFF',
+        muted: '#999999',
+      },
+      background: {
+        primary: '#FFFFFF',
+        secondary: '#FBFBFB',
+        surface: '#F5F5F5',
+        inverse: '#242424',
+      },
+      border: {
+        default: '#E0E0E0',
+        strong: '#BDBDBD',
+        inverse: '#444444',
+      },
+      state: {
+        success: '#28a745',
+        danger: '#dc3545',
+        warning: '#ffc107',
+        info: '#17a2b8',
+      },
+    },
+
+    components: {
+      button: {
+        primary: {
+          bg: '#333333',
+          text: '#FFFFFF',
+          hover: '#111111',
+        },
+        secondary: {
+          bg: '#ECECEC',
+          text: '#111111',
+          hover: '#CCCCCC',
+        },
+      },
+      dropdown: {
+        bg: '#242424',
+        border: '#E0E0E0',
+        itemHover: '#F7F7F7',
+      },
+      footerBar: {
+        bg: '#242424',
+        text: '#FFFFFF',
+      },
+    },
   },
   spacing: {
     xs: '8px',
@@ -34,6 +94,13 @@ export const tokens = {
       font-size: 1rem;
       line-height: 1.6;
       font-family: var(--font-nunito-sans);
+    `,
+
+    bodySm: css`
+      font-size: 16px;
+      line-height: 1.5;
+      font-family: var(--font-nunito-sans);
+      color: #555555;
     `,
   },
 };

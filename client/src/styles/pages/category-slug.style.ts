@@ -74,7 +74,7 @@ export const Select = styled.select`
 
   &:focus {
     outline: none;
-    border-color: ${tokens.colors.primary};
+    border-color: ${tokens.colors.semantic.border.inverse};
     box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
   }
 `;
@@ -128,11 +128,11 @@ export const ProductBadge = styled.div<{ type: 'new' | 'popular' | 'sale' }>`
   background: ${props => {
     switch (props.type) {
       case 'new':
-        return tokens.colors.success;
+        return tokens.colors.semantic.state.success;
       case 'popular':
-        return tokens.colors.primary;
+        return tokens.colors.semantic.text.primary;
       case 'sale':
-        return tokens.colors.danger;
+        return tokens.colors.semantic.state.danger;
       default:
         return '#6c757d';
     }

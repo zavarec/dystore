@@ -1,5 +1,8 @@
 import styled from '@emotion/styled';
+
 import { commonStyles, tokens } from '../shared';
+
+const { colors } = tokens;
 
 export const CartPageContainer = styled.div`
   ${commonStyles.container};
@@ -69,7 +72,7 @@ export const ItemName = styled.div`
     transition: color 0.2s ease;
 
     &:hover {
-      color: ${tokens.colors.primary};
+      color: ${colors.semantic.text.primary};
     }
   }
 `;
@@ -83,7 +86,7 @@ export const ItemDescription = styled.div`
 export const ItemPrice = styled.div`
   font-size: 20px;
   font-weight: 600;
-  color: ${tokens.colors.primary};
+  color: ${colors.semantic.text.primary};
 `;
 
 export const QuantityControls = styled.div`
@@ -111,7 +114,7 @@ export const QuantityButton = styled.button`
 
   &:hover:not(:disabled) {
     background: #e9ecef;
-    color: ${tokens.colors.primary};
+    color: ${colors.semantic.text.primary};
   }
 
   &:disabled {
@@ -150,9 +153,9 @@ export const RemoveButton = styled.button`
   width: 40px;
   height: 40px;
   border-radius: 8px;
-  border: 1px solid ${tokens.colors.danger};
+  border: 1px solid ${colors.semantic.state.danger};
   background: white;
-  color: ${tokens.colors.danger};
+  color: ${colors.semantic.state.danger};
   font-size: 18px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -161,7 +164,7 @@ export const RemoveButton = styled.button`
   justify-content: center;
 
   &:hover:not(:disabled) {
-    background: ${tokens.colors.danger};
+    background: ${colors.semantic.state.danger};
     color: white;
   }
 
@@ -250,7 +253,7 @@ export const EmptyCartDescription = styled.p`
 
 export const ContinueShoppingButton = styled.button`
   ${commonStyles.button};
-  background: ${tokens.colors.primary};
+  background: ${colors.semantic.text.primary};
   color: white;
   font-size: 16px;
   display: inline-block;

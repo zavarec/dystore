@@ -2,7 +2,6 @@ import createCache from '@emotion/cache';
 
 const isBrowser = typeof document !== 'undefined';
 
-// Создание кэша для Emotion - потому что стили должны быть быстрыми как Dyson
 export function createEmotionCache() {
   let insertionPoint: HTMLElement | undefined;
 

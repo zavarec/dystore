@@ -16,7 +16,8 @@ export const DropdownTrigger = styled.button<{
   font-size: 16px;
   position: relative;
   padding: 32px 18px 24px 18px;
-  background: ${props => (props.$isActive ? 'rgba(255, 255, 255, 0.1)' : 'transparent')};
+
+  background: ${props => (props.$isActive ? '#242424' : 'transparent')};
   border: none;
   border-bottom: 1px solid transparent; /* фиксируем высоту */
   cursor: pointer;

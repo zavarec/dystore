@@ -1,4 +1,4 @@
-import { ContactSupport } from '@/components/sections/support/contact-support';
+import { ContactsBar } from '@/features/contacts-bar/contacts-bar';
 
 import {
   FooterContainer,
@@ -38,6 +38,8 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
               <br />
               📧 dyson-group@yandex.com
             </FooterText>
+
+            <ContactsBar />
           </FooterSection>
 
           <FooterContentWrapper>
@@ -49,15 +51,15 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
               <FooterLink href="/category/accessories">Аксессуары</FooterLink>
             </FooterSection>
 
-            {/* <FooterSection> */}
-            {/* <h3>Покупателям</h3> */}
-            {/* Неактивные ссылки закомментированы до появления страниц */}
-            {/* <FooterLink href="/delivery">Доставка</FooterLink> */}
-            {/* <FooterLink href="/payment">Оплата</FooterLink> */}
-            {/* <FooterLink href="/warranty">Гарантия</FooterLink> */}
-            {/* <FooterLink href="/returns">Возврат</FooterLink> */}
-            {/* <FooterLink href="/service">Сервис</FooterLink> */}
-            {/* </FooterSection> */}
+            <FooterSection>
+              <h3>Покупателям</h3>
+
+              <FooterLink href="/delivery">Доставка</FooterLink>
+              {/* <FooterLink href="/payment">Оплата</FooterLink> */}
+              <FooterLink href="/warranty">Гарантия</FooterLink>
+              <FooterLink href="/returns">Возврат</FooterLink>
+              {/* <FooterLink href="/service">Сервис</FooterLink> */}
+            </FooterSection>
 
             <FooterSection>
               <h3>О компании</h3>

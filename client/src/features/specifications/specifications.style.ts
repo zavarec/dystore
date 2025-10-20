@@ -12,7 +12,7 @@ export const SpecsSection = styled.section`
 export const SpecsHeader = styled.h2`
   ${tokens.typography.h2};
   margin: 0 0 24px;
-  color: #222;
+  color: ${tokens.colors.palette.black};
 `;
 
 export const SpecsWrapper = styled.ul`
@@ -43,7 +43,7 @@ export const SpecLabel = styled.div`
   font-size: 1rem;
   line-height: 1.5rem;
   font-weight: 500;
-  color: #6a6a6a;
+  color: ${tokens.colors.semantic.text.secondary};
   letter-spacing: 0.2px;
   margin-bottom: auto;
 
@@ -63,7 +63,8 @@ export const SpecValueRow = styled.div`
 export const SpecValue = styled.span`
   ${tokens.typography.body};
   font-size: 1.5rem;
-  color: #111;
+  color: ${tokens.colors.semantic.text.primary};
+
   /* white-space: nowrap; */
 
   /* две строки максимум, остальное обрежем */
@@ -76,7 +77,7 @@ export const SpecValue = styled.span`
 export const SpecUnit = styled.span`
   ${tokens.typography.body};
   font-size: 1.5rem;
-  color: #6a6a6a;
+  color: ${tokens.colors.semantic.text.primary};
 `;
 
 export const GroupTitle = styled.h3`

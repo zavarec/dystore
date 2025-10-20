@@ -1,24 +1,22 @@
-import styled from '@emotion/styled';
 import Link from 'next/link';
+
+import styled from '@emotion/styled';
 
 import { media } from '@/styles/breakpoints';
 
 export const FooterContainer = styled.footer`
-  background: #1a1a1a;
+  background: #000000;
   color: white;
-  padding: 40px 0 20px;
-  margin-top: 80px;
+  padding: 24px var(--page-gutter);
 `;
 
 export const FooterContent = styled.div`
-  max-width: 1200px;
-
-  padding: 0 var(--page-gutter);
+  margin-left: auto;
 `;
 
 export const FooterGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: minmax(260px, 1fr) 2fr;
   gap: 40px;
   margin-bottom: 30px;
 
@@ -41,9 +39,10 @@ export const FooterLink = styled(Link)`
   color: #ccc;
   text-decoration: none;
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   transition: color 0.3s ease;
 
+  font-size: 16px;
   &:hover {
     color: #fff;
   }
@@ -87,8 +86,26 @@ export const LogoIcon = styled.div`
 `;
 
 export const FooterContentWrapper = styled.div`
+  margin-left: auto;
+  display: flex;
+  gap: 32px;
+  justify-content: flex-end;
+  align-items: flex-start;
+  text-align: right;
+
+  // делаем колонки немного уже, чтобы аккуратнее смотрелось
+  & > ${FooterSection} {
+    min-width: 200px;
+  }
+
   ${media.down('tablet')} {
-    display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 24px;
+
+    & > ${FooterSection} {
+      min-width: 0;
+    }
   }
 `;

@@ -5,7 +5,7 @@ import { tokens } from '@/styles/shared';
 export const Section = styled.section`
   display: grid;
   gap: clamp(12px, 1.8vw, 20px);
-  color: ${tokens.colors.primary};
+  color: ${tokens.colors.semantic.text.primary};
   padding-left: 20px;
 
   .visually-hidden {

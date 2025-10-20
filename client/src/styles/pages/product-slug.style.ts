@@ -3,6 +3,8 @@ import styled from '@emotion/styled';
 import { media } from '../breakpoints';
 import { tokens, commonStyles } from '../shared';
 
+const { colors } = tokens;
+
 export const ProductPageContainer = styled.div`
   ${commonStyles.container};
   padding-top: 40px;
@@ -11,7 +13,7 @@ export const ProductPageContainer = styled.div`
     padding-left: 0;
   }
 
-  color: ${tokens.colors.primary};
+  color: ${colors.semantic.text.primary};
 `;
 
 export const ProductBreadcrumbs = styled.nav`
@@ -25,7 +27,7 @@ export const ProductBreadcrumbs = styled.nav`
     transition: color 0.2s ease;
 
     &:hover {
-      color: ${tokens.colors.primary};
+      color: ${colors.semantic.text.primary};
       text-decoration: underline;
     }
   }
@@ -37,7 +39,7 @@ export const ProductBreadcrumbs = styled.nav`
 `;
 
 export const BreadcrumbLink = styled.a`
-  color: ${tokens.colors.primary};
+  color: ${colors.semantic.text.primary};
   text-decoration: none;
   transition: color 0.2s ease;
 
@@ -85,7 +87,7 @@ export const ThumbnailImage = styled.div`
   justify-content: center;
 
   &:hover {
-    border-color: ${tokens.colors.primary};
+    border-color: ${colors.semantic.border.inverse};
   }
 `;
 
@@ -93,7 +95,7 @@ export const ProductInfoSection = styled.div`
   display: flex;
   flex-direction: column;
   gap: 24px;
-  color: ${tokens.colors.primary};
+  color: ${colors.semantic.text.primary};
 `;
 
 export const ProductTitle = styled.h1`
@@ -101,12 +103,12 @@ export const ProductTitle = styled.h1`
   font-weight: 400;
   line-height: 1.2;
   margin: 0;
-  color: ${tokens.colors.primary};
+  color: ${colors.semantic.text.primary};
 `;
 
 export const ProductDescription = styled.p`
   font-size: 16px;
-  color: ${tokens.colors.primary};
+  color: ${colors.semantic.text.primary};
   line-height: 1.6;
   margin: 0;
 `;
@@ -121,7 +123,7 @@ export const ProductPrice = styled.div`
 export const CurrentPrice = styled.span`
   font-size: 32px;
   font-weight: 700;
-  color: ${tokens.colors.primary};
+  color: ${colors.semantic.text.primary};
 `;
 
 export const OriginalPrice = styled.span`
@@ -305,7 +307,7 @@ export const ProductInfoWithImageWrapperStyled = styled.div`
     flex-direction: column;
     padding: 40px var(--page-gutter);
   }
-  color: ${tokens.colors.primary};
+  color: ${colors.semantic.text.primary};
 `;
 
 export const ProductMotifMobileWrapper = styled.div`

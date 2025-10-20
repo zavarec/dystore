@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
-import { PhoneAuthForm } from '@/features/auth/forms/phone-auth-form';
+// import { PhoneAuthForm } from '@/features/auth/forms/phone-auth-form';
 // import { UsernameAuthForm } from '@/features/auth/forms/username-auth-form';
 // import { AuthModeButton, AuthModeContainer, AuthModeSelector } from './auth-modal-content.style';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { selectIsAuthenticated } from '@/store/slices/auth-slice/auth.selectors';
 import { setAuthModalOpen } from '@/store/slices/uiSlice';
 import { Modal } from '@/components/atoms/modal';
+import { PhoneAuthForm } from '../forms/phone-auth-form/phone-auth-form';
 
 interface AuthModalProps {
   onClose?: () => void;
@@ -16,7 +17,7 @@ export const AuthModal: React.FC<AuthModalProps> = () => {
   const isAuthModalOpen = useAppSelector(state => state.uiSlice.isAuthModalOpen);
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
 
-  // Закрываем модалку при успешной авторизации
+
   useEffect(() => {
     if (isAuthenticated && isAuthModalOpen) {
       dispatch(setAuthModalOpen(false));

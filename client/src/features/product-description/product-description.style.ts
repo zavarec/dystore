@@ -3,10 +3,12 @@ import styled from '@emotion/styled';
 import { media } from '@/styles/breakpoints';
 import { tokens } from '@/styles/shared';
 
+const { colors } = tokens;
+
 export const SectionWrap = styled.section`
   border-radius: 28px;
-  background: ${tokens.colors.bgSecondary};
-  color: #111827;
+  background: ${colors.semantic.background.secondary};
+  color: ${colors.semantic.text.primary};
   font-family: var(--font-nunito-sans, 'Nunito Sans', sans-serif);
 
   ${media.down('mobile')} {
@@ -25,8 +27,8 @@ export const ToggleBar = styled.div`
 
 export const ToggleButton = styled.button<{ isOpen: boolean }>`
   width: 100%;
-  background: rgba(255, 255, 255, 0.48);
-  border: 1px solid rgba(17, 24, 39, 0.12);
+  background: ${colors.semantic.background.secondary};
+  border: 1px solid ${colors.semantic.border.default};
   border-bottom: ${({ isOpen }) => (isOpen ? '0px' : `1px solid rgba(17, 24, 39, 0.12)`)};
 
   padding: 16px 20px;
@@ -71,8 +73,7 @@ export const Collapse = styled.div<{ $open: boolean }>`
 
 export const CollapseInner = styled.div<{ isOpen: boolean }>`
   padding: clamp(20px, 4vw, 32px);
-  background: ${tokens.colors.bgSecondary};
-
+  background: ${colors.semantic.background.secondary};
   border: 1px solid rgba(17, 24, 39, 0.08);
   border-top: ${({ isOpen }) => (isOpen ? '0px' : `1px solid rgba(17, 24, 39, 0.12)`)};
 
@@ -90,7 +91,7 @@ export const Title = styled.h3`
   margin: 0;
   font-size: clamp(20px, 3vw, 26px);
   font-weight: 700;
-  color: #0f172a;
+  color: ${colors.palette.black};
 `;
 
 export const Body = styled.div`
@@ -98,7 +99,7 @@ export const Body = styled.div`
   gap: 14px;
   font-size: clamp(16px, 2.4vw, 18px);
   line-height: 1.65;
-  color: rgba(15, 23, 42, 0.88);
+  color: ${colors.semantic.text.primary};
 `;
 
 export const Paragraph = styled.p`
