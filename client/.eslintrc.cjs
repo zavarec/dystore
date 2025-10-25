@@ -1,0 +1,76 @@
+const path = require('path');
+
+/** @type {import('eslint').Linter.Config} */
+module.exports = {
+  root: true,
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    project: ['./tsconfig.json'],
+    tsconfigRootDir: __dirname,
+  },
+  plugins: ['@typescript-eslint', 'import'],
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:import/recommended',
+    'plugin:import/typescript',
+    'plugin:prettier/recommended',
+  ],
+  settings: {
+    'import/resolver': {
+      typescript: {
+        project: [path.join(__dirname, 'tsconfig.json')],
+        alwaysTryTypes: true,
+      },
+      node: true,
+    },
+    'import/internal-regex': '^@/',
+  },
+  overrides: [
+    {
+      files: ['src/**/*.{ts,tsx}'],
+      rules: {
+        'import/order': [
+          'error',
+          {
+            groups: ['builtin', 'external', 'internal', 'type', ['parent', 'sibling', 'index']],
+            pathGroups: [
+              { pattern: 'react', group: 'external', position: 'before' },
+              { pattern: 'react/**', group: 'external', position: 'before' },
+              { pattern: 'next', group: 'external', position: 'before' },
+              { pattern: 'next/**', group: 'external', position: 'before' },
+              { pattern: '@/**', group: 'internal', position: 'before' },
+            ],
+            pathGroupsExcludedImportTypes: ['react'],
+            'newlines-between': 'always',
+            alphabetize: { order: 'asc', caseInsensitive: true },
+          },
+        ],
+        'import/no-duplicates': 'error',
+        'import/first': 'error',
+        '@typescript-eslint/consistent-type-imports': [
+          'error',
+          {
+            prefer: 'type-imports',
+            fixStyle: 'separate-type-imports',
+          },
+        ],
+        'no-restricted-imports': [
+          'error',
+          {
+            paths: [
+              {
+                name: 'react',
+                importNames: ['default'],
+                message:
+                  'Не импортируй React по умолчанию. Используй именованные хуки: import { useState } from \'react\'. Для типов — import type { ReactNode } from \'react\'.',
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
+};

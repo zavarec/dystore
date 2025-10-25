@@ -15,15 +15,11 @@ import { wrapper } from '@/store';
 import { initializeAuth } from '@/store/slices/auth-slice/auth.slice';
 import { loadUserProfile } from '@/store/slices/auth-slice/auth.thunks';
 import { fetchCart } from '@/store/slices/cart-slice/cart.thunks';
-
-// Централизованные шрифты
-import { fontClassNames } from '@/styles/fonts';
-
-import 'react-toastify/dist/ReactToastify.css';
-import { GlobalGutters } from '@/styles/global-gutters';
 import { FirstVisitFadeStyles } from '@/styles/first-visit/first-visit-fade';
 import { FirstVisitBoot } from '@/styles/first-visit/firts-visit-boot';
-
+import { fontClassNames } from '@/styles/fonts';
+import { GlobalGutters } from '@/styles/global-gutters';
+import 'react-toastify/dist/ReactToastify.css';
 // Глобальные стили - чистые как после уборки Dyson
 const globalStyles = css`
   * {

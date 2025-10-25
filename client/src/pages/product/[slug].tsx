@@ -45,6 +45,7 @@ import { adaptProductForUI } from '@/utils/product-adapters';
 interface ProductPageProps {
   product: ProductWithDetails;
   placements?: PromoPlacement[]; // список PromoPlacement с включенной promoSection
+  isPreview?: boolean;
 }
 
 const getProductImage = (product: ProductWithDetails): string => {
@@ -324,20 +325,22 @@ export const getStaticPaths: GetStaticPaths = async () => {
   return { paths: [], fallback: 'blocking' };
 };
 
-export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
+export const getStaticProps: GetStaticProps = async ({ params, locale, preview = false }) => {
+  const isPreview = Boolean(preview);
   const slug = String(params?.slug || '');
   const apiBase = process.env.API_URL_SERVER || 'http://api:3001/api'; // <— ключевое
+  const fetchOptions: RequestInit | undefined = isPreview ? { cache: 'no-store' } : undefined;
 
   try {
     // 1) по slug
-    const r1 = await fetch(`${apiBase}/products/slug/${encodeURIComponent(slug)}`);
+    const r1 = await fetch(`${apiBase}/products/slug/${encodeURIComponent(slug)}`, fetchOptions);
     if (!r1.ok) return { notFound: true, revalidate: 60 };
     const bySlug = await r1.json();
 
     // 2) по id (если нужно)
     let productRaw = bySlug;
     try {
-      const r2 = await fetch(`${apiBase}/products/id/${encodeURIComponent(bySlug.id)}`);
+      const r2 = await fetch(`${apiBase}/products/id/${encodeURIComponent(bySlug.id)}`, fetchOptions);
       if (r2.ok) productRaw = await r2.json();
     } catch (error: unknown) {
       console.error(error);
@@ -350,6 +353,7 @@ export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
 
     const placementsBySlugRes = await fetch(
       `${apiBase}/promo?pageType=PRODUCT&entityId=${encodeURIComponent(entitySlug)}`,
+      fetchOptions,
     );
     if (placementsBySlugRes.ok) {
       placements = await placementsBySlugRes.json();
@@ -358,20 +362,30 @@ export const getStaticProps: GetStaticProps = async ({ params, locale }) => {
     if ((!placements || placements.length === 0) && entityId) {
       const placementsByIdRes = await fetch(
         `${apiBase}/promo?pageType=PRODUCT&entityId=${encodeURIComponent(entityId)}`,
+        fetchOptions,
       );
       if (placementsByIdRes.ok) {
         placements = await placementsByIdRes.json();
       }
     }
 
-    return {
+    const baseResponse = {
       props: {
         ...(await serverSideTranslations(locale ?? 'ru', ['common'])),
         product: adaptProductForUI(productRaw),
         placements,
+        isPreview,
       },
-      revalidate: 3600,
     };
+
+    if (!isPreview) {
+      return {
+        ...baseResponse,
+        revalidate: 3600,
+      };
+    }
+
+    return baseResponse;
   } catch {
     return { notFound: true, revalidate: 60 };
   }

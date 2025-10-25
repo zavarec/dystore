@@ -6,9 +6,9 @@ const nextConfig = {
   swcMinify: true,
   i18n,
 
-  // compiler: {
-  //   emotion: true, // ⬅️ включает SWC-плагин Emotion
-  // },
+  compiler: {
+    emotion: true, // ⬅️ включает SWC-плагин Emotion
+  },
 
   // Разрешаем сборку даже при ESLint/TS ошибках (MVP)
   eslint: {

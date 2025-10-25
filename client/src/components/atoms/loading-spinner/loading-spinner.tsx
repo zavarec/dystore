@@ -1,4 +1,3 @@
-import React from 'react';
 import { LoadingSpinnerStyled } from './loading-spinner.style';
 
 interface LoadingSpinnerProps {
@@ -6,10 +5,7 @@ interface LoadingSpinnerProps {
   height?: string;
 }
 
-export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
-  message = 'Загрузка...',
-  height = '100vh',
-}) => (
+export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ height = '100vh' }) => (
   <div
     style={{
       display: 'flex',

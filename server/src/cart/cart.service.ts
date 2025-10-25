@@ -76,12 +76,11 @@ export class CartService {
         return { cart: existingByUser, createdNew: false };
       }
     }
-    const newToken = token ?? ""; // genCartToken() — ваша функция генерации token
     const newCart = await this.prisma.cart.create({
       data: {
         userId: userId ?? null,
-        token: newToken,
         status: CartStatus.ACTIVE,
+        ...(token ? { token } : {}),
       },
       include: {
         items: { include: { product: { include: { mainImage: true } } } },
