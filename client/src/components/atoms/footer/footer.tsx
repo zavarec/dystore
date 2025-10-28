@@ -1,3 +1,4 @@
+import { COMPANY_INFO } from '@/constants/contacts.constants';
 import { ContactsBar } from '@/features/contacts-bar/contacts-bar';
 
 import {
@@ -34,9 +35,9 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
               качества.
             </FooterText>
             <FooterText>
-              📞 8 (800) 555-35-35
+              📞 {COMPANY_INFO.COMPANY_PHONE_NUMBER}
               <br />
-              📧 dyson-group@yandex.com
+              📧 {COMPANY_INFO.COMPANY_EMAIL_ADRESS}
             </FooterText>
 
             <ContactsBar />
@@ -58,6 +59,7 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
               {/* <FooterLink href="/payment">Оплата</FooterLink> */}
               <FooterLink href="/warranty">Гарантия</FooterLink>
               <FooterLink href="/returns">Возврат</FooterLink>
+              <FooterLink href="/privacy">Политика конфиденциальности</FooterLink>
               {/* <FooterLink href="/service">Сервис</FooterLink> */}
             </FooterSection>
 
@@ -72,7 +74,7 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
         </FooterGrid>
 
         <FooterBottom>
-          <p>© 2024 DysonGroup. Все права защищены.</p>
+          <p>© 2025 DysonGroup. Все права защищены.</p>
         </FooterBottom>
       </FooterContent>
     </FooterContainer>

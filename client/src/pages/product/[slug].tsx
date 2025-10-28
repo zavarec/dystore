@@ -44,7 +44,7 @@ import { adaptProductForUI } from '@/utils/product-adapters';
 
 interface ProductPageProps {
   product: ProductWithDetails;
-  placements?: PromoPlacement[]; // список PromoPlacement с включенной promoSection
+  placements?: PromoPlacement[];
   isPreview?: boolean;
 }
 
@@ -340,7 +340,10 @@ export const getStaticProps: GetStaticProps = async ({ params, locale, preview =
     // 2) по id (если нужно)
     let productRaw = bySlug;
     try {
-      const r2 = await fetch(`${apiBase}/products/id/${encodeURIComponent(bySlug.id)}`, fetchOptions);
+      const r2 = await fetch(
+        `${apiBase}/products/id/${encodeURIComponent(bySlug.id)}`,
+        fetchOptions,
+      );
       if (r2.ok) productRaw = await r2.json();
     } catch (error: unknown) {
       console.error(error);

@@ -14,7 +14,13 @@ import {
 import { AboutCompanyPageWrapper } from '../about-company/about-company.style';
 import { PoliciesDropdown } from '../policies-dropdown/policies-dropdown';
 
-export type PolicyKey = 'delivery' | 'returns' | 'warranty' | 'environment' | 'about';
+export type PolicyKey =
+  | 'delivery'
+  | 'returns'
+  | 'warranty'
+  | 'environment'
+  | 'about'
+  | 'privacy-policy';
 
 export const POLICY_PAGES: Array<{ key: PolicyKey; label: string; href: string }> = [
   { key: 'about', label: 'О компании', href: '/about' },
@@ -22,6 +28,7 @@ export const POLICY_PAGES: Array<{ key: PolicyKey; label: string; href: string }
   { key: 'returns', label: 'Возврат товара', href: '/returns' },
   { key: 'warranty', label: 'Гарантийное обслуживание', href: '/warranty' },
   { key: 'environment', label: 'Экологическая политика', href: '/environment' },
+  { key: 'privacy-policy', label: 'Политика конфиденциальности', href: '/privacy' },
 ];
 
 export const PoliciesLayout: React.FC<{
@@ -29,17 +36,7 @@ export const PoliciesLayout: React.FC<{
   title: string;
   breadcrumbsPrefix?: Array<{ href: string; label: string }>; // то, что до раздела "Политики"
   children: React.ReactNode;
-}> = ({
-  current,
-  title,
-  breadcrumbsPrefix = [
-    { href: '/', label: 'Главная' },
-    { href: '/inside', label: 'Inside Dyson' },
-    { href: '/community', label: 'Community' },
-    { href: '/sustainability', label: 'Sustainability' },
-  ],
-  children,
-}) => {
+}> = ({ current, title, breadcrumbsPrefix, children }) => {
   const router = useRouter();
   return (
     <AboutCompanyPageWrapper>
@@ -58,14 +55,14 @@ export const PoliciesLayout: React.FC<{
       </PoliciesTopBar>
       {/* Контент страницы */}
       <div>
-        <h3>{title}</h3>
+        {/* <h3>{title}</h3> */}
         <div>{children}</div>
       </div>
 
       {/* Хлебные крошки */}
       <PoliciesBreadcrumbsBar aria-label="Хлебные крошки">
         <PoliciesBreadcrumbsInner>
-          {breadcrumbsPrefix.map((b, i) => (
+          {breadcrumbsPrefix?.map((b, i) => (
             <Fragment key={b.href + i}>
               {i > 0 && <CrumbSepLight>/</CrumbSepLight>}
               <Link href={b.href} passHref legacyBehavior>

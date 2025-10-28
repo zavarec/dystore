@@ -1,4 +1,4 @@
-import { PoliciesLayout } from '@/features/policies/policies-layour';
+import { PoliciesLayout } from '@/features/policies/policies-layout';
 
 import {
   AboutCompanyBlockTitle,
@@ -11,8 +11,17 @@ import {
 
 export const EnvironmentalPolicy: React.FC<{
   breadcrumbs?: Array<{ href: string; label: string }>;
-}> = () => (
-  <PoliciesLayout current="environment" title="Экологическая политика">
+}> = ({
+  breadcrumbs = [
+    { href: '/', label: 'Главная' },
+    { href: '/privacy', label: 'Политика конфиденциальности' },
+  ],
+}) => (
+  <PoliciesLayout
+    current="environment"
+    title="Экологическая политика"
+    breadcrumbsPrefix={breadcrumbs}
+  >
     <AboutCompanyPageWrapper>
       <AboutCompanyContainer>
         <AboutCompanySection>

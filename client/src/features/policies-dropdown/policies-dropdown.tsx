@@ -1,12 +1,12 @@
 import styled from '@emotion/styled';
 
+import { ChevronIcon } from '@/components/atoms/chevron-icon/chevron-icon';
 import type { BaseItem } from '@/components/atoms/dropdown/dropdown';
 import Dropdown from '@/components/atoms/dropdown/dropdown';
 
-import type { PolicyKey } from '../policies/policies-layour';
+import type { PolicyKey } from '../policies/policies-layout';
 
-import { POLICY_PAGES } from '../policies/policies-layour';
-import { ChevronIcon } from '@/components/atoms/chevron-icon/chevron-icon';
+import { POLICY_PAGES } from '../policies/policies-layout';
 
 export const PoliciesDropdownContainer = styled.div`
   display: flex;

@@ -2,6 +2,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 
 import { FaqSection } from '@/components/sections/faq/faq';
+import { COMPANY_INFO } from '@/constants/contacts.constants';
 import {
   ContactsCard,
   ContactsCardContent,
@@ -25,8 +26,8 @@ const ContactsPage = () => {
   const org = {
     name: 'Dyson-group',
     url: 'https://dyson-group.ru',
-    phone: '+7 (999) 123-45-67',
-    email: 'support@dyson-group.ru',
+    phone: COMPANY_INFO.COMPANY_PHONE_NUMBER,
+    email: COMPANY_INFO.COMPANY_EMAIL_ADRESS,
     sameAs: ['https://youtube.com/@dyson', 'https://t.me/dystore'],
   };
 
@@ -96,7 +97,7 @@ const ContactsPage = () => {
                 </ContactsCardText>
               </ContactsCardContent>
 
-              <ContactsCTA href="tel:+79991234567">Позвоните</ContactsCTA>
+              <ContactsCTA href="tel:+78005501474">Позвоните</ContactsCTA>
             </ContactsCard>
 
             <ContactsCard>

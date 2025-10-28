@@ -1,4 +1,5 @@
-import { PoliciesLayout } from '@/features/policies/policies-layour';
+import { COMPANY_INFO } from '@/constants/contacts.constants';
+import { PoliciesLayout } from '@/features/policies/policies-layout';
 
 import {
   AboutCompanyBlockTitle,
@@ -11,8 +12,18 @@ import {
 
 export const WarrantyService: React.FC<{
   breadcrumbs?: Array<{ href: string; label: string }>;
-}> = () => (
-  <PoliciesLayout current="warranty" title="Гарантийное обслуживание">
+}> = ({
+  breadcrumbs = [
+    { href: '/', label: 'Главная' },
+    { href: '/returns', label: 'Возврат товара' },
+    { href: '/delivery', label: 'Доставка и оплата' },
+  ],
+}) => (
+  <PoliciesLayout
+    current="warranty"
+    title="Гарантийное обслуживание"
+    breadcrumbsPrefix={breadcrumbs}
+  >
     <AboutCompanyPageWrapper>
       <AboutCompanyContainer>
         <div
@@ -47,8 +58,9 @@ export const WarrantyService: React.FC<{
             <AboutCompanyList>
               <li>Подготовьте: товар, гарантийный талон и документ, подтверждающий покупку.</li>
               <li>
-                Свяжитесь с нами: <strong>support@dystore.ru</strong> или{' '}
-                <strong>+7 (495) 000-00-00</strong>. Мы подскажем ближайший авторизованный сервис.
+                Свяжитесь с нами: <strong>{COMPANY_INFO.COMPANY_EMAIL_ADRESS}</strong> или{' '}
+                <strong>{COMPANY_INFO.COMPANY_PHONE_NUMBER}</strong>. Мы подскажем ближайший
+                авторизованный сервис.
               </li>
               <li>Передайте устройство в сервисный центр согласно инструкции оператора.</li>
             </AboutCompanyList>
