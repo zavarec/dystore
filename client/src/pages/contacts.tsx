@@ -127,7 +127,7 @@ const ContactsPage = () => {
                 </ContactsCardText>
               </ContactsCardContent>
 
-              <ContactsCTA href="/support/chat">Открыть чат</ContactsCTA>
+              <ContactsCTA href="tg://resolve?domain=dyson_group_bot">Открыть чат</ContactsCTA>
             </ContactsCard>
 
             <ContactsCard>
@@ -154,7 +154,7 @@ const ContactsPage = () => {
                 </ContactsCardText>
               </ContactsCardContent>
 
-              <ContactsCTA href="mailto:support@dystore.local">Отправить письмо</ContactsCTA>
+              <ContactsCTA href="mailto:dyson-group@yandex.com">Отправить письмо</ContactsCTA>
             </ContactsCard>
 
             <ContactsCard>

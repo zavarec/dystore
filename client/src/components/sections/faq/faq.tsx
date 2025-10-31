@@ -10,6 +10,7 @@ import {
   FaqQuestion,
   FaqSectionWrapper,
 } from './faq.style';
+import { COMPANY_INFO } from '@/constants/contacts.constants';
 
 interface Question {
   id: number;
@@ -48,8 +49,8 @@ const questions: Question[] = [
     answer: (
       <>
         Вы можете написать нам в <strong>Telegram</strong>, позвонить по телефону{' '}
-        <a href="tel:+79991234567">+7 (999) 123-45-67</a> или отправить письмо на{' '}
-        <a href="mailto:support@dystore.local">support@dystore.local</a>.
+        <a href="tel:+78005501474">{COMPANY_INFO.COMPANY_PHONE_NUMBER}</a> или отправить письмо на{' '}
+        <a href="mailto:dyson-group@yandex.com">{COMPANY_INFO.COMPANY_EMAIL_ADRESS}</a>.
       </>
     ),
   },

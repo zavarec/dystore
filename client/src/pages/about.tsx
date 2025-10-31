@@ -1,15 +1,16 @@
+import { COMPANY_INFO } from '@/constants/contacts.constants';
 import { AboutCompany } from '@/features/about-company/about-company';
 
 const AboutPage = () => (
   <AboutCompany
     heading="Сведения о компании"
     companyName="Dyson-Group LLC"
-    addressLines={['ул. Примерная, 10', 'Москва', 'Россия', '101000']}
+    addressLines={['ул. Воронежская, 46', 'Москва', 'Россия', '115597']}
     companyNumberLabel="ОГРН/регистрационный номер"
-    companyNumber="1234567890123"
+    companyNumber="322774600478526"
     contactText="По вопросам конфиденциальности свяжитесь с нами по адресу"
-    contactEmailLabel="privacy@dyson-group.ru"
-    contactEmail="privacy@dyson-group.ru"
+    contactEmailLabel={COMPANY_INFO.COMPANY_EMAIL_ADRESS}
+    contactEmail={COMPANY_INFO.COMPANY_EMAIL_ADRESS}
     breadcrumbs={[
       { href: '/', label: 'Главная' },
       { href: '/inside', label: 'О нас' },
