@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import type { GetStaticPaths, GetStaticProps, NextPage } from 'next';
+import type { GetServerSideProps, NextPage } from 'next';
 
 import Head from 'next/head';
 import Image from 'next/image';
@@ -45,7 +45,6 @@ import { adaptProductForUI } from '@/utils/product-adapters';
 interface ProductPageProps {
   product: ProductWithDetails;
   placements?: PromoPlacement[];
-  isPreview?: boolean;
 }
 
 const getProductImage = (product: ProductWithDetails): string => {
@@ -320,21 +319,14 @@ function getCategoryName(category: Category | string): string {
   return 'Товары';
 }
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  // На билде не ходим в API: пусто + fallback
-  return { paths: [], fallback: 'blocking' };
-};
-
-export const getStaticProps: GetStaticProps = async ({ params, locale, preview = false }) => {
-  const isPreview = Boolean(preview);
+export const getServerSideProps: GetServerSideProps = async ({ params, locale }) => {
   const slug = String(params?.slug || '');
   const apiBase = process.env.API_URL_SERVER || 'http://api:3001/api'; // <— ключевое
-  const fetchOptions: RequestInit | undefined = isPreview ? { cache: 'no-store' } : undefined;
 
   try {
     // 1) по slug
-    const r1 = await fetch(`${apiBase}/products/slug/${encodeURIComponent(slug)}`, fetchOptions);
-    if (!r1.ok) return { notFound: true, revalidate: 60 };
+    const r1 = await fetch(`${apiBase}/products/slug/${encodeURIComponent(slug)}`);
+    if (!r1.ok) return { notFound: true };
     const bySlug = await r1.json();
 
     // 2) по id (если нужно)
@@ -342,7 +334,6 @@ export const getStaticProps: GetStaticProps = async ({ params, locale, preview =
     try {
       const r2 = await fetch(
         `${apiBase}/products/id/${encodeURIComponent(bySlug.id)}`,
-        fetchOptions,
       );
       if (r2.ok) productRaw = await r2.json();
     } catch (error: unknown) {
@@ -356,7 +347,6 @@ export const getStaticProps: GetStaticProps = async ({ params, locale, preview =
 
     const placementsBySlugRes = await fetch(
       `${apiBase}/promo?pageType=PRODUCT&entityId=${encodeURIComponent(entitySlug)}`,
-      fetchOptions,
     );
     if (placementsBySlugRes.ok) {
       placements = await placementsBySlugRes.json();
@@ -365,32 +355,21 @@ export const getStaticProps: GetStaticProps = async ({ params, locale, preview =
     if ((!placements || placements.length === 0) && entityId) {
       const placementsByIdRes = await fetch(
         `${apiBase}/promo?pageType=PRODUCT&entityId=${encodeURIComponent(entityId)}`,
-        fetchOptions,
       );
       if (placementsByIdRes.ok) {
         placements = await placementsByIdRes.json();
       }
     }
 
-    const baseResponse = {
+    return {
       props: {
         ...(await serverSideTranslations(locale ?? 'ru', ['common'])),
         product: adaptProductForUI(productRaw),
         placements,
-        isPreview,
       },
     };
-
-    if (!isPreview) {
-      return {
-        ...baseResponse,
-        revalidate: 3600,
-      };
-    }
-
-    return baseResponse;
   } catch {
-    return { notFound: true, revalidate: 60 };
+    return { notFound: true };
   }
 };
 
