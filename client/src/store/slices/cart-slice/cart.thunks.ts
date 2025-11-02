@@ -7,7 +7,8 @@ import type { AddToCartRequest } from '@/types/models/cart.model';
 // Получить корзину
 export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, { rejectWithValue }) => {
   try {
-    return await CartService.getCart();
+    const response = await CartService.getCart();
+    return response;
   } catch (error) {
     if (error instanceof AxiosError) {
       return rejectWithValue(error.response?.data?.message || 'Ошибка загрузки корзины');

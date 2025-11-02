@@ -1,7 +1,8 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
-import { AuthState } from './auth.types';
-import AuthService from '@/services/auth.service';
+import type { AuthState } from './auth.types';
+import type { PayloadAction } from '@reduxjs/toolkit';
+
 import {
   loadUserProfile,
   loginWithPassword,

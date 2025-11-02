@@ -28,6 +28,10 @@ import {
 import { DropdownWithContentSection } from '../dropdown-with-content-section/dropdown-with-content-section';
 import { MachineHighlightsSection } from '../machine-highlights-section/machine-highlights-section';
 
+export type ResponsivePadding =
+  | string // "24px 32px"
+  | { mobile?: string; desktop?: string };
+
 function useAutoplay(enabled: boolean, intervalMs: number, onTick: () => void) {
   const saved = useRef(onTick);
   useEffect(() => {
@@ -74,6 +78,12 @@ function renderMedia(media?: PromoMedia) {
   return null;
 }
 
+function resolvePadding(p?: string | { mobile?: string; desktop?: string }) {
+  if (!p) return { mobile: undefined, desktop: undefined };
+  if (typeof p === 'string') return { mobile: p, desktop: p };
+  return { mobile: p.mobile ?? p.desktop, desktop: p.desktop ?? p.mobile };
+}
+
 export const PromoCarouselSection = (section: PromoSection) => {
   if (section.variant !== PromoVariant.CAROUSEL) return null;
 
@@ -108,7 +118,7 @@ export const PromoCarouselSection = (section: PromoSection) => {
   const startX = useRef<number | null>(null);
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    startX.current = e.touches[0].clientX;
+    startX.current = e.touches[0]?.clientX;
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
@@ -124,45 +134,53 @@ export const PromoCarouselSection = (section: PromoSection) => {
     startX.current = null;
   };
 
-  const renderSlide = (slide: PromoCarouselSlide) => (
-    <>
-      <Media>{renderMedia(slide.media)}</Media>
-      <Grad />
-      <Overlay align={slide.align ?? 'left'}>
-        <div>
-          {slide.title && (
-            <Title
-              {...(slide.titleColor && { $color: slide.titleColor })}
-              {...(slide.titleSize && { $fontSize: slide.titleSize })}
-              {...(slide.titleWeight && { $fontWeight: slide.titleWeight })}
-              {...(slide.titleLineHeight && { $lineHeight: slide.titleLineHeight })}
-              {...(slide.titleMargin && { $margin: slide.titleMargin })}
-            >
-              {slide.title}
-            </Title>
-          )}
-          {slide.subtitle && (
-            <Subtitle
-              {...(slide.subtitleColor && { $color: slide.subtitleColor })}
-              {...(slide.subtitleSize && { $fontSize: slide.subtitleSize })}
-              {...(slide.subtitleWeight && { $fontWeight: slide.subtitleWeight })}
-              {...(slide.subtitleLineHeight && { $lineHeight: slide.subtitleLineHeight })}
-              {...(slide.subtitleMargin && { $margin: slide.subtitleMargin })}
-              {...(slide.subtitleOpacity && { $opacity: slide.subtitleOpacity })}
-            >
-              {slide.subtitle}
-            </Subtitle>
-          )}
-          {slide.cta && (
-            <a href={slide.cta.href} aria-label={slide.cta.text}>
-              {slide.cta.text}
-              <span aria-hidden>→</span>
-            </a>
-          )}
-        </div>
-      </Overlay>
-    </>
-  );
+  const renderSlide = (slide: PromoCarouselSlide) => {
+    const { mobile, desktop } = resolvePadding(slide.padding ?? payload.padding);
+
+    return (
+      <>
+        <Media>{renderMedia(slide.media)}</Media>
+        <Grad />
+        <Overlay
+          align={slide.align ?? 'left'}
+          mobilePadding={mobile ?? '24'}
+          desktopPadding={desktop ?? '32px 40px'}
+        >
+          <div>
+            {slide.title && (
+              <Title
+                {...(slide.titleColor && { $color: slide.titleColor })}
+                {...(slide.titleSize && { $fontSize: slide.titleSize })}
+                {...(slide.titleWeight && { $fontWeight: slide.titleWeight })}
+                {...(slide.titleLineHeight && { $lineHeight: slide.titleLineHeight })}
+                {...(slide.titleMargin && { $margin: slide.titleMargin })}
+              >
+                {slide.title}
+              </Title>
+            )}
+            {slide.subtitle && (
+              <Subtitle
+                {...(slide.subtitleColor && { $color: slide.subtitleColor })}
+                {...(slide.subtitleSize && { $fontSize: slide.subtitleSize })}
+                {...(slide.subtitleWeight && { $fontWeight: slide.subtitleWeight })}
+                {...(slide.subtitleLineHeight && { $lineHeight: slide.subtitleLineHeight })}
+                {...(slide.subtitleMargin && { $margin: slide.subtitleMargin })}
+                {...(slide.subtitleOpacity && { $opacity: slide.subtitleOpacity })}
+              >
+                {slide.subtitle}
+              </Subtitle>
+            )}
+            {slide.cta && (
+              <a href={slide.cta.href} aria-label={slide.cta.text}>
+                {slide.cta.text}
+                <span aria-hidden>→</span>
+              </a>
+            )}
+          </div>
+        </Overlay>
+      </>
+    );
+  };
 
   return (
     <Wrap bg={currentBg} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>

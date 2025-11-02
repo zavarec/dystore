@@ -1,3 +1,5 @@
+import type { ResponsivePadding } from '@/features/promo-block/components/promo-carousel-section/promo-carousel-section';
+
 export type PromoMedia =
   | { type: 'image'; src: string }
   | { type: 'video'; src: string; poster?: string };
@@ -23,6 +25,7 @@ export interface PromoCarouselSlide {
   subtitleLineHeight?: string;
   subtitleMargin?: string;
   subtitleOpacity?: number;
+  padding?: ResponsivePadding;
 }
 
 export interface PromoCarouselContent {
@@ -32,6 +35,7 @@ export interface PromoCarouselContent {
   showDots?: boolean; // по умолчанию true
   showArrows?: boolean; // по умолчанию true
   slides: PromoCarouselSlide[];
+  padding?: ResponsivePadding;
 }
 
 export interface PromoDropdownContent {

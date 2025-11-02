@@ -1,4 +1,4 @@
-import { RootState } from '@/store';
+import type { RootState } from '@/store';
 
 export const selectCartItems = (state: RootState) => state.cartSlice?.cart?.items ?? [];
 export const selectIsCartLoading = (state: RootState) => state?.cartSlice.isLoading;

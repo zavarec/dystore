@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
+
 import { specFromAtttributeUnitMap, specPriorityMap } from '@/constants/spec-attributes.constant';
+
 import {
   BottomRow,
   DimensionsCol,

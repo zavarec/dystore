@@ -40,16 +40,21 @@ export const Media = styled.div`
   }
 `;
 
-export const Overlay = styled.div<{ align?: 'left' | 'right' | 'center' }>`
+export const Overlay = styled.div<{
+  align?: 'left' | 'right' | 'center';
+  mobilePadding?: string;
+  desktopPadding?: string;
+}>`
   position: relative;
   z-index: 2;
   height: 100%;
   display: grid;
   align-items: center;
-  padding: 24px;
+  padding: ${({ mobilePadding }) => mobilePadding ?? '24px'};
 
   @media (min-width: 960px) {
-    padding: 32px 40px;
+    padding: ${({ desktopPadding, mobilePadding }) =>
+      desktopPadding ?? mobilePadding ?? '32px 40px'};
   }
 
   > div {

@@ -2,6 +2,8 @@ import { useState } from 'react';
 
 import { AnimatePresence } from 'framer-motion';
 
+import { COMPANY_INFO } from '@/constants/contacts.constants';
+
 import {
   FaqAnswer,
   FaqHeading,
@@ -10,7 +12,6 @@ import {
   FaqQuestion,
   FaqSectionWrapper,
 } from './faq.style';
-import { COMPANY_INFO } from '@/constants/contacts.constants';
 
 interface Question {
   id: number;

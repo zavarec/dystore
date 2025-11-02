@@ -47,9 +47,14 @@ const cartSlice = createSlice({
       })
       .addCase(fetchCart.fulfilled, (state, { payload }) => {
         state.isLoading = false;
-        if (payload) {
-          state.cart = payload;
-        }
+        if (!payload) return;
+
+        const { items } = payload;
+
+        const totalPrice = items.reduce((acc, item) => acc + item.product.price, 0);
+
+        state.cart = payload;
+        state.totalPrice = totalPrice;
       })
       .addCase(fetchCart.rejected, (state, action) => {
         state.isLoading = false;

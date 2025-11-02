@@ -1,3 +1,5 @@
+import { ResponsivePadding } from '@/features/promo-block/components/promo-carousel-section/promo-carousel-section';
+
 export enum PromoVariant {
   BANNER = 'BANNER',
 
@@ -77,6 +79,7 @@ export interface PromoSection {
   startsAt?: string | null;
   endsAt?: string | null;
   source?: string | null;
+  padding?: ResponsivePadding;
 }
 
 // Расширенная модель из админ-эндпоинта (include: category, createdBy)
