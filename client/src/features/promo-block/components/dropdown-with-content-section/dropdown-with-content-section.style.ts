@@ -90,7 +90,7 @@ export const CollapseInner = styled.div`
 
   .dd-content {
     /* Центрируем контент и ограничиваем ширину блока с круглыми иллюстрациями */
-    max-width: 1100px;
+    /* max-width: 1100px; */
     margin: 0 auto;
     padding: 0 16px;
     @media (min-width: 960px) {

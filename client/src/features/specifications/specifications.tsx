@@ -83,16 +83,6 @@ export const Specifications: React.FC<SpecificationsProps> = ({
     return { topSpecs, dims };
   }, [specs]);
 
-  console.log(
-    {
-      dims,
-      topSpecs,
-      specs,
-      dimensionsImageUrl,
-    },
-    'DIMS AND TOP SPECS',
-  );
-
   return (
     <SpecsSection>
       <SpecsHeader>{title}</SpecsHeader>

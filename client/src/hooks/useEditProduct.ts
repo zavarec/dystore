@@ -34,8 +34,6 @@ export const useEditProduct = (productId: string) => {
   }, [productId, router]);
 
   const handleSubmit = async (data: UpdateProductDto) => {
-    console.log(data, 'DATA');
-
     setLoading(true);
     try {
       const payload: Partial<UpdateProductDto> = {};

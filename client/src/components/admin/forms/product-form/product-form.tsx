@@ -320,8 +320,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     };
 
     await onSubmit(mapFormToCreateDto(nextData));
-
-    console.log(data, 'DATA');
   };
 
   // Обработчики загрузки изображений

@@ -9,8 +9,6 @@ import { CtaRow, CtaBtn } from '../../promo-block.style';
 export function BannerSection(s: PromoSection) {
   const side = s.contentSide === 'RIGHT' ? 'RIGHT' : 'LEFT';
 
-  console.log(s, 'sectionProps');
-
   return (
     <BannerWrap $bg={s.bgColor ?? null} $height={s.heightPx ?? null}>
       {/* Фоновое медиа на всю ширину/высоту */}

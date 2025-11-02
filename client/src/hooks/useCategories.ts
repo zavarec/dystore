@@ -52,7 +52,6 @@ export const useCategoryBySlug = (slug: string) => {
     async () => {
       const all = await CategoriesService.getAllCategories();
 
-      console.log(all, 'all in useCategoryBySlug');
       return all.find(cat => cat.slug === slug) || null;
     },
     {
@@ -61,7 +60,6 @@ export const useCategoryBySlug = (slug: string) => {
       dedupingInterval: 2 * 60 * 1000,
     },
   );
-  console.log(data, 'data in useCategoryBySlug');
 
   const refetch = () => mutate();
 

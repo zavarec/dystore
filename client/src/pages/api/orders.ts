@@ -40,12 +40,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Здесь можно добавить логику сохранения заказа в базу данных
     // Например, отправка на бэкенд сервер
 
-    console.log('Новый заказ:', {
-      orderId: generateOrderId(),
-      ...orderData,
-      createdAt: new Date().toISOString(),
-    });
-
     // Имитируем отправку на сервер (в реальном приложении здесь будет axios.post к серверу)
     await new Promise(resolve => setTimeout(resolve, 1000));
 

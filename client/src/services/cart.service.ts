@@ -7,7 +7,6 @@ class CartService {
   static async getCart(): Promise<Cart> {
     const { data } = await apiClient.get<Cart>('/cart');
 
-    console.log(data, 'cartData');
 
     return data;
   }

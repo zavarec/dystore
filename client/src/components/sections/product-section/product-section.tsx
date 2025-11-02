@@ -20,8 +20,6 @@ export const ProductSection: React.FC<ProductSectionProps> = ({
   loading = false,
 }) => {
   const displayProducts = maxItems ? products.slice(0, maxItems) : products;
-  console.log('ProductSection props:', { title, products, variant, maxItems, loading });
-  console.log('Display products:', displayProducts);
 
   return (
     <Section>

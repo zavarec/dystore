@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import ReactSelect from 'react-select';
 import { toast } from 'react-toastify';
@@ -22,8 +22,6 @@ import { updatePromoSection } from '@/store/slices/promo/promo.thunks';
 import { ContentSideEnum, PromoFont, PromoVariant } from '@/types/models/promo-section.model';
 import type { PromoSection, UpdatePromoSectionDto } from '@/types/models/promo-section.model';
 
-import { sampleCarousel, sampleDropdown, sampleHighlights } from '../../utils';
-
 export function PromoSectionEditModal({
   item,
   onClose,
@@ -38,9 +36,7 @@ export function PromoSectionEditModal({
     (state: RootState) => state.sectionsWithPlacementsSlice.bySectionId[item.id],
   );
 
-  useEffect(() => {
-    console.log(sectionItem, 'sectionItem');
-  }, [sectionItem]);
+  useEffect(() => {}, [sectionItem]);
 
   const [variant, setVariant] = useState<PromoVariant>(sectionItem.variant);
   const [title, setTitle] = useState<string>(sectionItem.title ?? '');
@@ -129,8 +125,10 @@ export function PromoSectionEditModal({
           } else {
             throw new Error('kind должен быть "carousel", "dropdown" или "highlights"');
           }
-        } catch (err: any) {
-          setContentErr(err?.message || 'Некорректный JSON');
+        } catch (err) {
+          if (err instanceof Error) {
+            setContentErr(err?.message || 'Некорректный JSON');
+          }
           setSubmitting(false);
           return;
         }
@@ -160,8 +158,6 @@ export function PromoSectionEditModal({
         // createdById: userId,
         content, // ← ВАЖНО: кладём JSON сюда
       };
-
-      console.log(dto, 'DTO');
 
       await dispatch(updatePromoSection({ id: item.id, dto }));
       onClose();

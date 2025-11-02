@@ -149,7 +149,6 @@ export const ProductImageUpload: React.FC<ProductImageUploadProps> = ({
         onError?.(validationError);
         return;
       }
-      console.log('uploadFile', file);
 
       setUploading(true);
       setImageError(false);
@@ -159,7 +158,6 @@ export const ProductImageUpload: React.FC<ProductImageUploadProps> = ({
           alt: `${label} - ${file.name}`,
           description: `Изображение товара ${label}`,
         });
-        console.log('uploadFile', files);
 
         // if (productId && files && files.length > 0) {
         //   await UploadsService.setMainImage(productId, files[0]?.id || '');
@@ -248,10 +246,6 @@ export const ProductImageUpload: React.FC<ProductImageUploadProps> = ({
 
   useEffect(() => {
     if (displayImageUrl) setImageError(false);
-    console.log('ProductImageUpload - currentImageUrl:', currentImageUrl);
-    console.log('ProductImageUpload - builtUrl:', builtUrl);
-    console.log('ProductImageUpload - displayImageUrl:', displayImageUrl);
-    console.log('ProductImageUpload - hasImage:', hasImage);
   }, [displayImageUrl, currentImageUrl, builtUrl, hasImage]);
 
   return (

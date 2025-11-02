@@ -33,8 +33,6 @@ export const DysonProductCard: React.FC<DysonProductCardProps> = ({ product, ind
 
   const href = `/product/${product.slug}`;
 
-  console.log(product, 'PRODUCT in product card');
-
   const genericBlur =
     'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMjgwJyBoZWlnaHQ9JzI4MCcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJz48cmVjdCB3aWR0aD0nMjgwJyBoZWlnaHQ9JzI4MCcgZmlsbD0nI2U5ZWNlZicvPjwvc3ZnPg==';
 

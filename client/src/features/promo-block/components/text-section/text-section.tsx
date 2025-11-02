@@ -9,7 +9,6 @@ export function TextSection(s: PromoSection) {
   // Центр/лево/право — берём из contentSide или дефолтим в CENTER
   const side = (s.contentSide as Align) || 'CENTER';
   const align = side === 'RIGHT' ? 'right' : side === 'LEFT' ? 'left' : 'center';
-  console.log(s, 'sectionPara');
 
   return (
     <TextWrap $bg={s.bgColor ?? null}>

@@ -48,8 +48,6 @@ interface ProductPageProps {
 }
 
 const getProductImage = (product: ProductWithDetails): string => {
-  console.log(product, 'PRODUCT in getProductImage');
-
   return product.images?.[0]?.url || '/images/placeholder.webp';
 };
 
@@ -147,8 +145,6 @@ const ProductPage: NextPage<ProductPageProps> = ({ product, placements }) => {
       },
     ],
   };
-
-  console.log(placements, 'PLACEMENTS in product page');
 
   return (
     <>
@@ -332,9 +328,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, locale })
     // 2) по id (если нужно)
     let productRaw = bySlug;
     try {
-      const r2 = await fetch(
-        `${apiBase}/products/id/${encodeURIComponent(bySlug.id)}`,
-      );
+      const r2 = await fetch(`${apiBase}/products/id/${encodeURIComponent(bySlug.id)}`);
       if (r2.ok) productRaw = await r2.json();
     } catch (error: unknown) {
       console.error(error);

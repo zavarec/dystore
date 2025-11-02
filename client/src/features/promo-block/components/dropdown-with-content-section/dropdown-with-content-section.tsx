@@ -55,6 +55,8 @@ export const DropdownWithContentSection: React.FC<Props> = ({
 
   if (!options.length) return null;
 
+  console.log(content, 'content');
+
   return (
     <SectionWrap $barBg={barBg} $contentBg={contentBg} $barText={barText} $barBorder={barBorder}>
       <Container>

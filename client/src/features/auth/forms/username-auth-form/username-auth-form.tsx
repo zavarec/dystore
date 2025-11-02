@@ -42,9 +42,7 @@ export const UsernameAuthForm: React.FC<UsernameAuthFormProps> = ({
 
   const isAdminPath = router.pathname.startsWith('/admin');
 
-  useEffect(() => {
-    console.log(isAdminPath, 'isAdminPath');
-  }, [isAdminPath]);
+  useEffect(() => {}, [isAdminPath]);
 
   const [isLoginMode, setIsLoginMode] = useState(true);
 

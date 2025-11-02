@@ -55,8 +55,6 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
   const categoryTree = React.useMemo(() => {
     if (!categories || categories.length === 0) return [];
 
-    console.log(categories, 'categories');
-
     const tree = CategoryTreeUtils.buildTree(categories);
     // Возвращаем только корневые категории для главной навигации
     return tree;
@@ -66,7 +64,6 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
-    console.log(user, 'user');
 
     window.addEventListener('scroll', handleScroll);
 

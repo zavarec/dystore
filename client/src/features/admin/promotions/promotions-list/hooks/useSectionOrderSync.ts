@@ -69,7 +69,6 @@ export function useSectionOrderSync({
     if (reorderItems.length > 0) {
       const updatedSections = await LayoutService.reorder(reorderItems);
       setPageSections(updatedSections);
-      console.log('Порядок секций обновлен:', updatedSections);
       return updatedSections;
     }
 
@@ -89,6 +88,3 @@ export function useSectionOrderSync({
     refreshSections,
   };
 }
-
-
-

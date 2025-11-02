@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useMemo, useState } from 'react';
+
+import { useSelector } from 'react-redux';
 
 import {
   Wrapper,
@@ -9,21 +10,21 @@ import {
   CategoryPromoGrid as Grid,
   Empty,
 } from '@/features/admin/promotions/promotions-list/promotions-list.style';
+import { useAppDispatch } from '@/hooks';
+import { selectPromoSections } from '@/store/slices/promo/promo.selectors';
 import {
   listPromoSections,
   deletePromoSection,
   duplicatePromoSection,
 } from '@/store/slices/promo/promo.thunks';
+import type { PromoSection } from '@/types/models/promo-section.model';
 
 import { PromoSectionCard } from './ui/promo-section-card';
 import { PromoSectionCreateModal } from './ui/promo-section-create-modal';
 import { PromoSectionEditModal } from './ui/promo-section-edit-modal';
 
-import { selectPromoSections } from '@/store/slices/promo/promo.selectors';
-import { PromoSection } from '@/types/models/promo-section.model';
-
 export function PromoSectionsBoard() {
-  const dispatch = useDispatch<any>();
+  const dispatch = useAppDispatch();
   const sections = useSelector(selectPromoSections) as PromoSection[];
   const [q, setQ] = useState('');
   const [isCreateOpen, setIsCreateOpen] = useState(false);

@@ -21,8 +21,6 @@ export const useCategoryProducts = ({ categoryId, options }: UseCategoryProducts
     },
   );
 
-  console.log(data, 'DATA');
-
   const refetch = () => mutate();
 
   return {

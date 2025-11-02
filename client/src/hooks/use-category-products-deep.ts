@@ -46,7 +46,7 @@ const fetcher = async (
   }
 
   const data = await response.json();
-  console.log('Products response:', data);
+
   return data as Resp;
 };
 
@@ -75,8 +75,6 @@ export function useCategoryProductsDeep(params: {
       ? ['categoryDeepProducts', slug, deep, validPage, validLimit, sort]
       : null;
 
-  console.log('useCategoryProductsDeep called with:', { slug, deep, page, limit, sort, key });
-
   const { data, error, isValidating, mutate } = useSWR<Resp>(
     key,
     key
@@ -95,15 +93,6 @@ export function useCategoryProductsDeep(params: {
       revalidateOnFocus: false,
     },
   );
-
-  console.log('useCategoryProductsDeep result:', {
-    data,
-    error,
-    isValidating,
-    loading: key ? (!data && !error) || isValidating : false,
-    products: data?.items ?? [],
-    total: data?.total ?? 0,
-  });
 
   return {
     data,

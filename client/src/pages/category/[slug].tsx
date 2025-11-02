@@ -70,9 +70,8 @@ const CategoryPage: NextPage<CategoryPageProps> = ({ slug, seoMeta, locale, plac
 
   // Адаптируем продукты для UI
   const rawProducts = useMemo(() => {
-    console.log('Raw fetched products:', fetchedProducts);
     const adapted = adaptProductsForUI(fetchedProducts ?? []);
-    console.log('Adapted products:', adapted);
+
     return adapted;
   }, [fetchedProducts]);
 
