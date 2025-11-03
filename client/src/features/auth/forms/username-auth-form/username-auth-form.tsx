@@ -1,10 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Resolver, useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { useState, useEffect } from 'react';
+
 import { useRouter } from 'next/router';
-import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useForm } from 'react-hook-form';
 
 import { Button } from '@/components/atoms/button';
+import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+import { clearError } from '@/store/slices/auth-slice/auth.slice';
+import { loginWithPassword, registerWithPassword } from '@/store/slices/auth-slice/auth.thunks';
+
+import type { LoginFormData, RegisterFormData } from './username-auth-form.schema';
+import type { Resolver } from 'react-hook-form';
+
+import { loginValidationSchema, registerValidationSchema } from './username-auth-form.schema';
 import {
   AuthFormTitle,
   AuthFormSubtitle,
@@ -16,14 +25,6 @@ import {
   // CloseButton,
   SwitchModeButton,
 } from './username-auth-form.style';
-import { loginWithPassword, registerWithPassword } from '@/store/slices/auth-slice/auth.thunks';
-import { clearError } from '@/store/slices/auth-slice/auth.slice';
-import {
-  LoginFormData,
-  RegisterFormData,
-  loginValidationSchema,
-  registerValidationSchema,
-} from './username-auth-form.schema';
 
 interface UsernameAuthFormProps {
   onClose?: () => void;

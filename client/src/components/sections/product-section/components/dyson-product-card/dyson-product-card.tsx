@@ -1,7 +1,11 @@
-import React from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
-import { ProductWithDetails } from '@/types/models/product.model';
+import Link from 'next/link';
+
+import { ButtonVariant } from '@/components/atoms/button/button.style';
+import { AddToCartButton } from '@/features/cart/add-to-cart-button';
+import { AddToCartButtonVariant } from '@/features/cart/add-to-cart-button/add-to-cart-button';
+import type { ProductWithDetails } from '@/types/models/product.model';
+
 import {
   Card,
   SaveBadge,
@@ -17,9 +21,6 @@ import {
   SaveAmount,
   ProductTitleWithImageWrapper,
 } from './dyson-product-card.style';
-import { AddToCartButton } from '@/features/cart/add-to-cart-button';
-import { ButtonVariant } from '@/components/atoms/button/button.style';
-import { AddToCartButtonVariant } from '@/features/cart/add-to-cart-button/add-to-cart-button';
 
 interface DysonProductCardProps {
   product: ProductWithDetails;
@@ -101,13 +102,13 @@ export const DysonProductCard: React.FC<DysonProductCardProps> = ({ product, ind
         <ProductInfo>
           {/* Цены */}
           <PriceContainer>
-            <CurrentPrice>₽{product.price.toLocaleString('ru-RU')}</CurrentPrice>
+            <CurrentPrice>{product.price.toLocaleString('ru-RU')}₽</CurrentPrice>
 
             {product.originalPrice && (
               <div>
-                <OriginalPrice>Was ₽{product.originalPrice.toLocaleString('ru-RU')}</OriginalPrice>
+                <OriginalPrice>Было {product.originalPrice.toLocaleString('ru-RU')}₽</OriginalPrice>
 
-                <SaveAmount>Save ₽{discount.toLocaleString('ru-RU')}</SaveAmount>
+                <SaveAmount>Вы экономите {discount.toLocaleString('ru-RU')}₽</SaveAmount>
               </div>
             )}
           </PriceContainer>

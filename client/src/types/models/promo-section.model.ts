@@ -1,4 +1,4 @@
-import { ResponsivePadding } from '@/features/promo-block/components/promo-carousel-section/promo-carousel-section';
+import type { ResponsivePadding } from '@/features/promo-block/components/promo-carousel-section/promo-carousel-section';
 
 export enum PromoVariant {
   BANNER = 'BANNER',

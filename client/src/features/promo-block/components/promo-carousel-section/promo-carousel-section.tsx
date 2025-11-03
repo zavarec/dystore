@@ -118,12 +118,20 @@ export const PromoCarouselSection = (section: PromoSection) => {
   const startX = useRef<number | null>(null);
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    startX.current = e.touches[0]?.clientX;
+    const firstTouch = e.touches[0];
+    startX.current = firstTouch ? firstTouch.clientX : null;
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (startX.current === null) return;
-    const deltaX = e.changedTouches[0].clientX - startX.current;
+
+    const firstChangeTouch = e.changedTouches[0];
+    if (!firstChangeTouch) {
+      startX.current = null;
+      return;
+    }
+
+    const deltaX = firstChangeTouch.clientX - startX.current;
     if (Math.abs(deltaX) > 50) {
       if (deltaX > 0) {
         prev(); // свайп вправо → предыдущий

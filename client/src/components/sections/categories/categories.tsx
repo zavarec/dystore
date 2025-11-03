@@ -1,5 +1,14 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
+
+import { CategoryCardSkeleton } from '@/components/atoms/skeleton';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+import { useIsOverflow } from '@/hooks/use-is-overflow';
+import {
+  selectIsRootCategoriesLoading,
+  selectRootCategories,
+} from '@/store/slices/categories-slice/categories.selectors';
+import { fetchRootCategories } from '@/store/slices/categories-slice/categories.thunks';
+
 import {
   CategoriesSection,
   CategoriesContainer,
@@ -7,14 +16,7 @@ import {
   CategoriesTitle,
   ScrollContainer,
 } from './categories.style';
-import { fetchRootCategories } from '@/store/slices/categories-slice/categories.thunks';
 import { CategoryCard } from './components';
-import { CategoryCardSkeleton } from '@/components/atoms/skeleton';
-import {
-  selectIsRootCategoriesLoading,
-  selectRootCategories,
-} from '@/store/slices/categories-slice/categories.selectors';
-import { useIsOverflow } from '@/hooks/use-is-overflow';
 
 export const Categories: React.FC = () => {
   const dispatch = useAppDispatch();

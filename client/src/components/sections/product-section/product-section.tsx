@@ -1,8 +1,8 @@
-import React from 'react';
-import { ProductWithDetails } from '@/types/models/product.model';
+import { ProductCardSkeleton } from '@/components/atoms/skeleton';
+import type { ProductWithDetails } from '@/types/models/product.model';
+
 import { DysonProductCard } from './components';
 import { Section, SectionTitle, ProductGrid } from './product-section.style';
-import { ProductCardSkeleton } from '@/components/atoms/skeleton';
 
 interface ProductSectionProps {
   title: string;

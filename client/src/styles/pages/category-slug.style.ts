@@ -10,8 +10,7 @@ export const Container = styled.div`
 
 export const Header = styled.section`
   text-align: left;
-  padding: 40px 0;
-  /* margin-bottom: 60px; */
+  ${commonStyles.container};
 `;
 
 export const CategoryTitle = styled.h1`

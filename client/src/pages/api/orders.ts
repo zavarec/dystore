@@ -1,4 +1,5 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import { requireCsrf } from '@/lib/csrf';
 
 interface OrderItem {

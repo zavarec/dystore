@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
-import { LayoutService, PageSectionDTO } from '@/services/layout.service';
+
+import type { PageSectionDTO } from '@/services/layout.service';
+import { LayoutService } from '@/services/layout.service';
 import { PromotionSlot } from '@/types/models/promotion.model';
 
 // Маппинг PromotionSlot к SectionKey (HERO не мапится, так как не в PageSection)

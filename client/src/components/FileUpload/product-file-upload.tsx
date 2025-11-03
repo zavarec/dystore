@@ -1,7 +1,10 @@
-// src/components/ProductForm/ProductImageUpload/ProductImageUpload.tsx
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
+
 import Image from 'next/image';
+
 import { UploadSimple, Camera, Trash, WarningCircle, CircleNotch } from '@phosphor-icons/react';
+
+import UploadsService from '@/services/uploads.service';
 
 import {
   UploadContainer,
@@ -24,7 +27,6 @@ import {
   HiddenInput,
   Tip,
 } from './product-file-upload.style';
-import UploadsService from '@/services/uploads.service';
 
 // Типы для загруженного файла (совместимые с вашим API)
 export interface UploadedFile {

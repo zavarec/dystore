@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 
-import type { GetStaticProps, GetStaticPaths, NextPage, GetServerSideProps } from 'next';
+import type { NextPage, GetServerSideProps } from 'next';
 
 import Link from 'next/link';
 
@@ -35,10 +35,6 @@ import { PromoSlot } from '@/types/models/promo-section.model';
 import type { SeoMeta } from '@/types/models/seo-meta.model';
 import { groupBySlot } from '@/utils/page-promo';
 import { adaptProductsForUI } from '@/utils/product-adapters';
-
-// import { HorizontalScroller } from '@/components/atoms/horizontal-scroller/horizontal-scroller';
-// import { CategoryCard } from '@/components/sections/categories/components';
-
 import { buildSEOFromMeta, fetchSeoMetaSSR } from '@/utils/seo';
 // import { allCategoriesPreviewImage } from '@/constants/category.constnat';
 
@@ -269,7 +265,7 @@ export const getServerSideProps: GetServerSideProps = async ({ params, locale })
   try {
     seoMeta = await fetchSeoMetaSSR('CATEGORY', slug, lng);
   } catch (e: unknown) {
-    // лог при желании
+    console.error(e);
     seoMeta = null;
   }
 

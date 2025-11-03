@@ -19,8 +19,18 @@ import {
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import type { RootState } from '@/store';
 import { updatePromoSection } from '@/store/slices/promo/promo.thunks';
+import type {
+  PromoCarouselContent,
+  PromoDropdownContent,
+  PromoHighlightsContent,
+} from '@/types/models/promo-carousel';
 import { ContentSideEnum, PromoFont, PromoVariant } from '@/types/models/promo-section.model';
 import type { PromoSection, UpdatePromoSectionDto } from '@/types/models/promo-section.model';
+
+interface MyOption {
+  value: string;
+  label: string;
+}
 
 export function PromoSectionEditModal({
   item,
@@ -45,7 +55,7 @@ export function PromoSectionEditModal({
   const [videoUrl, setVideoUrl] = useState<string>(sectionItem.videoUrl ?? '');
   const [ctaText, setCtaText] = useState<string>(sectionItem.ctaText ?? '');
   const [ctaLink, setCtaLink] = useState<string>(sectionItem.ctaLink ?? '');
-  const [font, setFont] = useState<PromoFont | ''>(sectionItem.font ?? '');
+  const [font, setFont] = useState<PromoFont | string>(sectionItem.font ?? '');
   const [titleColor, setTitleColor] = useState<string>(sectionItem.titleColor ?? '');
   const [textColor, setTextColor] = useState<string>(sectionItem.textColor ?? '');
   const [ctaBg, setCtaBg] = useState<string>(sectionItem.ctaBg ?? '');
@@ -109,17 +119,17 @@ export function PromoSectionEditModal({
             throw new Error('Ожидается объект с полем kind');
           }
 
-          const kind = (content as any).kind;
+          const kind = (content as PromoCarouselContent).kind;
           if (kind === 'carousel') {
-            if (!Array.isArray((content as any).slides)) {
+            if (!Array.isArray((content as PromoCarouselContent).slides)) {
               throw new Error('Ожидается { kind:"carousel", slides:[ ... ] }');
             }
           } else if (kind === 'dropdown') {
-            if (!Array.isArray((content as any).options)) {
+            if (!Array.isArray((content as PromoDropdownContent).options)) {
               throw new Error('Ожидается { kind:"dropdown", options:[ ... ] }');
             }
           } else if (kind === 'highlights') {
-            if (!Array.isArray((content as any).items)) {
+            if (!Array.isArray((content as PromoHighlightsContent).items)) {
               throw new Error('Ожидается { kind:"highlights", items:[ ... ] }');
             }
           } else {
@@ -161,8 +171,10 @@ export function PromoSectionEditModal({
 
       await dispatch(updatePromoSection({ id: item.id, dto }));
       onClose();
-    } catch (err: any) {
-      toast.error(err?.message || 'Не удалось обновить секцию');
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message || 'Не удалось обновить секцию');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -183,7 +195,7 @@ export function PromoSectionEditModal({
             <ReactSelect
               options={variantOptions}
               value={variantOptions.find(o => o.value === variant) || null}
-              onChange={(opt: any) => setVariant(opt?.value as PromoVariant)}
+              onChange={opt => setVariant(opt?.value as PromoVariant)}
               isClearable={false}
             />
           </Field>
@@ -282,7 +294,9 @@ export function PromoSectionEditModal({
             <ReactSelect
               options={fontOptions}
               value={fontOptions.find(o => o.value === (font || '')) || fontOptions[0]}
-              onChange={(opt: any) => setFont((opt?.value || '') as any)}
+              onChange={(opt: MyOption | undefined | null) =>
+                setFont(opt?.value ?? '') as PromoFont | undefined
+              }
               isClearable
             />
           </Field>
@@ -320,7 +334,9 @@ export function PromoSectionEditModal({
                 contentSideOptions.find(o => o.value === (contentSide || '')) ||
                 contentSideOptions[0]
               }
-              onChange={(opt: any) => setContentSide((opt?.value || '') as any)}
+              onChange={(opt: MyOption | undefined | null) =>
+                setContentSide((opt?.value ?? '') as ContentSideEnum)
+              }
               isClearable
             />
           </Field>
