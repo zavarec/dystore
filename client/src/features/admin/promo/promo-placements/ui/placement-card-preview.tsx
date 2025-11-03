@@ -1,4 +1,4 @@
-import { PromoPlacement } from '@/types/models/promo-placement.model';
+import type { PromoPlacement } from '@/types/models/promo-placement.model';
 
 export const PlacementCardPreview: React.FC<{ item: PromoPlacement }> = ({ item }) => {
   const previewContent =

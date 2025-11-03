@@ -53,6 +53,7 @@ import { CreatePlacementModal } from './ui/CreatePlacementModal';
 import { EditPlacementModal } from './ui/EditPlacementModal';
 import { PlacementCardPreview } from './ui/placement-card-preview';
 import { SortablePlacementCard } from './ui/SortablePlacementCard';
+import { PromoSectionEditModal } from '../promo-sections/ui/promo-section-edit-modal';
 
 // import { Select } from '../promo-sections/ui/promo-sections-modals.style';
 
@@ -63,18 +64,22 @@ export function PromoPlacementsBoard() {
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editing, setEditing] = useState<PromoPlacement | null>(null);
+  const [editingSection, setEditingSection] = useState<PromoSection | null>(null);
 
   const [attachOpen, setAttachOpen] = useState(false);
   const [attachToSlot, setAttachToSlot] = useState<PromoSlot | null>(null);
 
   const [pendingLocal, setPendingLocal] = useState(false);
 
-  const byId = useSelector((s: RootState) => (s as any).sectionsWithPlacementsSlice.byPlacementId);
+  const byId = useSelector((state: RootState) => state.sectionsWithPlacementsSlice.byPlacementId);
   const byPage = useSelector(
-    (s: RootState) => (s as any).sectionsWithPlacementsSlice.byPlacementPage,
+    (state: RootState) => state.sectionsWithPlacementsSlice.byPlacementPage,
   );
   const isLoading = useSelector(
-    (s: RootState) => (s as any).sectionsWithPlacementsSlice.placementsLoading,
+    (state: RootState) => state.sectionsWithPlacementsSlice.placementsLoading,
+  );
+  const sectionsById = useSelector(
+    (state: RootState) => state.sectionsWithPlacementsSlice.bySectionId,
   );
 
   const [params, setParams] = useState<{ pageType?: PromoPageType; entityId?: string }>({});
@@ -191,14 +196,38 @@ export function PromoPlacementsBoard() {
     setPendingLocal(false);
   };
 
-  const onEditSection = async (item: PromoPlacement) => {
-    // опционально можно открыть редактор секции
+  const openSectionEditor = async (item: PromoPlacement) => {
     const id = (item as any).promoSectionId ?? item.promoSection?.id;
     if (!id) return;
-    const list = (await dispatch(listPromoSections())) as PromoSection[];
-    const found = list.find(section => section.id === id) as PromoSection | undefined;
-    if (!found) return;
-    // тут можно открыть свою модалку редактирования секции
+
+    const existing = sectionsById?.[id];
+    if (existing) {
+      setEditingSection(existing);
+      return;
+    }
+
+    const action = await dispatch(listPromoSections());
+    const payload = action?.payload ?? action;
+    const list: PromoSection[] | undefined = Array.isArray(payload)
+      ? payload
+      : payload?.allSections;
+    const found = list?.find(section => section.id === id);
+    if (found) {
+      setEditingSection(found);
+    }
+  };
+
+  const handleEditSection = (item: PromoPlacement) => {
+    void openSectionEditor(item);
+  };
+
+  const handleSectionModalClose = () => {
+    setEditingSection(null);
+    if (params.pageType && params.entityId) {
+      void dispatch(
+        listPlacements({ pageType: params.pageType, entityId: params.entityId } as any),
+      );
+    }
   };
 
   const onDetachPlacement = async (item: PromoPlacement) => {
@@ -309,7 +338,7 @@ export function PromoPlacementsBoard() {
                         item={item}
                         sortMode
                         onEdit={() => setEditing(item)}
-                        onEditSection={() => onEditSection(item)}
+                        onEditSection={() => handleEditSection(item)}
                         onDelete={() => onDetachPlacement(item)}
                         onChangeSlot={(s: PromoSlot) => {
                           dispatch(updatePlacement({ id: item.id, dto: { slot: s } }));
@@ -347,6 +376,10 @@ export function PromoPlacementsBoard() {
             setAttachToSlot(null);
           }}
         />
+      )}
+
+      {editingSection && (
+        <PromoSectionEditModal item={editingSection} onClose={handleSectionModalClose} />
       )}
     </Wrapper>
   );

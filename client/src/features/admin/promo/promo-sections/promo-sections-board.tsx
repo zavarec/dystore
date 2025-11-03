@@ -26,19 +26,26 @@ import { PromoSectionEditModal } from './ui/promo-section-edit-modal';
 export function PromoSectionsBoard() {
   const dispatch = useAppDispatch();
   const sections = useSelector(selectPromoSections) as PromoSection[];
-  const [q, setQ] = useState('');
+  const [searchText, setSearchText] = useState('');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editing, setEditing] = useState<PromoSection | null>(null);
 
   useEffect(() => {
-    dispatch(listPromoSections(q || undefined));
-  }, [dispatch, q]);
+    dispatch(listPromoSections(searchText || undefined));
+  }, [dispatch, searchText]);
 
   const filtered = useMemo(() => {
-    const s = q.trim().toLowerCase();
+    const s = searchText.trim().toLowerCase();
     if (!s) return sections;
-    return sections.filter(x => (x.title || '').toLowerCase().includes(s));
-  }, [sections, q]);
+
+    return sections.filter(section => {
+      const title = section.title?.toLowerCase() ?? '';
+      const subtitle = section.subtitle?.toLowerCase() ?? '';
+      const id = String(section.id ?? '').toLowerCase();
+
+      return title.includes(s) || subtitle.includes(s) || id.includes(s);
+    });
+  }, [sections, searchText]);
 
   const handleDelete = async (id: number) => {
     if (window.confirm('Удалить секцию?')) await dispatch(deletePromoSection(id));
@@ -56,13 +63,15 @@ export function PromoSectionsBoard() {
           <Sub>Каталог секций. Создание / редактирование / дублирование</Sub>
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
             <input
-              value={q}
-              onChange={e => setQ(e.target.value)}
+              value={searchText}
+              onChange={e => setSearchText(e.target.value)}
               placeholder="Поиск по заголовку"
               style={{ width: 260 }}
             />
             <button onClick={() => setIsCreateOpen(true)}>Создать</button>
-            <button onClick={() => dispatch(listPromoSections(q || undefined))}>Обновить</button>
+            <button onClick={() => dispatch(listPromoSections(searchText || undefined))}>
+              Обновить
+            </button>
           </div>
         </HeaderRow>
 

@@ -1,6 +1,8 @@
-import { NextPage } from 'next';
-import { AdminLayout } from '@/components/admin/layout/admin-layout';
+import type { NextPage } from 'next';
+
 import dynamic from 'next/dynamic';
+
+import { AdminLayout } from '@/components/admin/layout/admin-layout';
 
 const PromoSectionsBoard = dynamic(
   () =>

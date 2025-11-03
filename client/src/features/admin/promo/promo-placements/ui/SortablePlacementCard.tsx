@@ -1,6 +1,6 @@
-import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+
 import {
   PromotionsCard,
   CardBody,
@@ -9,11 +9,10 @@ import {
   MetaItem,
   Actions,
   Status,
-  Thumb,
-  VideoBadge,
 } from '@/features/admin/promotions/promotions-list/promotions-list.style';
+import type { PromoPlacement } from '@/types/models/promo-placement.model';
 import { PromoSlot } from '@/types/models/promo-section.model';
-import { PromoPlacement } from '@/types/models/promo-placement.model';
+
 import { CloseIcon, DeleteButton } from '../promo-placements-board.style';
 import { Preview } from './card-preview';
 
@@ -44,18 +43,6 @@ export const SortablePlacementCard: React.FC<Props> = ({
   const style = { transform: CSS.Transform.toString(transform), transition } as React.CSSProperties;
 
   const dragProps = sortMode ? { ...attributes, ...listeners } : {};
-
-  const previewContent =
-    item.promoSection?.imageUrl || item.promoSection?.videoUrl ? (
-      <div
-        style={{
-          height: 140,
-          background: `url(${item.promoSection?.imageUrl}) center/cover no-repeat`,
-        }}
-      >
-        {item.promoSection?.videoUrl && <VideoBadge>video</VideoBadge>}
-      </div>
-    ) : null;
 
   return (
     <PromotionsCard

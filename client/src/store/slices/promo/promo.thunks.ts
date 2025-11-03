@@ -1,10 +1,11 @@
+import { createAsyncThunk } from '@reduxjs/toolkit';
+
 import { PromoService } from '@/services/promo.service';
-import {
+import type {
   CreatePromoSectionDto,
   PromoSection,
   UpdatePromoSectionDto,
 } from '@/types/models/promo-section.model';
-import { createAsyncThunk } from '@reduxjs/toolkit';
 
 export const listPromoSections = createAsyncThunk('promo/sections/list', async (q?: string) => {
   return await PromoService.listSections(q);
@@ -64,7 +65,7 @@ export const duplicatePromoSection = createAsyncThunk(
   async (source: PromoSection, { rejectWithValue }) => {
     try {
       // соберём dto для создания
-      const { id, createdAt, updatedAt, placements, ...rest } = source as any;
+      const { id, createdAt, updatedAt, placements, ...rest } = source;
 
       const dto: CreatePromoSectionDto = {
         ...rest,
@@ -75,8 +76,10 @@ export const duplicatePromoSection = createAsyncThunk(
       // создаём новую секцию
       const created = await PromoService.createSection(dto);
       return created; // вернём для редьюсера
-    } catch (e: any) {
-      return rejectWithValue(e?.message || 'Не удалось дублировать секцию');
+    } catch (error) {
+      if (error instanceof Error) {
+        return rejectWithValue(error?.message || 'Не удалось дублировать секцию');
+      }
     }
   },
 );

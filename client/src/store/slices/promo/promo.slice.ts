@@ -1,4 +1,9 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
+
+import type { PromoPlacement } from '@/types/models/promo-placement.model';
+import type { PromoSection } from '@/types/models/promo-section.model';
+
+import type { PayloadAction } from '@reduxjs/toolkit';
 
 import {
   createPlacement,
@@ -12,8 +17,6 @@ import {
   updatePlacement,
   updatePromoSection,
 } from './promo.thunks';
-import { PromoPlacement } from '@/types/models/promo-placement.model';
-import { PromoSection } from '@/types/models/promo-section.model';
 
 type SectionsWithPlacementsState = {
   allSections: PromoSection[];
@@ -70,7 +73,7 @@ const sectionsWithPlacementsSlice = createSlice({
         state.sectionsLoading = true;
         state.sectionsError = null;
       })
-      .addCase(listPromoSections.fulfilled, (state, { payload }: PayloadAction<any[]>) => {
+      .addCase(listPromoSections.fulfilled, (state, { payload }) => {
         state.sectionsLoading = false;
         state.bySectionId = {};
         state.allSectionIds = [];

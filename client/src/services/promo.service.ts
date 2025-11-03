@@ -1,9 +1,14 @@
-import { CreatePromoSectionDto, UpdatePromoSectionDto } from '@/types/models/promo-section.model';
-import { apiClient } from './api';
-import {
+import type {
   CreatePromoPlacementDto,
   UpdatePromoPlacementDto,
 } from '@/types/models/promo-placement.model';
+import type {
+  CreatePromoSectionDto,
+  PromoSection,
+  UpdatePromoSectionDto,
+} from '@/types/models/promo-section.model';
+
+import { apiClient } from './api';
 
 export class PromoService {
   static async getForPage(pageType: string, entityId: string) {
@@ -11,7 +16,7 @@ export class PromoService {
     return data;
   }
   // admin: sections
-  static async listSections(q?: string) {
+  static async listSections(q?: string): Promise<PromoSection> {
     const { data } = await apiClient.get('/admin/promo-sections', { params: { q } });
     return data;
   }
