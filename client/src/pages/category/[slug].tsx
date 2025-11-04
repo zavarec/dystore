@@ -111,8 +111,8 @@ const CategoryPage: NextPage<CategoryPageProps> = ({ slug, seoMeta, locale, plac
     [slug, locale],
   ); // и
 
-  // SEO данные
   const seoData = buildSEOFromMeta(fallBackSEO, seoMeta);
+  const isCategoryDysonCorale = category?.slug === 'vypryamiteli-dyson-corrale';
 
   return (
     <>
@@ -128,8 +128,12 @@ const CategoryPage: NextPage<CategoryPageProps> = ({ slug, seoMeta, locale, plac
         {...(categoryVideoSrc ? { src: categoryVideoSrc } : {})}
         {...(!categoryVideoSrc && category?.imageUrl ? { backgroundImage: category.imageUrl } : {})}
       >
-        <h1 style={{ fontSize: '2.2rem', marginBottom: 12 }}>{categoryName}</h1>
-        <p style={{ opacity: 0.9, marginBottom: 16 }}>{categoryDescription}</p>
+        {!isCategoryDysonCorale && (
+          <>
+            <h1 style={{ fontSize: '2.2rem', marginBottom: 12 }}>{categoryName}</h1>
+            <p style={{ opacity: 0.9, marginBottom: 16 }}>{categoryDescription}</p>
+          </>
+        )}
         {/* <Button
             size="large"
             onClick={scrollToSubcategories}

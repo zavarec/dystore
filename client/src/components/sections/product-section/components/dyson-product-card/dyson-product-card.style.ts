@@ -178,6 +178,7 @@ export const OriginalPrice = styled.span`
   color: #999;
   font-size: 14px;
   margin-right: 12px;
+  text-decoration: line-through;
 
   @media (max-width: 480px) {
     font-size: 13px;

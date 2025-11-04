@@ -8,7 +8,6 @@ import type { ProductWithDetails } from '@/types/models/product.model';
 
 import {
   Card,
-  SaveBadge,
   ProductImage,
   ProductInfo,
   ProductTitle,
@@ -63,7 +62,7 @@ export const DysonProductCard: React.FC<DysonProductCardProps> = ({ product, ind
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: index * 0.1 }}
     >
-      {discount > 0 && <SaveBadge>Сохраните ₽{discount.toLocaleString('ru-RU')}</SaveBadge>}
+      {/* {discount > 0 && <SaveBadge>Сохраните ₽{discount.toLocaleString('ru-RU')}</SaveBadge>} */}
 
       <Link href={href}>
         <ProductTitleWithImageWrapper>
@@ -100,7 +99,7 @@ export const DysonProductCard: React.FC<DysonProductCardProps> = ({ product, ind
               <div>
                 <OriginalPrice>Было {product.originalPrice.toLocaleString('ru-RU')}₽</OriginalPrice>
 
-                <SaveAmount>Вы экономите {discount.toLocaleString('ru-RU')}₽</SaveAmount>
+                <SaveAmount>Скидка {discount.toLocaleString('ru-RU')}₽</SaveAmount>
               </div>
             )}
           </PriceContainer>
