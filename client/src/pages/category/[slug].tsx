@@ -45,6 +45,8 @@ interface CategoryPageProps {
   placements?: PromoPlacement[];
 }
 
+const MODEL_ORDER = ['V15', 'V12', 'V11', 'V10', 'V8', 'Gen5', '360', 'WashG1'];
+
 const CategoryPage: NextPage<CategoryPageProps> = ({ slug, seoMeta, locale, placements }) => {
   // const router = useRouter();
   const [sortBy, setSortBy] = useState<ProductSortBy>(ProductSortBy.POPULARITY);
@@ -81,9 +83,18 @@ const CategoryPage: NextPage<CategoryPageProps> = ({ slug, seoMeta, locale, plac
         return sorted.sort((a, b) => b.price - a.price);
       case ProductSortBy.POPULARITY:
       default:
-        return sorted;
+        return sorted.sort((a, b) => {
+          const aModelIndex = MODEL_ORDER.findIndex(model => a.name.includes(model));
+          const bModelIndex = MODEL_ORDER.findIndex(model => b.name.includes(model));
+
+          return (
+            (aModelIndex === -1 ? 999 : aModelIndex) - (bModelIndex === -1 ? 999 : bModelIndex)
+          );
+        });
     }
   }, [rawProducts, sortBy]);
+
+  console.log(sortedProducts, 'sortedProducts');
 
   const loading = categoryLoading || productsLoading;
   const categoryName = category?.name || 'Категория';
