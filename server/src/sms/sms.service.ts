@@ -35,8 +35,10 @@ export class SmsService {
         return;
       }
 
+      const normalizedPhone = this.normalizePhone(phone);
+
       const params: any = {
-        to: phone,
+        to: normalizedPhone,
         text: `Ваш код подтверждения: ${code}`,
       };
 
@@ -44,6 +46,7 @@ export class SmsService {
       if (this.testMode) params.test = 1; // включаем test=1
 
       const result = await this.sendViaSmsRu(params);
+      this.logger.debug(`SMS.ru response: ${JSON.stringify(result)}`);
 
       // Проверяем общий статус
       if (result?.status !== "OK") {
@@ -55,7 +58,7 @@ export class SmsService {
       }
 
       // Проверяем конкретный номер
-      const phoneResult = result.sms?.[phone];
+      const phoneResult = result.sms?.[normalizedPhone];
       if (!phoneResult || phoneResult.status !== "OK") {
         this.logger.error(
           `SMS not accepted for ${phone}: ${JSON.stringify(phoneResult)}`,
@@ -70,7 +73,11 @@ export class SmsService {
       this.logger.log(
         `SMS ${this.testMode ? "(TEST MODE)" : ""} sent to ${this.maskPhone(
           phone,
-        )}, sms_id=${phoneResult.sms_id}, balance=${result.balance}`,
+        )}, status=${phoneResult.status_code} ${
+          phoneResult.status_text ?? ""
+        }, sms_id=${phoneResult.sms_id ?? ""}, balance=${
+          result.balance ?? ""
+        }`,
       );
     } catch (e: any) {
       this.logger.error(`Ошибка при отправке SMS: ${e?.message || e}`);
@@ -100,6 +107,18 @@ export class SmsService {
         }
       });
     });
+  }
+
+  private normalizePhone(phone: string): string {
+    const digits = phone.replace(/\D/g, "");
+    if (digits.length === 11) {
+      if (digits.startsWith("8")) {
+        return `7${digits.slice(1)}`;
+      }
+      return digits;
+    }
+    if (digits.length === 10) return `7${digits}`;
+    return digits;
   }
 
   private maskPhone(phone: string): string {
