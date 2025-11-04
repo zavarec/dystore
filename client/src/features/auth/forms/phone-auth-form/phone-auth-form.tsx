@@ -65,6 +65,10 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({ onClose, redirectT
     mode: 'onSubmit',
   });
 
+  const {
+    formState: { errors: phoneFormErrors },
+  } = phoneForm;
+
   // Форма для ввода кода
   const codeForm = useForm<CodeFormData>({
     resolver: yupResolver(codeValidationSchema),
@@ -179,14 +183,14 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({ onClose, redirectT
                 />
               )}
             />
-            {phoneForm.formState.errors.phone && (
+            {phoneFormErrors.phone && (
               <ErrorMessage id="phone-error" role="alert">
-                {phoneForm.formState.errors.phone.message}
+                {phoneFormErrors.phone.message}
               </ErrorMessage>
             )}
           </FormGroup>
 
-          {error && <ErrorMessage role="alert">{error}</ErrorMessage>}
+          {/* {error && <ErrorMessage role="alert">{error}</ErrorMessage>} */}
 
           <FormActions>
             <Button

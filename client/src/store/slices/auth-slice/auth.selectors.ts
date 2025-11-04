@@ -1,4 +1,4 @@
-import { RootState } from '@/store';
+import type { RootState } from '@/store';
 
 export const selectIsAuthenticated = (state: RootState) => state.authSlice.isAuthenticated;
 export const selectUser = (state: RootState) => state.authSlice.user;
