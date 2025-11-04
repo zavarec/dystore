@@ -55,7 +55,7 @@ export const MachineHighlightsSection: React.FC<Props> = ({ section, content }) 
   const bg = content.bgColor ?? section.bgColor ?? '#fff';
   const heading = content.heading ?? section.title ?? undefined;
   const subheading = content.subheading ?? section.subtitle ?? undefined;
-  const headingColor = content.textColor ?? section.titleColor ?? undefined;
+  const textColor = content.textColor ?? section.titleColor ?? undefined;
 
   return (
     <Section
@@ -74,13 +74,13 @@ export const MachineHighlightsSection: React.FC<Props> = ({ section, content }) 
     >
       <Wrapper>
         {(heading || subheading) && (
-          <Heading $color={headingColor}>
+          <Heading $color={textColor}>
             {heading && <h2>{heading}</h2>}
             {subheading && <p>{subheading}</p>}
           </Heading>
         )}
 
-        <Grid $variant={layout}>
+        <Grid>
           {content.items.map(item => {
             // цифры-спаны в юнитах сетки: 4/8/12
             const spanSm = item.span?.sm ?? 4; // вся строка на sm
@@ -116,8 +116,10 @@ export const MachineHighlightsSection: React.FC<Props> = ({ section, content }) 
                 }
               >
                 {item.media && <Media>{renderMedia(item)}</Media>}
-                {item.title && <CardTitle>{item.title}</CardTitle>}
-                {item.description && <CardDescription>{item.description}</CardDescription>}
+                {item.title && <CardTitle $color={textColor}>{item.title}</CardTitle>}
+                {item.description && (
+                  <CardDescription $color={textColor}>{item.description}</CardDescription>
+                )}
                 {item.ctaText && item.href && (
                   <CardCta href={item.href} aria-label={item.ctaText}>
                     {item.ctaText}

@@ -23,7 +23,6 @@ export const Heading = styled.header<{ $color?: string | undefined }>`
   display: flex;
   flex-direction: column;
   gap: 16px;
-
   h2 {
     margin: 0;
     font-size: clamp(28px, 3.2vw, 40px);
@@ -36,19 +35,20 @@ export const Heading = styled.header<{ $color?: string | undefined }>`
     margin: 0;
     font-size: clamp(16px, 2vw, 18px);
     line-height: 1.55;
-    color: rgba(55, 65, 81, 0.88);
+    color: ${({ $color }) => $color || `rgba(55, 65, 81, 0.88)`};
   }
 `;
 
-export const CardTitle = styled.h3`
+export const CardTitle = styled.h3<{ $color?: string | undefined }>`
+  color: ${({ $color }) => $color || `rgba(55, 65, 81, 0.88)`};
   margin: 0;
   font-size: clamp(18px, 2vw, 20px);
   font-weight: 600;
 `;
 
-export const CardDescription = styled.p`
+export const CardDescription = styled.p<{ $color?: string | undefined }>`
   margin: 0;
-  color: rgba(55, 65, 81, 0.88);
+  color: ${({ $color }) => $color || `rgba(55, 65, 81, 0.88)`};
   line-height: 1.6;
   font-size: 15px;
 `;

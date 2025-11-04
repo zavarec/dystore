@@ -29,7 +29,6 @@ interface DysonProductCardProps {
 }
 
 export const DysonProductCard: React.FC<DysonProductCardProps> = ({ product, index = 0 }) => {
-  // Рассчитываем скидку
   const discount = product.originalPrice ? product.originalPrice - product.price : 0;
 
   const href = `/product/${product.slug}`;
@@ -37,7 +36,6 @@ export const DysonProductCard: React.FC<DysonProductCardProps> = ({ product, ind
   const genericBlur =
     'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0nMjgwJyBoZWlnaHQ9JzI4MCcgeG1sbnM9J2h0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnJz48cmVjdCB3aWR0aD0nMjgwJyBoZWlnaHQ9JzI4MCcgZmlsbD0nI2U5ZWNlZicvPjwvc3ZnPg==';
 
-  // Создаем звезды для рейтинга
   const renderStars = (rating: number) => {
     const stars = [];
     const fullStars = Math.floor(rating);
@@ -65,13 +63,10 @@ export const DysonProductCard: React.FC<DysonProductCardProps> = ({ product, ind
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, delay: index * 0.1 }}
     >
-      {/* Бейдж скидки */}
-      {discount > 0 && <SaveBadge>Save ₽{discount.toLocaleString('ru-RU')}</SaveBadge>}
+      {discount > 0 && <SaveBadge>Сохраните ₽{discount.toLocaleString('ru-RU')}</SaveBadge>}
 
       <Link href={href}>
         <ProductTitleWithImageWrapper>
-          {/* Изображение товара */}
-
           <ProductImage>
             <Image
               src={product.mainImage?.url || '/images/placeholder.webp'}
@@ -90,7 +85,6 @@ export const DysonProductCard: React.FC<DysonProductCardProps> = ({ product, ind
             <span>{product.name}</span>
           </ProductTitle>
 
-          {/* Рейтинг */}
           <RatingContainer>
             <StarRating>{renderStars(product.rating || 4)}</StarRating>
 
@@ -98,9 +92,7 @@ export const DysonProductCard: React.FC<DysonProductCardProps> = ({ product, ind
           </RatingContainer>
         </ProductTitleWithImageWrapper>
 
-        {/* Информация о товаре */}
         <ProductInfo>
-          {/* Цены */}
           <PriceContainer>
             <CurrentPrice>{product.price.toLocaleString('ru-RU')}₽</CurrentPrice>
 
@@ -115,7 +107,6 @@ export const DysonProductCard: React.FC<DysonProductCardProps> = ({ product, ind
         </ProductInfo>
       </Link>
 
-      {/* Кнопка */}
       <AddToCartButton
         // productId={product.id}
         product={product}
