@@ -1,11 +1,13 @@
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import { AxiosError } from 'axios';
+
 import AuthService from '@/services/auth.service';
-import {
+import type {
   LoginRequest,
   RegisterRequest,
   SendCodeRequest,
   VerifyCodeRequest,
 } from '@/types/models/auth.model';
-import { createAsyncThunk } from '@reduxjs/toolkit';
 
 // Async thunks
 export const sendCode = createAsyncThunk(
@@ -14,8 +16,10 @@ export const sendCode = createAsyncThunk(
     try {
       const response = await AuthService.sendCode(data);
       return { ...response, phone: data.phone };
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Ошибка при отправке кода');
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(error.response?.data?.message || 'Ошибка при отправке кода');
+      }
     }
   },
 );
@@ -27,8 +31,10 @@ export const verifyCode = createAsyncThunk(
       await AuthService.verifyCode(data);
       const user = await AuthService.getProfile();
       return { user, token: null };
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Ошибка при проверке кода');
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(error.response?.data?.message || 'Ошибка при проверке кода');
+      }
     }
   },
 );
@@ -39,8 +45,10 @@ export const loadUserProfile = createAsyncThunk(
     try {
       const user = await AuthService.getProfile();
       return user;
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Ошибка загрузки профиля');
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(error.response?.data?.message || 'Ошибка загрузки профиля');
+      }
     }
   },
 );
@@ -58,8 +66,10 @@ export const loginWithPassword = createAsyncThunk(
       await AuthService.login(data);
       const user = await AuthService.getProfile();
       return { user, token: null };
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Ошибка при входе');
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(error.response?.data?.message || 'Ошибка при входе');
+      }
     }
   },
 );
@@ -68,13 +78,15 @@ export const registerWithPassword = createAsyncThunk(
   'auth/registerWithPassword',
   async (data: RegisterRequest, { rejectWithValue }) => {
     try {
-      const response = await AuthService.register(data);
+      // const response = await AuthService.register(data);
       // После регистрации сразу авторизуем через внутренний login (если сервер сразу не ставит куку)
       await AuthService.login({ email: data.email, password: data.password });
       const user = await AuthService.getProfile();
       return { user, token: null };
-    } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || 'Ошибка при регистрации');
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(error.response?.data?.message || 'Ошибка при регистрации');
+      }
     }
   },
 );

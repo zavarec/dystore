@@ -1,11 +1,13 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
+
 // import { PhoneAuthForm } from '@/features/auth/forms/phone-auth-form';
 // import { UsernameAuthForm } from '@/features/auth/forms/username-auth-form';
 // import { AuthModeButton, AuthModeContainer, AuthModeSelector } from './auth-modal-content.style';
+import { Modal } from '@/components/atoms/modal';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { selectIsAuthenticated } from '@/store/slices/auth-slice/auth.selectors';
 import { setAuthModalOpen } from '@/store/slices/uiSlice';
-import { Modal } from '@/components/atoms/modal';
+
 import { PhoneAuthForm } from '../forms/phone-auth-form/phone-auth-form';
 
 interface AuthModalProps {
@@ -16,7 +18,6 @@ export const AuthModal: React.FC<AuthModalProps> = () => {
   const dispatch = useAppDispatch();
   const isAuthModalOpen = useAppSelector(state => state.uiSlice.isAuthModalOpen);
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
-
 
   useEffect(() => {
     if (isAuthenticated && isAuthModalOpen) {

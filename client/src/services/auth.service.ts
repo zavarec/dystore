@@ -17,7 +17,7 @@ import { apiClient } from './api';
 export type ApiError = Error & { status?: number; details?: unknown };
 
 export class AuthService {
-  static apiAuthUrl = 'api/auth'; // твой базовый URL
+  static apiAuthUrl = '/api/auth'; // твой базовый URL
 
   private static async getOrInitCsrfToken(): Promise<string | undefined> {
     let token = Cookies.get('XSRF-TOKEN');

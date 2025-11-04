@@ -34,7 +34,7 @@ interface Props {
 export const MachineHighlightsSection: React.FC<Props> = ({ section, content }) => {
   if (!content.items?.length) return null;
 
-  const layout = content.layout ?? 'grid';
+  // const layout = content.layout ?? 'grid';
 
   // колонки для grid
   const colsSm = content.columnsSm ?? 1;
