@@ -1,19 +1,31 @@
-// modal.style.ts
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
 
-export const ModalOverlay = styled(motion.div)<{ $alignStart?: boolean }>`
+export const ModalOverlay = styled(motion.div)<{
+  $alignStart?: boolean;
+  $scrollStrategy?: 'content' | 'page' | 'modal' | undefined;
+}>`
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: saturate(140%) blur(2px);
-  display: flex;
-  align-items: ${({ $alignStart }) => ($alignStart ? 'flex-end' : 'center')};
-  justify-content: center;
   z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: ${({ $alignStart, $scrollStrategy }) =>
+    $scrollStrategy === 'modal' ? 'flex-start' : $alignStart ? 'flex-end' : 'center'};
   padding: 16px;
-`;
+  min-height: 100vh;
+  overscroll-behavior: contain;
 
+  ${({ $scrollStrategy }) =>
+    $scrollStrategy === 'modal'
+      ? `
+        padding-top: clamp(48px, 10vh, 120px);
+        overflow-y: auto;
+      `
+      : ''}
+`;
 const sizeToMaxWidth: Record<'sm' | 'md' | 'lg' | 'xl', string> = {
   sm: '420px',
   md: '560px',
@@ -25,14 +37,25 @@ export const ModalContainer = styled(motion.div)<{
   $size: 'sm' | 'md' | 'lg' | 'xl';
   $maxWidth?: string;
   $isSheet?: boolean;
+  $fullHeight: boolean | undefined;
+  $scrollStrategy?: 'content' | 'page' | 'modal' | undefined;
 }>`
   position: relative;
   width: 100%;
   max-width: ${({ $maxWidth, $size }) => $maxWidth ?? sizeToMaxWidth[$size]};
-  max-height: 85vh;
+  /* полноэкранная высота для 'modal' или когда явно включили fullHeight */
+  ${({ $scrollStrategy, $fullHeight }) =>
+    $scrollStrategy === 'modal'
+      ? `
+        height: auto;
+        min-height: auto;
+        flex: 0 1 auto;
+      `
+      : $fullHeight
+        ? 'height: 100vh; max-height: none;'
+        : 'max-height: 85vh;'}
   display: flex;
   flex-direction: column;
-  border-radius: ${({ $isSheet }) => ($isSheet ? '20px 20px 16px 16px' : '24px')};
   background: #fff;
   border: 1px solid rgba(0, 0, 0, 0.06);
   box-shadow:
@@ -40,17 +63,6 @@ export const ModalContainer = styled(motion.div)<{
     0 8px 28px rgba(0, 0, 0, 0.14),
     inset 0 1px 0 rgba(255, 255, 255, 0.35);
   overflow: hidden;
-
-  @media (max-width: 520px) {
-    max-width: 100%;
-    ${({ $isSheet }) =>
-      $isSheet
-        ? `
-      border-radius: 20px 20px 0 0;
-      max-height: 92vh;
-    `
-        : ''}
-  }
 `;
 
 export const ModalHeader = styled.div`
@@ -96,15 +108,49 @@ export const ModalCloseButton = styled.button`
   }
 `;
 
-export const ModalContent = styled.div<{ $padding: number }>`
+export const ModalContent = styled.div<{
+  $padding: number;
+  $scrollStrategy: 'content' | 'page' | 'modal' | undefined;
+  $hasHeader?: boolean;
+}>`
   padding: ${({ $padding }) => `${$padding}px`};
-  overflow: auto;
-  max-height: calc(85vh - 62px);
   font-family: var(--font-nunito-sans);
   font-size: 16px;
   line-height: 1.55;
   color: #2b2b2b;
-  p {
-    margin: 0 0 12px;
+
+  ${({ $scrollStrategy, $hasHeader }) =>
+    $scrollStrategy === 'modal'
+      ? `
+        /* скроллим только контент модалки, фон зафиксирован */
+        flex: 1 1 auto;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;      /* не протекаем на фон */
+        overscroll-behavior-y: contain;
+        touch-action: pan-y;
+        max-height: 100%;                  /* вся доступная высота контейнера */
+      `
+      : $scrollStrategy === 'page'
+        ? `
+        /* для page — без внутреннего скролла */
+        overflow: visible;
+        max-height: none;
+        flex: 1 1 auto;
+      `
+        : `
+        /* старый content-режим с ограничением по высоте */
+        overflow: auto;
+        max-height: calc(85vh - ${$hasHeader ? 62 : 0}px);
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+      `}
+
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE и старый Edge */
+  &::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none; /* Chrome, Safari */
   }
 `;

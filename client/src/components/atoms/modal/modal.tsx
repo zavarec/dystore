@@ -14,6 +14,7 @@ import {
 
 type Size = 'sm' | 'md' | 'lg' | 'xl';
 type Variant = 'center' | 'sheet';
+type ScrollStrategy = 'content' | 'page' | 'modal';
 
 interface ModalProps {
   isOpen: boolean;
@@ -26,6 +27,8 @@ interface ModalProps {
   padding?: number; // внутренний отступ
   closeOnOverlayClick?: boolean;
   closeOnEsc?: boolean;
+  scrollStrategy?: ScrollStrategy; // 'content' | 'page'
+  fullHeight?: boolean;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -39,6 +42,8 @@ export const Modal: React.FC<ModalProps> = ({
   padding = 24,
   closeOnOverlayClick = true,
   closeOnEsc = true,
+  scrollStrategy,
+  fullHeight,
 }) => {
   const titleId = useId();
   const isSheet = variant === 'sheet';
@@ -53,12 +58,16 @@ export const Modal: React.FC<ModalProps> = ({
   }, [isOpen, closeOnEsc, onClose]);
 
   useEffect(() => {
-    if (isOpen) document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
-
+    if (!isOpen) return;
+    if (scrollStrategy === 'content' || scrollStrategy === 'modal') {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
+    return;
+  }, [isOpen, scrollStrategy]);
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget && closeOnOverlayClick) onClose();
   };
@@ -69,7 +78,8 @@ export const Modal: React.FC<ModalProps> = ({
     <AnimatePresence>
       {isOpen && (
         <ModalOverlay
-          $alignStart={isSheet}
+          $scrollStrategy={scrollStrategy}
+          $alignStart={scrollStrategy === 'modal' ? false : isSheet} // важно!
           onClick={handleOverlayClick}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -83,10 +93,12 @@ export const Modal: React.FC<ModalProps> = ({
             $size={size}
             {...(maxWidth ? { $maxWidth: maxWidth } : {})}
             $isSheet={isSheet}
+            $fullHeight={fullHeight}
             initial={isSheet ? { y: 24, opacity: 0 } : { y: 12, scale: 0.98, opacity: 0 }}
             animate={isSheet ? { y: 0, opacity: 1 } : { y: 0, scale: 1, opacity: 1 }}
             exit={isSheet ? { y: 16, opacity: 0 } : { y: 8, scale: 0.98, opacity: 0 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
+            $scrollStrategy={scrollStrategy}
           >
             {title && (
               <ModalHeader>
@@ -96,7 +108,11 @@ export const Modal: React.FC<ModalProps> = ({
                 </ModalCloseButton>
               </ModalHeader>
             )}
-            <ModalContent $padding={padding}>
+            <ModalContent
+              $padding={padding}
+              $scrollStrategy={scrollStrategy}
+              $hasHeader={Boolean(title)}
+            >
               {!title && (
                 <div style={{ position: 'absolute', right: 16, top: 16, zIndex: 1000 }}>
                   <ModalCloseButton onClick={onClose} aria-label="Закрыть">

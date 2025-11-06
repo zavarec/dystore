@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router';
 
 import { AuthModal } from '@/features/auth/modals/auth-modal';
+import { ContactUsModal } from '@/features/contact-us-modal/contact-us-modal';
 
 import { PageContainer, Main } from './layout.style';
 import { Footer } from '../atoms/footer';
@@ -36,6 +37,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, className }) => {
 
       <NoSSR fallback={null}>
         <AuthModal />
+        <ContactUsModal />
       </NoSSR>
     </>
   );

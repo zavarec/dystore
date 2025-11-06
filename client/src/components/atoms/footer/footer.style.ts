@@ -54,6 +54,22 @@ export const FooterText = styled.p`
   margin-bottom: 10px;
 `;
 
+export const FooterEmailButton = styled.button`
+  color: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+
+  &:hover,
+  &:focus {
+    color: #fff;
+  }
+`;
+
 export const FooterBottom = styled.div`
   border-top: 1px solid #333;
   padding-top: 20px;

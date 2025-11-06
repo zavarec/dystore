@@ -1,5 +1,7 @@
 import { COMPANY_INFO } from '@/constants/contacts.constants';
 import { ContactsBar } from '@/features/contacts-bar/contacts-bar';
+import { useAppDispatch } from '@/hooks/redux';
+import { setContactModalOpen } from '@/store/slices/uiSlice';
 
 import {
   FooterContainer,
@@ -12,6 +14,7 @@ import {
   Logo,
   LogoIcon,
   FooterContentWrapper,
+  FooterEmailButton,
 } from './footer.style';
 
 interface FooterProps {
@@ -19,6 +22,12 @@ interface FooterProps {
 }
 
 export const Footer: React.FC<FooterProps> = ({ className }) => {
+  const dispatch = useAppDispatch();
+
+  const handleContactClick = () => {
+    dispatch(setContactModalOpen(true));
+  };
+
   return (
     <FooterContainer className={className}>
       {/* <ContactSupport /> */}
@@ -37,7 +46,14 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
             <FooterText>
               📞 {COMPANY_INFO.COMPANY_PHONE_NUMBER}
               <br />
-              📧 {COMPANY_INFO.COMPANY_EMAIL_ADRESS}
+              📧{' '}
+              <FooterEmailButton
+                type="button"
+                onClick={handleContactClick}
+                aria-label="Открыть форму обратной связи"
+              >
+                {COMPANY_INFO.COMPANY_EMAIL_ADRESS}
+              </FooterEmailButton>
             </FooterText>
 
             <ContactsBar />

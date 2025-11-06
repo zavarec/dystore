@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+
 import { PhoneAuthForm } from '@/features/auth/forms/phone-auth-form';
 import { UsernameAuthForm } from '@/features/auth/forms/username-auth-form';
+
 import { AuthModeButton, AuthModeContainer, AuthModeSelector } from './auth-modal-content.style';
 
 interface AuthModalContentProps {

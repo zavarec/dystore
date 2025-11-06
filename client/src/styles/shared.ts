@@ -37,6 +37,7 @@ export const tokens = {
         default: '#E0E0E0',
         strong: '#BDBDBD',
         inverse: '#444444',
+        input: '#919191',
       },
       state: {
         success: '#28a745',

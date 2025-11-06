@@ -1,10 +1,14 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Notification } from '@/types/common';
+import { createSlice } from '@reduxjs/toolkit';
+
+import type { Notification } from '@/types/common';
+
+import type { PayloadAction } from '@reduxjs/toolkit';
 
 interface UIState {
   isMobileMenuOpen: boolean;
   isSearchOpen: boolean;
   isAuthModalOpen: boolean;
+  isContactModalOpen: boolean;
   notifications: Notification[];
   theme: 'light' | 'dark';
   isLoading: boolean;
@@ -15,6 +19,7 @@ const initialState: UIState = {
   isMobileMenuOpen: false,
   isSearchOpen: false,
   isAuthModalOpen: false,
+  isContactModalOpen: false,
   notifications: [],
   theme: 'light',
   isLoading: false,
@@ -42,6 +47,12 @@ const uiSlice = createSlice({
     },
     setAuthModalOpen: (state, action: PayloadAction<boolean>) => {
       state.isAuthModalOpen = action.payload;
+    },
+    toggleContactModal: state => {
+      state.isContactModalOpen = !state.isContactModalOpen;
+    },
+    setContactModalOpen: (state, action: PayloadAction<boolean>) => {
+      state.isContactModalOpen = action.payload;
     },
     addNotification: (state, action: PayloadAction<Omit<Notification, 'id'>>) => {
       const notification: Notification = {
@@ -75,6 +86,8 @@ export const {
   setSearchOpen,
   toggleAuthModal,
   setAuthModalOpen,
+  toggleContactModal,
+  setContactModalOpen,
   addNotification,
   removeNotification,
   clearNotifications,

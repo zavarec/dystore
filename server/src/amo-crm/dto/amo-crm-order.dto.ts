@@ -1,4 +1,3 @@
-// src/amocrm/dto/order.dto.ts
 export interface OrderItemDTO {
   productId: string;
   name: string;
@@ -14,7 +13,7 @@ export interface CustomerDTO {
 }
 
 export interface OrderDTO {
-  orderId: string;   // человекочитаемый номер (orderNumber)
+  orderId: string; // человекочитаемый номер (orderNumber)
   total: number;
   items: OrderItemDTO[];
   customer: CustomerDTO;

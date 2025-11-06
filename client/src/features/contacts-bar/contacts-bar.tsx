@@ -3,6 +3,8 @@ import Link from 'next/link';
 
 import styled from '@emotion/styled';
 
+import { useAppDispatch } from '@/hooks';
+import { setContactModalOpen } from '@/store/slices/uiSlice';
 import { media } from '@/styles/breakpoints';
 import { tokens } from '@/styles/shared';
 
@@ -49,10 +51,18 @@ export const Icon = styled(Image)`
 `;
 
 export const ContactsBar = () => {
+  const dispatch = useAppDispatch();
+
+  const handleContactClick = (e: React.MouseEvent, name: string) => {
+    if (name === 'Email') {
+      e.preventDefault();
+      dispatch(setContactModalOpen(true));
+    }
+  };
   const items = [
     {
       name: 'Telegram',
-      href: 'https://t.me/dystore',
+      href: 'tg://resolve?domain=dyson_group_bot',
       src: '/images/icons/contacts/telegram.png',
       alt: 'Telegram',
     },
@@ -85,6 +95,7 @@ export const ContactsBar = () => {
           target={href.startsWith('http') ? '_blank' : undefined}
           rel="noreferrer"
           aria-label={alt}
+          onClick={e => handleContactClick(e, name)}
         >
           <Icon src={src} alt={alt} fill sizes="32px" />
         </ContactItem>
