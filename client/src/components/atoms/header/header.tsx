@@ -1,12 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useState, useEffect, useMemo } from 'react';
+
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 
+import { MobileCategoryList } from '@/components/atoms/mobile-category-list/mobile-category-list';
+import { NoSSR } from '@/components/atoms/no-ssr/no-ssr';
+import { Skeleton } from '@/components/atoms/skeleton';
+import { CartButton } from '@/features/cart/cart-button/cart-button';
+import { CategoryDropdown } from '@/features/categories/category-dropdown';
 import { useAppSelector, useAppDispatch } from '@/hooks/redux';
+import { useCategories } from '@/hooks/useCategories';
+import { selectIsAuthenticated, selectUser } from '@/store/slices/auth-slice/auth.selectors';
 import { logout } from '@/store/slices/auth-slice/auth.thunks';
 import { setAuthModalOpen } from '@/store/slices/uiSlice';
-import { useCategories } from '@/hooks/useCategories';
 import { CategoryTreeUtils } from '@/types/models/category.model';
 
 import {
@@ -17,7 +24,6 @@ import {
   MobileMenuButton,
   MenuLine,
   SearchContainer,
-  SearchInput,
   AuthButton,
   UserInfo,
   UserName,
@@ -26,13 +32,6 @@ import {
   HeaderRight,
 } from './header.style';
 
-import { selectIsAuthenticated, selectUser } from '@/store/slices/auth-slice/auth.selectors';
-import { NoSSR } from '@/components/atoms/no-ssr/no-ssr';
-import { CategoryDropdown } from '@/features/categories/category-dropdown';
-import { CartButton } from '@/features/cart/cart-button/cart-button';
-import { MobileCategoryList } from '@/components/atoms/mobile-category-list/mobile-category-list';
-import { Skeleton } from '@/components/atoms/skeleton';
-
 interface HeaderProps {
   className?: string;
 }
@@ -40,7 +39,7 @@ interface HeaderProps {
 export const Header: React.FC<HeaderProps> = ({ className }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  // const [searchQuery, setSearchQuery] = useState('');
 
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -48,15 +47,13 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const user = useAppSelector(selectUser);
 
-  // Загружаем категории
   const { categories, loading: categoriesLoading } = useCategories();
 
-  // Строим дерево категорий (только корневые категории для навигации)
-  const categoryTree = React.useMemo(() => {
+  const categoryTree = useMemo(() => {
     if (!categories || categories.length === 0) return [];
 
     const tree = CategoryTreeUtils.buildTree(categories);
-    // Возвращаем только корневые категории для главной навигации
+
     return tree;
   }, [categories]);
 
@@ -72,7 +69,6 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
     };
   }, []);
 
-  // Закрывать мобильное меню при прокрутке вниз на небольшой порог
   useEffect(() => {
     if (!isMobileMenuOpen) return;
     const startY = window.scrollY;
@@ -88,12 +84,12 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
     };
   }, [isMobileMenuOpen]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
-    }
-  };
+  // const handleSearch = (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   if (searchQuery.trim()) {
+  //     router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+  //   }
+  // };
 
   const handleLogout = async () => {
     await dispatch(logout());
@@ -104,7 +100,6 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
     if (isAuthenticated) {
       router.push('/profile');
     } else {
-      // Всегда открываем модальное окно авторизации
       dispatch(setAuthModalOpen(true));
     }
   };
@@ -139,7 +134,6 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
               </div>
             ) : (
               <>
-                {/* Desktop: выпадающие меню по hover */}
                 <div className="desktop-nav">
                   {categoryTree.map(category => {
                     const isActive = router.asPath.startsWith(`/category/${category.slug}`);
@@ -154,12 +148,8 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
                   })}
                 </div>
 
-                {/* Mobile: вертикальный список с раскрытием подкатегорий */}
                 <div className="mobile-nav">
-                  <MobileCategoryList
-                    categories={categoryTree as any}
-                    loading={categoriesLoading}
-                  />
+                  <MobileCategoryList categories={categoryTree} loading={categoriesLoading} />
                 </div>
               </>
             )}
@@ -178,7 +168,6 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
               />
             </form> */}
 
-            {/* ✅ ИСПРАВЛЕНИЕ: Информация о пользователе безопасно рендерится */}
             <NoSSR
               fallback={
                 <AuthButton onClick={handleAuthClick} aria-label="Войти в аккаунт">

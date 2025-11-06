@@ -48,19 +48,20 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
               <h3>Каталог</h3>
               <FooterLink href="/category/vacuum-cleaners">Пылесосы</FooterLink>
               <FooterLink href="/category/hair-care">Уход за волосами</FooterLink>
-              <FooterLink href="/category/air-treatment">Очистители воздуха</FooterLink>
-              <FooterLink href="/category/accessories">Аксессуары</FooterLink>
+              <FooterLink href="/category/climate-tech">Климатическая техника</FooterLink>
+              <FooterLink href="/category/headphones">Наушники</FooterLink>
+              {/* <FooterLink href="/category/accessories">Аксессуары</FooterLink> */}
             </FooterSection>
 
             <FooterSection>
               <h3>Покупателям</h3>
 
               <FooterLink href="/delivery">Доставка</FooterLink>
-              {/* <FooterLink href="/payment">Оплата</FooterLink> */}
               <FooterLink href="/warranty">Гарантия</FooterLink>
+              {/* <FooterLink href="/payment">Оплата</FooterLink> */}
               <FooterLink href="/returns">Возврат</FooterLink>
-              <FooterLink href="/privacy">Политика конфиденциальности</FooterLink>
               {/* <FooterLink href="/service">Сервис</FooterLink> */}
+              <FooterLink href="/privacy">Политика конфиденциальности</FooterLink>
             </FooterSection>
 
             <FooterSection>
