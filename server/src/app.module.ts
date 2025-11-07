@@ -25,6 +25,7 @@ import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
 import { UploadModule } from "./upload/upload.module";
 import { AmocrmModule } from "./amo-crm/amo-crm.module";
+import { ContactModule } from "./contact/contact.module";
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { AmocrmModule } from "./amo-crm/amo-crm.module";
     PromosModule,
     UploadModule,
     AmocrmModule,
+    ContactModule,
   ],
   controllers: [AppController, CsrfController],
   providers: [

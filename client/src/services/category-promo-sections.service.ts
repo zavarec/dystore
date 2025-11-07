@@ -1,11 +1,12 @@
-import { apiClient } from './api';
-import {
+import type {
   CategoryPromoSectionAdmin,
   PromoFont,
   ContentSideEnum,
   PromoSlot,
   PromoVariant,
 } from '@/types/models/promo-section.model';
+
+import { apiClient } from './api';
 
 export interface CreateCategoryPromoSectionDto {
   categoryId: number;
