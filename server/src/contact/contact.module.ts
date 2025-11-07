@@ -2,10 +2,11 @@ import { Module } from "@nestjs/common";
 
 import { ContactService } from "./contact.service";
 import { ContactController } from "./contact.controller";
-import { AmoHttpService } from "src/amo-crm/amo-http.service";
+import { AmocrmModule } from "src/amo-crm/amo-crm.module";
 
 @Module({
+  imports: [AmocrmModule],
   controllers: [ContactController],
-  providers: [ContactService, AmoHttpService],
+  providers: [ContactService],
 })
 export class ContactModule {}

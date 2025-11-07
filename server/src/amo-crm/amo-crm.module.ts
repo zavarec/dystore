@@ -15,6 +15,6 @@ import { AmoCrmController } from "./amo-crm.controller";
     AmoOrdersService,
     AmoProductsService,
   ],
-  exports: [AmoOrdersService, AmoAuthService],
+  exports: [AmoOrdersService, AmoAuthService, AmoHttpService],
 })
 export class AmocrmModule {}

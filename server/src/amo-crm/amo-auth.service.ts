@@ -1,8 +1,7 @@
-// src/amocrm/amo-auth.service.ts
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import Redis from 'ioredis';
-import axios from 'axios';
+import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import Redis from "ioredis";
+import axios from "axios";
 
 type Tokens = {
   access_token: string;
@@ -17,8 +16,8 @@ export class AmoAuthService {
 
   constructor(private readonly config: ConfigService) {
     // Если у тебя Redis уже инициализирован где-то — прокинь через DI.
-    this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
-    this.key = `amocrm:tokens:${this.config.get('AMO_SUBDOMAIN')}`;
+    this.redis = new Redis(process.env.REDIS_URL || "redis://localhost:6379");
+    this.key = `amocrm:tokens:${this.config.get("AMO_SUBDOMAIN")}`;
   }
 
   private async readTokens(): Promise<Tokens | null> {
@@ -32,7 +31,7 @@ export class AmoAuthService {
 
   async getAccessToken(): Promise<string> {
     const t = await this.readTokens();
-    if (!t) throw new Error('Amo tokens not initialized');
+    if (!t) throw new Error("Amo tokens not initialized");
     // авто-рефреш по сроку
     if (Date.now() > t.expires_at - 60_000) {
       await this.refreshTokens();
@@ -43,13 +42,13 @@ export class AmoAuthService {
   }
 
   async exchangeCodeForTokens(code: string) {
-    const base = `https://${this.config.get('AMO_SUBDOMAIN')}`;
+    const base = `https://${this.config.get("AMO_SUBDOMAIN")}`;
     const res = await axios.post(`${base}/oauth2/access_token`, {
-      client_id: this.config.get('AMO_CLIENT_ID'),
-      client_secret: this.config.get('AMO_CLIENT_SECRET'),
-      grant_type: 'authorization_code',
+      client_id: this.config.get("AMO_CLIENT_ID"),
+      client_secret: this.config.get("AMO_CLIENT_SECRET"),
+      grant_type: "authorization_code",
       code,
-      redirect_uri: this.config.get('AMO_REDIRECT_URI'),
+      redirect_uri: this.config.get("AMO_REDIRECT_URI"),
     });
     const expires_at = Date.now() + res.data.expires_in * 1000;
     const payload: Tokens = {
@@ -62,14 +61,14 @@ export class AmoAuthService {
 
   async refreshTokens() {
     const t = await this.readTokens();
-    if (!t) throw new Error('Amo tokens not initialized');
-    const base = `https://${this.config.get('AMO_SUBDOMAIN')}`;
+    if (!t) throw new Error("Amo tokens not initialized");
+    const base = `https://${this.config.get("AMO_SUBDOMAIN")}`;
     const res = await axios.post(`${base}/oauth2/access_token`, {
-      client_id: this.config.get('AMO_CLIENT_ID'),
-      client_secret: this.config.get('AMO_CLIENT_SECRET'),
-      grant_type: 'refresh_token',
+      client_id: this.config.get("AMO_CLIENT_ID"),
+      client_secret: this.config.get("AMO_CLIENT_SECRET"),
+      grant_type: "refresh_token",
       refresh_token: t.refresh_token,
-      redirect_uri: this.config.get('AMO_REDIRECT_URI'),
+      redirect_uri: this.config.get("AMO_REDIRECT_URI"),
     });
     const expires_at = Date.now() + res.data.expires_in * 1000;
     const payload: Tokens = {
