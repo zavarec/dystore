@@ -17,6 +17,16 @@ export class ContactService {
 
   private taskTypeId = Number(process.env.AMO_TASK_TYPE_ID) || 1; // проверь через GET task_types
 
+  private async debugGetNotes(leadId: number) {
+    const res = await this.amo.request<any>({
+      url: `leads/${leadId}/notes`,
+      method: "GET",
+      params: { limit: 50, page: 1 },
+    });
+    this.logger.log(`NOTES for lead ${leadId}: ${JSON.stringify(res)}`);
+    return res;
+  }
+
   private sleep(ms: number) {
     return new Promise((r) => setTimeout(r, ms));
   }
@@ -163,6 +173,8 @@ export class ContactService {
         .join("\n");
 
       await this.addLeadNoteWithRetry(leadId, noteLines);
+
+      await this.debugGetNotes(leadId);
 
       // задача
       await this.createTaskWithRetry(leadId, "Связаться по обращению с сайта");
