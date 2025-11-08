@@ -1,21 +1,13 @@
+import type {
+  SendContacRequestResponse,
+  SendContactRequestPayload,
+} from '@/types/models/contact.model';
+
 import { apiClient } from './api';
 
-export interface ContactRequestPayload {
-  fullName?: string;
-  email: string;
-  orderNumber?: string;
-  message: string;
-}
-
-interface ContactResponse {
-  success: boolean;
-  leadId?: number;
-  contactId?: number;
-}
-
 export const sendContactRequest = async (
-  payload: ContactRequestPayload,
-): Promise<ContactResponse> => {
-  const { data } = await apiClient.post<ContactResponse>('/contact', payload);
+  payload: SendContactRequestPayload,
+): Promise<SendContacRequestResponse> => {
+  const { data } = await apiClient.post<SendContacRequestResponse>('/contact', payload);
   return data;
 };

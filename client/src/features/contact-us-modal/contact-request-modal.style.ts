@@ -65,7 +65,7 @@ export const RequiredMark = styled.span`
 
 export const TextInput = styled.input`
   height: 56px;
-  border-radius: 0;
+  border-radius: 2px;
   border: 1px solid ${tokens.colors.semantic.border.input};
   padding: 0 18px;
   font-size: 1rem;
@@ -215,4 +215,12 @@ export const CardLink = styled(Link)`
   &:hover {
     color: ${tokens.colors.components.button.primary.hover};
   }
+`;
+
+export const ErrorMessage = styled.span`
+  display: block;
+  font-size: 0.875rem;
+  color: #dc3545;
+  margin-top: 6px;
+  font-weight: 500;
 `;

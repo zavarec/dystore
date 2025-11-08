@@ -59,7 +59,6 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({ onClose, redirectT
 
   const [timeLeft, setTimeLeft] = useState(0);
 
-  // Форма для ввода номера телефона
   const phoneForm = useForm<PhoneFormData>({
     resolver: yupResolver(phoneValidationSchema),
     mode: 'onSubmit',
@@ -69,7 +68,6 @@ export const PhoneAuthForm: React.FC<PhoneAuthFormProps> = ({ onClose, redirectT
     formState: { errors: phoneFormErrors },
   } = phoneForm;
 
-  // Форма для ввода кода
   const codeForm = useForm<CodeFormData>({
     resolver: yupResolver(codeValidationSchema),
     mode: 'onSubmit',

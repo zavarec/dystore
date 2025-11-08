@@ -13,6 +13,7 @@ import { Benefits } from '@/components/sections/benefits';
 import { Accessuares } from '@/features/accessuares/accessuares';
 import { AddToCartButton } from '@/features/cart/add-to-cart-button';
 import { AddToCartButtonVariant } from '@/features/cart/add-to-cart-button/add-to-cart-button';
+import { ContactRequestForm } from '@/features/contact-us-modal/contact-request-form';
 import { ProductKeyFeatures } from '@/features/key-features/product-key-features';
 import { ProductDescription as ProductDescriptionBlock } from '@/features/product-description/product-description';
 import { PromoSlotRenderer } from '@/features/promo-block/promo-slot-renderer';
@@ -34,6 +35,7 @@ import {
   ProductInfoWithImageWrapperStyled,
   ProductMotifDesktopWrapper,
   ProductMotifMobileWrapper,
+  ContactRequestFormWrapper,
 } from '@/styles/pages/product-slug.style';
 import type { Category } from '@/types/models/category.model';
 import type { ProductWithDetails } from '@/types/models/product.model';
@@ -291,6 +293,15 @@ const ProductPage: NextPage<ProductPageProps> = ({ product, placements }) => {
       />
 
       <PromoSlotRenderer placements={placements ?? []} slot={PromoSlot.PDP_BELOW_ACCESSORY} />
+
+      <ContactRequestFormWrapper>
+        <ContactRequestForm
+          title="Нужна помощь в выборе?"
+          description="Свяжитесь с командой Dyson.
+           Мы ответим на ваши вопросы, расскажем о технологиях и поможем оформить заказ. 
+           Поддержка работает ежедневно с 9:00 до 20:00 (Мск)."
+        />
+      </ContactRequestFormWrapper>
     </>
   );
 };

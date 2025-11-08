@@ -1,4 +1,5 @@
-import React from 'react';
+import { forwardRef } from 'react';
+
 import { Masked } from './phone-input.style';
 
 interface PhoneInputProps {
@@ -11,7 +12,7 @@ interface PhoneInputProps {
   placeholder?: string;
 }
 
-export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
+export const PhoneInput = forwardRef<HTMLInputElement, PhoneInputProps>(
   (
     {
       value,

@@ -8,14 +8,11 @@ interface NoSSRProps {
 /**
  * Компонент NoSSR предотвращает рендеринг дочерних элементов на сервере
  * и показывает их только после гидратации на клиенте.
- * 
+ *
  * Используйте для компонентов, которые критически зависят от клиентского состояния
  * (localStorage, window объекты, браузерные API)
  */
-export const NoSSR: React.FC<NoSSRProps> = ({ 
-  children, 
-  fallback = null 
-}) => {
+export const NoSSR: React.FC<NoSSRProps> = ({ children, fallback = null }) => {
   const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {

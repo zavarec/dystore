@@ -1,5 +1,7 @@
-import { IMaskInput } from 'react-imask';
 import styled from '@emotion/styled';
+import { IMaskInput } from 'react-imask';
+
+import { tokens } from '@/styles/shared';
 
 export type StyledProps = {
   hasError?: boolean;
@@ -9,8 +11,9 @@ export type StyledProps = {
 export const Masked = styled(IMaskInput)<StyledProps>`
   width: ${({ fullWidth }) => (fullWidth ? '100%' : 'auto')};
   padding: 12px 16px;
-  border: 1px solid ${({ hasError }) => (hasError ? '#e5484d' : '#D1D5DB')};
-  border-radius: 10px;
+  border: 1px solid
+    ${({ hasError }) => (hasError ? '#e5484d' : tokens.colors.semantic.border.input)};
+  border-radius: 2px;
   background: #fff;
   color: #111827;
   font-size: 16px;

@@ -15,44 +15,43 @@ export class ContactService {
   private tagSupport = process.env.AMO_TAG_SUPPORT || "Support";
   private sourceId = process.env.AMO_SOURCE_ID;
 
+  private taskTypeId = Number(process.env.AMO_TASK_TYPE_ID) || 1; // проверь через GET task_types
+
   private sleep(ms: number) {
     return new Promise((r) => setTimeout(r, ms));
   }
 
-  private async addLeadNoteWithRetry(leadId: number, text: string) {
-    // amo любит \r\n в HTML-рендере
-    const normalized = text.replace(/\r?\n/g, "\r\n");
+  private normalizeNoteText(s: string, limit = 4000) {
+    const normalized = s.replace(/\r?\n/g, "\r\n");
+    return normalized.length > limit
+      ? normalized.slice(0, limit - 1) + "…"
+      : normalized;
+  }
 
+  private async addLeadNoteWithRetry(leadId: number, text: string) {
     const body = [
       {
-        note_type: "common", // тип корректный
-        params: { text: normalized },
+        note_type: "common",
+        params: { text: this.normalizeNoteText(text) },
       },
     ];
+    const delays = [300, 600, 1200];
 
-    const maxAttempts = 4;
-    const delays = [250, 500, 1000]; // нарастающая пауза
-
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    for (let i = 0; i < delays.length + 1; i++) {
       try {
         const res = await this.amo.request<any>({
           url: `leads/${leadId}/notes`,
           method: "POST",
           data: body,
-          // убедись, что AmoHttpService проставляет
-          // headers: { 'Content-Type': 'application/json' }
         });
-
-        // опционально — убедимся, что нотка действительно создалась
         this.logger.log(
           `Note created for lead ${leadId}: ${JSON.stringify(res)}`,
         );
         return res;
       } catch (e: any) {
-        const status = e?.response?.status;
-        // Часто 404/409 — сразу после complex-создания. Ретраим.
-        if (attempt < maxAttempts && (status === 404 || status === 409)) {
-          await this.sleep(delays[attempt - 1] ?? 1000);
+        const code = e?.response?.status;
+        if (i < delays.length && (code === 404 || code === 409)) {
+          await this.sleep(delays[i]);
           continue;
         }
         this.logger.error(
@@ -64,14 +63,58 @@ export class ContactService {
     }
   }
 
-  /**
-   * Создаёт лид + контакт + заметку + задачу
-   */
+  private async createTaskWithRetry(leadId: number, text: string) {
+    const payload = [
+      {
+        text,
+        task_type_id: this.taskTypeId,
+        complete_till: Math.floor((Date.now() + 4 * 3600_000) / 1000),
+        entity_id: leadId,
+        entity_type: "leads",
+        responsible_user_id: this.responsibleUserId || undefined,
+      },
+    ];
+    const delays = [300, 600];
+
+    for (let i = 0; i < delays.length + 1; i++) {
+      try {
+        return await this.amo.request({
+          url: "tasks",
+          method: "POST",
+          data: payload,
+        });
+      } catch (e: any) {
+        const code = e?.response?.status;
+        if (i < delays.length && (code === 404 || code === 409)) {
+          await this.sleep(delays[i]);
+          continue;
+        }
+        throw e;
+      }
+    }
+  }
+
+  /** Создаёт лид + контакт + заметку + задачу */
   async createSupportLead(dto: CreateContactRequestDto) {
     const name = dto.fullName?.trim() || "Клиент с сайта";
     const leadName = `Обращение с сайта — ${name}`;
 
-    // 1) Создаём лид (complex) с привязкой контакта (email)
+    // contact custom fields
+    const contactFields: any[] = [];
+    if (dto.email) {
+      contactFields.push({
+        field_code: "EMAIL",
+        values: [{ value: dto.email, enum_code: "WORK" }],
+      });
+    }
+    if (dto.phone) {
+      // если храните без +7, можно префиксовать здесь
+      contactFields.push({
+        field_code: "PHONE",
+        values: [{ value: dto.phone, enum_code: "WORK" }],
+      });
+    }
+
     const payload = [
       {
         name: leadName,
@@ -82,12 +125,9 @@ export class ContactService {
           contacts: [
             {
               name,
-              custom_fields_values: [
-                {
-                  field_code: "EMAIL",
-                  values: [{ value: dto.email }],
-                },
-              ],
+              ...(contactFields.length
+                ? { custom_fields_values: contactFields }
+                : {}),
             },
           ],
           tags: this.tagSupport ? [{ name: this.tagSupport }] : undefined,
@@ -106,11 +146,14 @@ export class ContactService {
     const leadId: number | undefined = lead?.id;
     const contactId: number | undefined = lead?._embedded?.contacts?.[0]?.id;
 
-    // 2) Добавляем заметку в лид с текстом обращения (с задержкой и ретраями)
     if (leadId) {
+      // маленькая пауза — дать сделке "устаканиться"
+      await this.sleep(300);
+
       const noteLines = [
         `Имя: ${name}`,
-        `Email: ${dto.email}`,
+        dto.email ? `Email: ${dto.email}` : "",
+        dto.phone ? `Телефон: ${dto.phone}` : "",
         dto.orderNumber ? `Номер заказа/серийный: ${dto.orderNumber}` : "",
         "",
         "Сообщение:",
@@ -120,31 +163,11 @@ export class ContactService {
         .join("\n");
 
       await this.addLeadNoteWithRetry(leadId, noteLines);
+
+      // задача
+      await this.createTaskWithRetry(leadId, "Связаться по обращению с сайта");
     }
 
-    // 3) Создаём задачу ответственному
-    if (leadId && this.responsibleUserId) {
-      const completeTill = Math.floor((Date.now() + 4 * 60 * 60 * 1000) / 1000);
-
-      await this.amo.request({
-        url: `tasks`,
-        method: "POST",
-        data: [
-          {
-            text: "Связаться по обращению с сайта",
-            complete_till: completeTill,
-            entity_id: leadId,
-            entity_type: "leads",
-            responsible_user_id: this.responsibleUserId,
-          },
-        ],
-      });
-    }
-
-    return {
-      success: true,
-      leadId,
-      contactId,
-    };
+    return { success: true, leadId, contactId };
   }
 }

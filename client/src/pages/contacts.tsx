@@ -3,6 +3,8 @@ import Image from 'next/image';
 
 import { FaqSection } from '@/components/sections/faq/faq';
 import { COMPANY_INFO } from '@/constants/contacts.constants';
+import { useAppDispatch } from '@/hooks';
+import { setContactModalOpen } from '@/store/slices/uiSlice';
 import {
   ContactsCard,
   ContactsCardContent,
@@ -46,6 +48,12 @@ const ContactsPage = () => {
       },
     ],
     sameAs: org.sameAs,
+  };
+
+  const dispatch = useAppDispatch();
+
+  const handleOpenContactRequestModal = () => {
+    dispatch(setContactModalOpen(true));
   };
 
   return (
@@ -154,7 +162,9 @@ const ContactsPage = () => {
                 </ContactsCardText>
               </ContactsCardContent>
 
-              <ContactsCTA href="mailto:dyson-group@yandex.com">Отправить письмо</ContactsCTA>
+              <ContactsCTA as="button" onClick={handleOpenContactRequestModal}>
+                Отправить письмо
+              </ContactsCTA>
             </ContactsCard>
 
             <ContactsCard>

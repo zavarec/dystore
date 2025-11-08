@@ -78,7 +78,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     if (Number(status) >= 500) {
       const stack = exception instanceof Error ? exception.stack : undefined;
       this.logger.error(
-        `${request.method} ${request.url} - ${status} - ${message}`,
+        `${request.method} ${request.url} - ${status} - ${exception instanceof Error ? exception.message : message}`,
 
         { stack },
       );
