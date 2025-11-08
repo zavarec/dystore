@@ -45,10 +45,15 @@ export class ContactService {
         params: { text: this.normalizeNoteText(text) },
       },
     ];
-    const delays = [300, 600, 1200];
+    const maxAttempts = 4;
+    const delays = [250, 500, 1000];
 
-    for (let i = 0; i < delays.length + 1; i++) {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
+        this.logger.log(
+          `NOTE TRY ${attempt}/${maxAttempts} leadId=${leadId} body=${JSON.stringify(body)}`,
+        );
+
         const res = await this.amo.request<any>({
           url: `leads/${leadId}/notes`,
           method: "POST",
@@ -57,17 +62,20 @@ export class ContactService {
         this.logger.log(
           `Note created for lead ${leadId}: ${JSON.stringify(res)}`,
         );
+        this.logger.log(
+          `NOTE RESP status=OK leadId=${leadId} resp=${JSON.stringify(res?._embedded?.notes ?? res)}`,
+        );
         return res;
       } catch (e: any) {
+        this.logger.error(
+          `NOTE ERR leadId=${leadId} code=${e?.response?.status} data=${JSON.stringify(e?.response?.data)}`,
+        );
         const code = e?.response?.status;
-        if (i < delays.length && (code === 404 || code === 409)) {
-          await this.sleep(delays[i]);
+        if (attempt < delays.length && (code === 404 || code === 409)) {
+          await this.sleep(delays[attempt]);
           continue;
         }
-        this.logger.error(
-          `Failed to add note for lead ${leadId}`,
-          e?.response?.data ?? e,
-        );
+
         throw e;
       }
     }
