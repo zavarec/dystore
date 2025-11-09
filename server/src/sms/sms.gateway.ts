@@ -59,14 +59,15 @@ export class SmsAeroGateway implements SmsGateway {
 
   async sendText(to: string, text: string, opts?: SendOptions): Promise<void> {
     try {
-      const sign = opts?.sign ?? this.sign;
-      const res = await this.client.send(to, text, sign);
+      //   const sign = opts?.sign ?? this.sign;
+      const res = await this.client.send(to, text);
       if (!res || res.success === false) {
         throw new Error(`SmsAero failed: ${JSON.stringify(res)}`);
       }
-    } catch (e: any) {
-      if (e instanceof SmsAeroError || e instanceof SmsAeroHTTPError) throw e;
-      throw new Error(`SmsAero unknown error: ${e?.message || e}`);
+    } catch (error: any) {
+      if (error instanceof SmsAeroError || error instanceof SmsAeroHTTPError)
+        throw error;
+      throw new Error(`SmsAero unknown error: ${error?.message || error}`);
     }
   }
 
@@ -74,7 +75,7 @@ export class SmsAeroGateway implements SmsGateway {
     await this.client.sendTelegram(
       to,
       code,
-      sign ?? this.sign,
+      undefined,
       text ?? `Ваш код ${code}`,
     );
   }

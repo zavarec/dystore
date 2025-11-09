@@ -9,6 +9,7 @@ export const Section = styled.section<{ $bg?: string; sectionBorder: boolean }>`
   color: #111827;
   padding-top: 2rem;
   border: ${({ sectionBorder }) => sectionBorder && '1px solid #e0e0e0'};
+  padding-bottom: 16px;
 `;
 
 export const Wrapper = styled.div`
@@ -16,13 +17,13 @@ export const Wrapper = styled.div`
   // margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: clamp(32px, 4vw, 56px);
+  gap: clamp(12px, 2vw, 32px);
 `;
 
 export const Heading = styled.header<{ $color?: string | undefined }>`
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 8px;
   h2 {
     margin: 0;
     font-size: clamp(28px, 3.2vw, 40px);
