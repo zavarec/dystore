@@ -1,122 +1,72 @@
 import {
   HttpException,
   HttpStatus,
+  Inject,
   Injectable,
   Logger,
-  Inject,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { SMS_RU_CLIENT } from "./sms.provider";
+import { SMS_GATEWAY } from "./sms.tokens";
+import { SmsGateway } from "./sms.gateway";
 
 @Injectable()
 export class SmsService {
   private readonly logger = new Logger(SmsService.name);
-  private readonly apiKey: string;
-  private readonly from?: string; // альфа-имя (необяз.)
   private readonly testMode: boolean;
 
   constructor(
-    private readonly configService: ConfigService,
-    @Inject(SMS_RU_CLIENT) private readonly smsRuClient: any | null,
+    private readonly config: ConfigService,
+    @Inject(SMS_GATEWAY) private readonly gateway: SmsGateway | null,
   ) {
-    this.apiKey = this.configService.get<string>("SMS_RU_API_KEY", "");
-    this.from = this.configService.get<string>("SMS_RU_FROM") || undefined;
-    this.testMode = this.configService.get<string>("SMS_RU_TEST") === "1"; // включаем test-режим
+    this.testMode = this.config.get<string>("SMS_TEST") === "1";
   }
 
   async sendCode(phone: string, code: string): Promise<void> {
+    const normalized = this.normalizePhone(phone);
+    const text = `Ваш код подтверждения: ${code}`;
+
     try {
-      // DEV-режим: если нет ключа или клиента
-      if (!this.apiKey || !this.smsRuClient) {
-        this.logger.warn("SMS_RU_API_KEY не задан — dev-логирование кода.");
+      if (!this.gateway) {
         this.logger.warn(
           `DEV MODE — SMS code for ${this.maskPhone(phone)}: ${code}`,
         );
         return;
       }
-
-      const normalizedPhone = this.normalizePhone(phone);
-
-      const params: any = {
-        to: normalizedPhone,
-        text: `Ваш код подтверждения: ${code}`,
-      };
-
-      if (this.from) params.from = this.from;
-      if (this.testMode) params.test = 1; // включаем test=1
-
-      const result = await this.sendViaSmsRu(params);
-      this.logger.debug(`SMS.ru response: ${JSON.stringify(result)}`);
-
-      // Проверяем общий статус
-      if (result?.status !== "OK") {
-        this.logger.error(`SMS API error: ${JSON.stringify(result)}`);
-        throw new HttpException(
-          "Сервис SMS вернул ошибку",
-          HttpStatus.BAD_GATEWAY,
+      if (this.testMode) {
+        this.logger.log(
+          `TEST MODE — skip send. ${this.maskPhone(phone)}: ${code}`,
         );
+        return;
       }
 
-      // Проверяем конкретный номер
-      const phoneResult = result.sms?.[normalizedPhone];
-      if (!phoneResult || phoneResult.status !== "OK") {
-        this.logger.error(
-          `SMS not accepted for ${phone}: ${JSON.stringify(phoneResult)}`,
-        );
-        throw new HttpException(
-          "SMS не было принято оператором",
-          HttpStatus.BAD_GATEWAY,
-        );
-      }
-
-      // Лог с деталями
-      this.logger.log(
-        `SMS ${this.testMode ? "(TEST MODE)" : ""} sent to ${this.maskPhone(
-          phone,
-        )}, status=${phoneResult.status_code} ${
-          phoneResult.status_text ?? ""
-        }, sms_id=${phoneResult.sms_id ?? ""}, balance=${
-          result.balance ?? ""
-        }`,
-      );
+      await this.gateway.sendText(normalized, text);
+      this.logger.log(`SMS sent to ${this.maskPhone(phone)}`);
     } catch (e: any) {
-      this.logger.error(`Ошибка при отправке SMS: ${e?.message || e}`);
+      this.logger.error(`SMS send error: ${e?.message || e}`);
       throw new HttpException("Ошибка отправки SMS", HttpStatus.BAD_GATEWAY);
     }
   }
 
-  private sendViaSmsRu(params: any): Promise<any> {
-    return new Promise((resolve) => {
-      this.smsRuClient.sms_send(params, (res: any) => {
-        // если пакет вернул уже вложенный объект (code/description) — оборачиваем его
-        if (res && res.code && !res.status) {
-          resolve({
-            status: "OK",
-            sms: {
-              [params.to]: {
-                status: "OK",
-                status_code: Number(res.code),
-                status_text: res.description,
-                sms_id: res.ids,
-              },
-            },
-            balance: res.balance,
-          });
-        } else {
-          resolve(res);
-        }
-      });
-    });
+  async sendTelegramCode(phone: string, code: string): Promise<void> {
+    if (!this.gateway || !("sendTelegram" in this.gateway) || this.testMode) {
+      this.logger.log(
+        `Skip Telegram send (no gateway/TEST). ${this.maskPhone(phone)}: ${code}`,
+      );
+      return;
+    }
+    try {
+      const normalized = this.normalizePhone(phone);
+      // @ts-expect-error — метод есть у SmsAero
+      await this.gateway.sendTelegram(normalized, Number(code));
+    } catch (e: any) {
+      this.logger.error(`Telegram send error: ${e?.message || e}`);
+    }
   }
 
   private normalizePhone(phone: string): string {
     const digits = phone.replace(/\D/g, "");
-    if (digits.length === 11) {
-      if (digits.startsWith("8")) {
-        return `7${digits.slice(1)}`;
-      }
-      return digits;
-    }
+    if (digits.length === 11)
+      return digits.startsWith("8") ? `7${digits.slice(1)}` : digits;
     if (digits.length === 10) return `7${digits}`;
     return digits;
   }

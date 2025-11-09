@@ -7,7 +7,9 @@ import Image from 'next/image';
 
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
+import { BreadCrumbs } from '@/components/atoms/breadcrumbs/breadcrumbs';
 import { ButtonVariant } from '@/components/atoms/button/button.style';
+import { Divider } from '@/components/atoms/divider/divider';
 import { ProductMotif } from '@/components/product-motif/product-motif';
 import { Benefits } from '@/components/sections/benefits';
 import { Accessuares } from '@/features/accessuares/accessuares';
@@ -25,8 +27,6 @@ import {
   ProductImageSection,
   ProductMainImage,
   ProductInfoSection,
-  ProductBreadcrumbs,
-  BreadcrumbLink,
   ProductTitle,
   ProductDescription as ProductDescriptionText,
   ProductPrice,
@@ -205,17 +205,20 @@ const ProductPage: NextPage<ProductPageProps> = ({ product, placements }) => {
       {/* Промо: над всей страницей товара */}
       <PromoSlotRenderer placements={placements ?? []} slot={PromoSlot.ABOVE_HERO} />
 
-      <ProductPageContainer>
-        <ProductBreadcrumbs>
-          <BreadcrumbLink href="/">Главная</BreadcrumbLink>
-          <span> / </span>
-          <BreadcrumbLink href={`/category/${product.category?.slug}`}>
-            {getCategoryName(product.category ?? '')}
-          </BreadcrumbLink>
-          <span> / </span>
-          {/* <span>{product.name}</span> */}
-        </ProductBreadcrumbs>
+      <BreadCrumbs
+        items={[
+          { label: 'Главная', href: '/' },
+          {
+            label: getCategoryName(product.category ?? ''),
+            href: `/category/${product.category?.slug}`,
+          },
+        ]}
+        current={product.name}
+      />
 
+      <Divider />
+
+      <ProductPageContainer>
         <ProductInfoWithImageWrapperStyled>
           <ProductImageSection>
             {motifSrc && (

@@ -39,6 +39,9 @@ export const tokens = {
         inverse: '#444444',
         input: '#919191',
       },
+      divider: {
+        default: '#ebebeb',
+      },
       state: {
         success: '#28a745',
         danger: '#dc3545',

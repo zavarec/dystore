@@ -8,45 +8,11 @@ const { colors } = tokens;
 export const ProductPageContainer = styled.div`
   ${commonStyles.container};
   padding-top: 40px;
-  padding-right: 0;
   ${media.down('tablet')} {
     padding-left: 0;
   }
 
   color: ${colors.semantic.text.primary};
-`;
-
-export const ProductBreadcrumbs = styled.nav`
-  margin-bottom: 32px;
-  font-size: 14px;
-  color: #666;
-
-  a {
-    color: black;
-    text-decoration: none;
-    transition: color 0.2s ease;
-
-    &:hover {
-      color: ${colors.semantic.text.primary};
-      text-decoration: underline;
-    }
-  }
-
-  ${media.down('tablet')} {
-    border-bottom: 1px solid #ebebeb;
-    padding-left: 20px;
-  }
-`;
-
-export const BreadcrumbLink = styled.a`
-  color: ${colors.semantic.text.primary};
-  text-decoration: none;
-  transition: color 0.2s ease;
-
-  &:hover {
-    color: #0056b3;
-    text-decoration: underline;
-  }
 `;
 
 export const ProductImageSection = styled.div`
@@ -173,6 +139,9 @@ export const ProductMotifDesktopWrapper = styled.div`
 
 export const ContactRequestFormWrapper = styled.div`
   > div > form {
-    margin: 42px;
+    margin: 0px;
+    ${media.up('tablet')} {
+      margin: 42px;
+    }
   }
 `;

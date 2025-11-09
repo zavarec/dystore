@@ -19,7 +19,13 @@ export const Layout: React.FC<LayoutProps> = ({ children, className }) => {
   const isAdminRoute = router.pathname.startsWith('/admin');
 
   return (
-    <>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100dvh',
+      }}
+    >
       <NoSSR fallback={null}>
         <Header />
       </NoSSR>
@@ -39,6 +45,6 @@ export const Layout: React.FC<LayoutProps> = ({ children, className }) => {
         <AuthModal />
         <ContactRequestModal />
       </NoSSR>
-    </>
+    </div>
   );
 };

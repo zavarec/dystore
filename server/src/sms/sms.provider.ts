@@ -1,17 +1,30 @@
 import { Provider } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const SMSru = require("sms_ru");
+import { SMS_GATEWAY } from "./sms.tokens";
+import { SmsGateway, SmsRuGateway, SmsAeroGateway } from "./sms.gateway";
 
-export const SMS_RU_CLIENT = "SMS_RU_CLIENT";
-
-export const SmsProvider: Provider = {
-  provide: SMS_RU_CLIENT,
+export const smsGatewayProvider: Provider = {
+  provide: SMS_GATEWAY,
   inject: [ConfigService],
-  useFactory: (cfg: ConfigService) => {
-    const apiId = cfg.get<string>("SMS_RU_API_KEY") ?? "";
-    if (!apiId) return null; // dev-режим без отправки
-    const client = new SMSru(apiId);
-    return client;
+  useFactory: (cfg: ConfigService): SmsGateway | null => {
+    const provider = (cfg.get<string>("SMS_PROVIDER") || "dev").toLowerCase();
+
+    if (provider === "smsru") {
+      const apiId = cfg.get<string>("SMS_RU_API_KEY") ?? "";
+      const from = cfg.get<string>("SMS_RU_FROM") || undefined;
+      if (!apiId) return null; // dev-режим
+      return new SmsRuGateway(apiId, from);
+    }
+
+    if (provider === "smsaero") {
+      const email = cfg.get<string>("SMS_AERO_EMAIL") ?? "";
+      const key = cfg.get<string>("SMS_AERO_API_KEY") ?? "";
+      const sign = cfg.get<string>("SMS_AERO_SIGN") || "SMS Aero";
+      if (!email || !key) return null; // dev-режим
+      return new SmsAeroGateway(email, key, sign);
+    }
+
+    // dev: без внешнего провайдера
+    return null;
   },
 };

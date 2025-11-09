@@ -1,6 +1,7 @@
+import Link from 'next/link';
+
 import styled from '@emotion/styled';
 import { motion } from 'framer-motion';
-import Link from 'next/link';
 
 const HeaderContainer = styled.header<{ $isScrolled: boolean }>`
   position: fixed;
