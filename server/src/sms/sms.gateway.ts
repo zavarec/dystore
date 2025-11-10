@@ -50,17 +50,15 @@ export class SmsRuGateway implements SmsGateway {
 
 export class SmsAeroGateway implements SmsGateway {
   private client: any;
-  private sign: string;
 
   constructor(email: string, apiKey: string, sign: string) {
     this.client = new SmsAero(email, apiKey, { sign });
-    this.sign = sign;
   }
 
   async sendText(to: string, text: string, opts?: SendOptions): Promise<void> {
     try {
       //   const sign = opts?.sign ?? this.sign;
-      const res = await this.client.send(to, text);
+      const res = await this.client.send(to, text, "SMS Aero");
       if (!res || res.success === false) {
         throw new Error(`SmsAero failed: ${JSON.stringify(res)}`);
       }

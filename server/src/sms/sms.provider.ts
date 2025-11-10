@@ -21,7 +21,9 @@ export const smsGatewayProvider: Provider = {
       const key = cfg.get<string>("SMS_AERO_API_KEY") ?? "";
       const sign = cfg.get<string>("SMS_AERO_SIGN") || "SMS Aero";
       if (!email || !key) return null; // dev-режим
-      return new SmsAeroGateway(email, key, sign);
+
+      const client = new SmsAeroGateway(email, key);
+      return client;
     }
 
     // dev: без внешнего провайдера
