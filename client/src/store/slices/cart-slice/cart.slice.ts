@@ -5,7 +5,14 @@ import type { Cart } from '@/types/models/cart.model';
 
 import type { PayloadAction } from '@reduxjs/toolkit';
 
-import { fetchCart, addToCart, removeFromCart, fetchCartTotal, clearCart } from './cart.thunks';
+import {
+  fetchCart,
+  addToCart,
+  removeFromCart,
+  fetchCartTotal,
+  clearCart,
+  updateCartItemQuantity,
+} from './cart.thunks';
 
 interface CartState extends LoadingState {
   cart: Cart | null;
@@ -70,6 +77,19 @@ const cartSlice = createSlice({
         state.cart = action.payload;
       })
       .addCase(addToCart.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
+      // Установка количества
+      .addCase(updateCartItemQuantity.pending, state => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateCartItemQuantity.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.cart = action.payload;
+      })
+      .addCase(updateCartItemQuantity.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       })

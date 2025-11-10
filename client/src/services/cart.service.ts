@@ -32,6 +32,11 @@ class CartService {
     return data;
   }
 
+  static async setCartItemQuantity(data: AddToCartRequest): Promise<Cart> {
+    const response = await apiClient.post<Cart>('/cart/set-quantity', data);
+    return response.data;
+  }
+
   static async getCartTotal(): Promise<CartTotal> {
     const { data } = await apiClient.get<CartTotal>('/cart/total');
     return data;

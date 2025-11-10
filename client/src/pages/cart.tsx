@@ -17,9 +17,14 @@ import {
   selectCartItems,
   selectCartTotalItems,
   selectCartTotalPrice,
+  selectIsCartLoading,
 } from '@/store/slices/cart-slice/cart.selectors';
 import { setQuantity } from '@/store/slices/cart-slice/cart.slice';
-import { clearCart, removeFromCart } from '@/store/slices/cart-slice/cart.thunks';
+import {
+  clearCart,
+  removeFromCart,
+  updateCartItemQuantity,
+} from '@/store/slices/cart-slice/cart.thunks';
 import { setAuthModalOpen } from '@/store/slices/uiSlice';
 import {
   CartPageContainer,
@@ -51,7 +56,6 @@ const CartPage: React.FC = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
-  const [isLoading] = useState(false);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [comment, setComment] = useState('');
@@ -60,6 +64,7 @@ const CartPage: React.FC = () => {
   const totalItems = useAppSelector(selectCartTotalItems);
   const totalPrice = useAppSelector(selectCartTotalPrice);
   const isAuth = useAppSelector(selectIsAuthenticated);
+  const isCartLoading = useAppSelector(selectIsCartLoading);
 
   const handleQuantityChange = (productId: number, newQuantity: number) => {
     const item = cartItems.find(i => i.productId === productId);
@@ -70,7 +75,24 @@ const CartPage: React.FC = () => {
       return;
     }
 
-    dispatch(setQuantity({ productId, quantity: newQuantity }));
+    const nextQuantity = Math.max(1, newQuantity);
+    if (item.quantity === nextQuantity) return;
+
+    const previousQuantity = item.quantity;
+    dispatch(setQuantity({ productId, quantity: nextQuantity }));
+
+    void dispatch(
+      updateCartItemQuantity({
+        productId,
+        quantity: nextQuantity,
+      }),
+    )
+      .unwrap()
+      .catch(error => {
+        const message = typeof error === 'string' ? error : 'Не удалось обновить количество';
+        dispatch(setQuantity({ productId, quantity: previousQuantity }));
+        toast.error(message);
+      });
   };
 
   const handleRemoveByProductId = (productId: number) => {
@@ -214,7 +236,7 @@ const CartPage: React.FC = () => {
                 <QuantityControls>
                   <QuantityButton
                     onClick={() => handleQuantityChange(item.productId, item.quantity - 1)}
-                    disabled={isLoading}
+                    disabled={isCartLoading}
                   >
                     −
                   </QuantityButton>
@@ -231,13 +253,13 @@ const CartPage: React.FC = () => {
                       )
                     }
                     min={1}
-                    disabled={isLoading}
+                    disabled={isCartLoading}
                     inputMode="numeric"
                   />
 
                   <QuantityButton
                     onClick={() => handleQuantityChange(item.productId, item.quantity + 1)}
-                    disabled={isLoading}
+                    disabled={isCartLoading}
                   >
                     +
                   </QuantityButton>
@@ -245,7 +267,7 @@ const CartPage: React.FC = () => {
 
                 <RemoveButton
                   onClick={() => handleRemoveByProductId(item.productId)}
-                  disabled={isLoading}
+                  disabled={isCartLoading}
                   aria-label={`Удалить ${item.product.name} из корзины`}
                   title="Удалить из корзины"
                 >
@@ -266,7 +288,7 @@ const CartPage: React.FC = () => {
                   placeholder="Город, улица, дом, квартира"
                   value={deliveryAddress}
                   onChange={e => setDeliveryAddress(e.target.value)}
-                  disabled={isCheckingOut || isLoading}
+                  disabled={isCheckingOut || isCartLoading}
                   style={{ padding: 10, border: '1px solid #e5e7eb', borderRadius: 8 }}
                 />
               </label>
@@ -277,7 +299,7 @@ const CartPage: React.FC = () => {
                   placeholder="Например: позвоните за 30 минут до доставки"
                   value={comment}
                   onChange={e => setComment(e.target.value)}
-                  disabled={isCheckingOut || isLoading}
+                  disabled={isCheckingOut || isCartLoading}
                   rows={3}
                   style={{
                     padding: 10,
@@ -307,7 +329,7 @@ const CartPage: React.FC = () => {
             <CheckoutSection>
               <Button
                 onClick={handleCheckout}
-                disabled={isCheckingOut || isLoading}
+                disabled={isCheckingOut || isCartLoading}
                 size="large"
                 fullWidth
                 variant={ButtonVariant.PRIMARY}

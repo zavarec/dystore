@@ -83,6 +83,39 @@ export class CartController {
     }
   }
 
+  @ApiOperation({ summary: "Set item quantity (guest or user)" })
+  @ApiResponse({ status: 200 })
+  @Post("set-quantity")
+  @UseGuards(OptionalJwtAuthGuard)
+  async setQuantity(
+    @Req() req: any,
+    @Res({ passthrough: true }) res: any,
+    @CurrentUser() user: User | undefined,
+    @Body() dto: AddToCartDto,
+  ) {
+    try {
+      const token: string | undefined = req.cookies?.[CART_COOKIE];
+      const { cart, createdNew } = await this.cartService.getOrCreateCart({
+        userId: user?.id,
+        token,
+      });
+
+      if (!token || createdNew)
+        res.cookie(CART_COOKIE, cart.token, CART_COOKIE_OPTS);
+
+      return this.cartService.setCartItemQuantityByIdentity(
+        { userId: user?.id, token: cart.token },
+        dto,
+      );
+    } catch (e) {
+      if (e instanceof HttpException) throw e;
+      throw new HttpException(
+        "Ошибка при обновлении количества товара",
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
   @ApiOperation({ summary: "Remove item (guest or user)" })
   @ApiResponse({ status: 200 })
   @Delete("remove/:productId")

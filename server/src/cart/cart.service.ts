@@ -146,6 +146,35 @@ export class CartService {
     return (await this.getCartWithItems({ id: cart.id }))!;
   }
 
+  async setCartItemQuantityByIdentity(
+    identity: Identity,
+    dto: AddToCartDto,
+  ): Promise<CartWithItems> {
+    const { productId, quantity } = dto;
+    const nextQty = Math.max(1, quantity);
+
+    const product = await this.productsService.findOne(productId);
+    if (!product) throw new NotFoundException("Товар не найден");
+    if (product.stock < nextQty)
+      throw new BadRequestException("Недостаточно товара на складе");
+
+    const { cart } = await this.getOrCreateCart(identity);
+
+    const existing = await this.prisma.cartItem.findFirst({
+      where: { cartId: cart.id, productId },
+    });
+
+    if (!existing)
+      throw new NotFoundException("Товар не найден в корзине");
+
+    await this.prisma.cartItem.update({
+      where: { id: existing.id },
+      data: { quantity: nextQty },
+    });
+
+    return (await this.getCartWithItems({ id: cart.id }))!;
+  }
+
   async removeFromCartByIdentity(
     identity: Identity,
     productId: number,

@@ -21,6 +21,20 @@ export const addToCart = createAsyncThunk('cart/addToCart', async (data: AddToCa
   return await CartService.addToCart(data);
 });
 
+export const updateCartItemQuantity = createAsyncThunk(
+  'cart/updateCartItemQuantity',
+  async (data: AddToCartRequest, { rejectWithValue }) => {
+    try {
+      return await CartService.setCartItemQuantity(data);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(error.response?.data?.message || 'Не удалось обновить количество');
+      }
+      throw error;
+    }
+  },
+);
+
 // Удалить товар из корзины
 export const removeFromCart = createAsyncThunk('cart/removeFromCart', async (productId: number) => {
   return await CartService.removeFromCart(productId);
