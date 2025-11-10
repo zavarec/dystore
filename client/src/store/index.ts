@@ -1,16 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { createWrapper } from 'next-redux-wrapper';
-import productsSlice from './slices/products-slice/products.slice';
-import filtersSlice from './slices/filter-slice/filters.slice';
-import uiSlice from './slices/uiSlice';
+
 import authSlice from './slices/auth-slice/auth.slice';
 import cartSlice from './slices/cart-slice/cart.slice';
 import categoriesSlice from './slices/categories-slice/categories.slice';
+import filtersSlice from './slices/filter-slice/filters.slice';
 import ordersSlice from './slices/orders-slice/orders.slice';
-import promotionsSlice from './slices/promotion-slice/promotion.slice';
+import productsSlice from './slices/products-slice/products.slice';
 import sectionsWithPlacementsSlice from './slices/promo/promo.slice';
-
+import promotionsSlice from './slices/promotion-slice/promotion.slice';
 import seoSlice from './slices/seo-meta-slice/seo.slice';
+import uiSlice from './slices/uiSlice';
 
 const makeStore = () =>
   configureStore({

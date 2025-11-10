@@ -7,7 +7,7 @@ import { appWithTranslation } from 'next-i18next';
 import { Provider } from 'react-redux';
 import { ToastContainer } from 'react-toastify';
 
-import { LoadingSpinner } from '@/components/atoms/loading-spinner/loading-spinner';
+import { Preloader } from '@/components/atoms/preloader/preloader';
 import { Layout } from '@/components/layout';
 import { useAppDispatch } from '@/hooks/redux';
 import { initCsrf } from '@/services/security.service';
@@ -170,7 +170,7 @@ const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) 
   // ✅ ИСПРАВЛЕНИЕ: Предотвращаем hydration mismatch
   // Показываем контент с suppressHydrationWarning до завершения hydration
   if (!isHydrated) {
-    return <LoadingSpinner message="Инициализация..." />;
+    return <Preloader />;
   }
 
   return <>{children}</>;
@@ -193,6 +193,7 @@ function MyApp({ Component, ...rest }: AppProps) {
           <Layout>
             <Component {...props.pageProps} />
           </Layout>
+
           <ToastContainer
             position="bottom-right"
             autoClose={3000}

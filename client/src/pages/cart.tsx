@@ -11,6 +11,7 @@ import { toast } from 'react-toastify';
 import { Button } from '@/components/atoms/button';
 import { ButtonVariant } from '@/components/atoms/button/button.style';
 import { CartIcon } from '@/components/atoms/cart-icon/cart-icon';
+import { PageLoader } from '@/components/atoms/page-loader/page-loader';
 import { Benefits } from '@/components/sections/benefits';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { CartService, OrdersService } from '@/services';
@@ -166,6 +167,10 @@ const CartPage: React.FC = () => {
       setIsCheckingOut(false);
     }
   };
+
+  if (isCartLoading) {
+    return <PageLoader />;
+  }
 
   if (!cartItems.length) {
     return (

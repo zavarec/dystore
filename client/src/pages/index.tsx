@@ -5,7 +5,6 @@ import type { GetStaticProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import { SEOHead } from '@/components/atoms/seo-head/seo-head';
-import type { HeroSpotlightProps } from '@/components/hero-spotlight/hero-spotlight';
 import { HeroSpotlight } from '@/components/hero-spotlight/hero-spotlight';
 import { Benefits } from '@/components/sections/benefits';
 import { Categories } from '@/components/sections/categories';
@@ -79,7 +78,7 @@ const HomePage: NextPage = () => {
     window.scrollTo({ top: 600, behavior: 'smooth' });
   };
 
-  const promo1: HeroSpotlightProps = {
+  const promo1 = {
     title: 'Чистый воздух круглый год',
     subtitle: 'комфорт и свежесть в любое время года.',
     bgImage:

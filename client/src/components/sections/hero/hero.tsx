@@ -19,6 +19,8 @@ const heroSlides: CarouselSlide[] = [
     subtitle: 'Откройте для себя мир качественных товаров по доступным ценам',
     video:
       'https://video-eu.assetsadobe.com/dyson/_renditions_/526/5261034a-d1bc-40a2-a45c-9125ef7c693a/avs/Dyson_EMEA_Summer%20Promo_Social_1280x600_6s_XCAT_DEALPAGE-BANNER.mp4_master-0x540-2000k.mp4?',
+    poster: '/images/hero/1.webp',
+    background: '/images/hero/1.webp',
   },
 ];
 
@@ -31,6 +33,8 @@ export const Hero: React.FC<HeroProps> = ({ onCatalogClick }) => {
             height="100%"
             {...(slide.video ? { src: slide.video } : {})}
             {...(slide.background ? { backgroundImage: slide.background } : {})}
+            {...(slide.poster ? { poster: slide.poster } : {})}
+            priorityImage={index === 0}
           >
             <Container>
               <motion.h1

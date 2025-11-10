@@ -1,7 +1,9 @@
-import React, { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
+
 import {
   BannerContainer,
   BackgroundImage,
+  BackgroundImageWrapper,
   Overlay,
   VideoWrapper,
   Content,
@@ -25,6 +27,7 @@ export const PlayIcon = (
 export interface VideoBannerProps {
   src?: string; // video url
   backgroundImage?: string; // fallback/overlay background
+  poster?: string;
   height?: string | number;
   autoPlay?: boolean;
   muted?: boolean;
@@ -34,11 +37,14 @@ export interface VideoBannerProps {
   className?: string;
   children?: React.ReactNode; // Slot for heading/buttons
   contentAlign?: 'left' | 'center' | 'right';
+  preload?: 'auto' | 'metadata' | 'none';
+  priorityImage?: boolean;
 }
 
 export const VideoBanner: React.FC<VideoBannerProps> = ({
   src,
   backgroundImage,
+  poster,
   height = '60vh',
   autoPlay = true,
   muted = true,
@@ -48,19 +54,25 @@ export const VideoBanner: React.FC<VideoBannerProps> = ({
   className,
   children,
   contentAlign = 'center',
+  preload = 'metadata',
+  priorityImage = false,
 }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(Boolean(autoPlay));
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const [shouldRenderVideo, setShouldRenderVideo] = useState(false);
 
   useEffect(() => {
-    // Try to autoplay on mount on supported browsers
-    if (autoPlay && videoRef.current) {
-      const playPromise = videoRef.current.play();
-      if (playPromise && typeof playPromise.then === 'function') {
-        playPromise.then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
-      }
+    setShouldRenderVideo(Boolean(src));
+  }, [src]);
+
+  useEffect(() => {
+    if (!autoPlay || !shouldRenderVideo || !videoRef.current) return;
+    const playPromise = videoRef.current.play();
+    if (playPromise && typeof playPromise.then === 'function') {
+      playPromise.then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
     }
-  }, [autoPlay]);
+  }, [autoPlay, shouldRenderVideo]);
 
   const togglePlay = () => {
     if (!videoRef.current) return;
@@ -73,12 +85,44 @@ export const VideoBanner: React.FC<VideoBannerProps> = ({
     }
   };
 
+  const handleVideoLoaded = () => {
+    setIsVideoLoaded(true);
+  };
+
+  const fallbackImage = poster || backgroundImage;
+  const shouldShowFallback = Boolean(fallbackImage) && (!isVideoLoaded || !shouldRenderVideo);
+
   return (
     <BannerContainer height={height} className={className}>
-      {backgroundImage && <BackgroundImage background={backgroundImage} />}
-      {src && (
+      {fallbackImage && (
+        <BackgroundImageWrapper
+          isVisible={shouldShowFallback}
+          aria-hidden="true"
+          data-fallback-visible={shouldShowFallback}
+        >
+          <BackgroundImage
+            src={fallbackImage}
+            alt=""
+            fill
+            priority={priorityImage}
+            sizes="100vw"
+            quality={75}
+          />
+        </BackgroundImageWrapper>
+      )}
+      {shouldRenderVideo && src && (
         <VideoWrapper>
-          <video ref={videoRef} autoPlay={autoPlay} muted={muted} loop={loop} playsInline>
+          <video
+            ref={videoRef}
+            autoPlay={autoPlay}
+            muted={muted}
+            loop={loop}
+            playsInline
+            preload={preload}
+            poster={poster}
+            onLoadedData={handleVideoLoaded}
+            style={{ opacity: isVideoLoaded ? 1 : 0, transition: 'opacity 0.6s ease' }}
+          >
             <source src={src} />
           </video>
         </VideoWrapper>

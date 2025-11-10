@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import styled from '@emotion/styled';
 
 export const BannerContainer = styled.section<{
@@ -18,16 +19,19 @@ export const BannerContainer = styled.section<{
   }
 `;
 
-export const BackgroundImage = styled.div<{ background?: string }>`
+export const BackgroundImageWrapper = styled.div<{ isVisible: boolean }>`
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  background-image: url(${({ background }) => background});
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  opacity: ${({ isVisible }) => (isVisible ? 1 : 0)};
+  transition: opacity 0.6s ease;
+  pointer-events: none;
   z-index: 0;
+`;
+
+export const BackgroundImage = styled(Image)`
+  object-fit: cover;
 `;
 
 export const Overlay = styled.div`

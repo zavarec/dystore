@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+
 import { motion, AnimatePresence } from 'framer-motion';
+
 import {
   CarouselContainer,
   CarouselSlide,
@@ -14,6 +16,7 @@ export interface CarouselSlide {
   subtitle: string;
   background?: string;
   video?: string;
+  poster?: string;
 }
 
 interface CarouselProps {
@@ -30,6 +33,7 @@ export const Carousel: React.FC<CarouselProps> = ({
   children,
 }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const hasCustomRenderer = typeof children === 'function';
 
   const nextSlide = useCallback(() => {
     setCurrentSlide(prev => (prev + 1) % slides.length);
@@ -78,24 +82,26 @@ export const Carousel: React.FC<CarouselProps> = ({
                 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
           }
         >
-          <video
-            key={slides[currentSlide]?.video} // перезапуск при смене слайда
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              zIndex: 0,
-            }}
-          >
-            <source src={slides[currentSlide]?.video} type="video/mp4" />
-          </video>
+          {!hasCustomRenderer && slides[currentSlide]?.video && (
+            <video
+              key={slides[currentSlide]?.video} // перезапуск при смене слайда
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              style={{
+                position: 'absolute',
+                inset: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                zIndex: 0,
+              }}
+            >
+              <source src={slides[currentSlide]?.video} type="video/mp4" />
+            </video>
+          )}
 
           <CarouselContent>
             {children && slides[currentSlide] ? (
