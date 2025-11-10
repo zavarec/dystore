@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   HttpException,
   HttpStatus,
+  Req,
 } from "@nestjs/common";
 import {
   ApiTags,
@@ -24,6 +25,7 @@ import { Roles } from "../common/decorators/role.decorator";
 import { Role } from "@prisma/client";
 import { CurrentUser } from "../common/decorators/current-user.decorator";
 import { User } from "@prisma/client";
+import { CART_COOKIE } from "src/constants/cart.constant";
 
 @ApiTags("Orders")
 @Controller("order")
@@ -37,13 +39,16 @@ export class OrdersController {
   @ApiResponse({ status: 400, description: "Cart is empty or invalid data" })
   @Post()
   async createOrder(
+    @Req() req: any,
     @CurrentUser() user: User,
     @Body() createOrderDto: CreateOrderDto,
   ) {
     try {
+      const cartToken = req.cookies?.[CART_COOKIE] as string | undefined;
       const cart = await this.ordersService.createOrder(
         user.id,
         createOrderDto,
+        cartToken,
       );
       return cart;
     } catch (error) {
