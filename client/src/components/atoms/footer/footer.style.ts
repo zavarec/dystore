@@ -32,6 +32,12 @@ export const FooterSection = styled.div`
     font-weight: 600;
     margin-bottom: 20px;
     color: #fff;
+    ${media.down('tablet')} {
+      margin-bottom: 10px;
+    }
+  }
+  ${media.down('tablet')} {
+    width: 100%;
   }
 `;
 
@@ -45,6 +51,10 @@ export const FooterLink = styled(Link)`
   font-size: 16px;
   &:hover {
     color: #fff;
+  }
+
+  ${media.down('tablet')} {
+    border-bottom: 1px solid #fff;
   }
 `;
 
@@ -116,7 +126,7 @@ export const FooterContentWrapper = styled.div`
 
   ${media.down('tablet')} {
     flex-direction: column;
-    align-items: flex-start;
+    margin-left: 0;
     text-align: left;
     gap: 24px;
 

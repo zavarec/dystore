@@ -39,7 +39,7 @@ export const CartBadge = styled.span`
   position: absolute;
   top: -6px;
   right: -6px;
-  background: #dc3545;
+  background: #79b928;
   color: white;
   border-radius: 50%;
   width: 20px;

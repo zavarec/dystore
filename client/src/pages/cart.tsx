@@ -10,6 +10,8 @@ import { toast } from 'react-toastify';
 
 import { Button } from '@/components/atoms/button';
 import { ButtonVariant } from '@/components/atoms/button/button.style';
+import { CartIcon } from '@/components/atoms/cart-icon/cart-icon';
+import { Benefits } from '@/components/sections/benefits';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { CartService, OrdersService } from '@/services';
 import { selectIsAuthenticated } from '@/store/slices/auth-slice/auth.selectors';
@@ -37,7 +39,6 @@ import {
   ItemPrice,
   QuantityControls,
   QuantityButton,
-  QuantityInput,
   RemoveButton,
   CartSummary,
   SummaryRow,
@@ -48,9 +49,16 @@ import {
   EmptyCartTitle,
   EmptyCartDescription,
   CartItem,
+  CartContentGrid,
+  CartAddressForm,
+  CartField,
+  CartFieldLabel,
+  CartTextInput,
+  CartTextArea,
+  ItemPiceWithQuantityWrapper,
 } from '@/styles/pages/cart.style';
 import type { CartItem as CartItemType } from '@/types/models/cart.model';
-import { formatNumberRu } from '@/utils/format';
+import { formatNumberRu, formatPrice } from '@/utils/format';
 
 const CartPage: React.FC = () => {
   const router = useRouter();
@@ -201,17 +209,8 @@ const CartPage: React.FC = () => {
       <CartPageContainer>
         <CartHeader>
           <CartTitle>Корзина ({totalItems} товаров)</CartTitle>
-
-          {/* <Button variant={ButtonVariant.OUTLINE} onClick={handleClearCart}>Очистить корзину</Button> */}
         </CartHeader>
-
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '2fr 1fr',
-            gap: '40px',
-          }}
-        >
+        <CartContentGrid>
           <CartItems>
             {cartItems.map(item => (
               <CartItem key={item.id}>
@@ -230,49 +229,44 @@ const CartPage: React.FC = () => {
 
                 <ItemInfo>
                   <ItemName>{item.product.name}</ItemName>
-                  <ItemPrice>{formatNumberRu(item.product.price)} ₽</ItemPrice>
+
+                  <ItemPiceWithQuantityWrapper>
+                    <ItemPrice>{formatPrice(item.product.price)}</ItemPrice>
+
+                    <QuantityControls>
+                      <QuantityButton
+                        onClick={() => handleQuantityChange(item.productId, item.quantity - 1)}
+                        disabled={isCartLoading}
+                      >
+                        −
+                      </QuantityButton>
+
+                      <span
+                        style={{
+                          padding: '0 8px',
+                        }}
+                      >
+                        {item.quantity}
+                      </span>
+
+                      <QuantityButton
+                        onClick={() => handleQuantityChange(item.productId, item.quantity + 1)}
+                        disabled={isCartLoading}
+                      >
+                        +
+                      </QuantityButton>
+                    </QuantityControls>
+
+                    <RemoveButton
+                      onClick={() => handleRemoveByProductId(item.productId)}
+                      disabled={isCartLoading}
+                      aria-label={`Удалить ${item.product.name} из корзины`}
+                      title="Удалить из корзины"
+                    >
+                      <CartIcon />
+                    </RemoveButton>
+                  </ItemPiceWithQuantityWrapper>
                 </ItemInfo>
-
-                <QuantityControls>
-                  <QuantityButton
-                    onClick={() => handleQuantityChange(item.productId, item.quantity - 1)}
-                    disabled={isCartLoading}
-                  >
-                    −
-                  </QuantityButton>
-
-                  <QuantityInput
-                    type="number"
-                    value={item.quantity}
-                    onChange={e =>
-                      handleQuantityChange(
-                        item.productId,
-                        Number.isNaN(e.currentTarget.valueAsNumber)
-                          ? 1
-                          : Math.max(1, e.currentTarget.valueAsNumber),
-                      )
-                    }
-                    min={1}
-                    disabled={isCartLoading}
-                    inputMode="numeric"
-                  />
-
-                  <QuantityButton
-                    onClick={() => handleQuantityChange(item.productId, item.quantity + 1)}
-                    disabled={isCartLoading}
-                  >
-                    +
-                  </QuantityButton>
-                </QuantityControls>
-
-                <RemoveButton
-                  onClick={() => handleRemoveByProductId(item.productId)}
-                  disabled={isCartLoading}
-                  aria-label={`Удалить ${item.product.name} из корзины`}
-                  title="Удалить из корзины"
-                >
-                  ✕
-                </RemoveButton>
               </CartItem>
             ))}
           </CartItems>
@@ -280,36 +274,29 @@ const CartPage: React.FC = () => {
           <CartSummary>
             <h3>Итого</h3>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 16 }}>
-              <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <span>Адрес доставки</span>
-                <input
+            <CartAddressForm>
+              <CartField>
+                <CartFieldLabel>Адрес доставки</CartFieldLabel>
+                <CartTextInput
                   type="text"
                   placeholder="Город, улица, дом, квартира"
                   value={deliveryAddress}
                   onChange={e => setDeliveryAddress(e.target.value)}
                   disabled={isCheckingOut || isCartLoading}
-                  style={{ padding: 10, border: '1px solid #e5e7eb', borderRadius: 8 }}
                 />
-              </label>
+              </CartField>
 
-              <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <span>Комментарий к заказу (необязательно)</span>
-                <textarea
+              <CartField>
+                <CartFieldLabel>Комментарий к заказу (необязательно)</CartFieldLabel>
+                <CartTextArea
                   placeholder="Например: позвоните за 30 минут до доставки"
                   value={comment}
                   onChange={e => setComment(e.target.value)}
                   disabled={isCheckingOut || isCartLoading}
                   rows={3}
-                  style={{
-                    padding: 10,
-                    border: '1px solid #e5e7eb',
-                    borderRadius: 8,
-                    resize: 'vertical',
-                  }}
                 />
-              </label>
-            </div>
+              </CartField>
+            </CartAddressForm>
 
             <SummaryRow>
               <span>Товары ({totalItems})</span>
@@ -346,7 +333,11 @@ const CartPage: React.FC = () => {
               </div>
             </CheckoutSection>
           </CartSummary>
-        </div>
+
+          <div />
+
+          <Benefits variant="cart" />
+        </CartContentGrid>
       </CartPageContainer>
     </>
   );

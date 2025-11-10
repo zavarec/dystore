@@ -1,24 +1,34 @@
 import styled from '@emotion/styled';
 
+import { media } from '../breakpoints';
 import { commonStyles, tokens } from '../shared';
 
 const { colors } = tokens;
 
 export const CartPageContainer = styled.div`
   ${commonStyles.container};
-  padding: 40px 20px;
+  padding-top: 20px;
+  padding-bottom: 20px;
   min-height: 60vh;
 `;
 
 export const CartHeader = styled.div`
-  margin-bottom: 40px;
+  margin-bottom: 20px;
+  padding-left: 12px;
+  ${media.down('tablet')} {
+    padding-left: 0;
+  }
 `;
 
 export const CartTitle = styled.h1`
-  font-size: 32px;
-  font-weight: 700;
-  color: #1a1a1a;
+  font-size: 24px;
+  font-weight: 400;
+  color: ${colors.semantic.text.primary};
   margin: 0;
+
+  ${media.down('tablet')} {
+    display: flex;
+  }
 `;
 
 export const CartItems = styled.div`
@@ -29,12 +39,12 @@ export const CartItems = styled.div`
 
 export const CartItem = styled.div`
   display: grid;
-  grid-template-columns: 120px 1fr auto auto;
+  display: flex;
   gap: 20px;
   padding: 20px;
   background: white;
-  border-radius: 12px;
-  border: 1px solid #e5e5e5;
+  border-radius: 0.25rem;
+  border: 1px solid ${tokens.colors.semantic.border.cart};
   align-items: center;
   transition: all 0.2s ease;
 
@@ -59,6 +69,15 @@ export const ItemInfo = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 100%;
+`;
+
+export const ItemPiceWithQuantityWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
 `;
 
 export const ItemName = styled.div`
@@ -87,23 +106,24 @@ export const ItemPrice = styled.div`
   font-size: 20px;
   font-weight: 600;
   color: ${colors.semantic.text.primary};
+  margin-right: auto;
 `;
 
 export const QuantityControls = styled.div`
   display: flex;
   align-items: center;
-  gap: 2px;
-  border: 1px solid #e5e5e5;
-  border-radius: 8px;
+  border: 1px solid ${colors.semantic.border.inverse};
+  border-radius: 6.25rem;
   overflow: hidden;
+  flex-shrink: 0;
+  background-color: #fff;
 `;
 
 export const QuantityButton = styled.button`
-  width: 40px;
-  height: 40px;
+  padding: 0.5rem;
   border: none;
-  background: #f8f9fa;
   color: #666;
+  background-color: #fff;
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
@@ -113,7 +133,6 @@ export const QuantityButton = styled.button`
   justify-content: center;
 
   &:hover:not(:disabled) {
-    background: #e9ecef;
     color: ${colors.semantic.text.primary};
   }
 
@@ -123,37 +142,12 @@ export const QuantityButton = styled.button`
   }
 `;
 
-export const QuantityInput = styled.input`
-  width: 60px;
-  height: 40px;
-  border: none;
-  text-align: center;
-  font-size: 16px;
-  font-weight: 600;
-  color: #1a1a1a;
-  background: white;
-
-  &:focus {
-    outline: none;
-  }
-
-  /* Скрываем стрелки у input type="number" */
-  &::-webkit-outer-spin-button,
-  &::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-
-  &[type='number'] {
-    -moz-appearance: textfield;
-  }
-`;
-
 export const RemoveButton = styled.button`
   width: 40px;
   height: 40px;
-  border-radius: 8px;
-  border: 1px solid ${colors.semantic.state.danger};
+
+  border: 1px solid ${colors.semantic.border.cart};
+  border-radius: 2px;
   background: white;
   color: ${colors.semantic.state.danger};
   font-size: 18px;
@@ -162,9 +156,9 @@ export const RemoveButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-
+  margin-left: 12px;
   &:hover:not(:disabled) {
-    background: ${colors.semantic.state.danger};
+    border-color: ${colors.semantic.border.input};
     color: white;
   }
 
@@ -175,8 +169,8 @@ export const RemoveButton = styled.button`
 `;
 
 export const CartSummary = styled.div`
-  background: white;
-  border-radius: 12px;
+  background: ${colors.semantic.background.secondary};
+  border-radius: 0.25rem;
   border: 1px solid #e5e5e5;
   padding: 24px;
   height: fit-content;
@@ -264,42 +258,79 @@ export const ContinueShoppingButton = styled.button`
     box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
   }
 `;
+export const CartContentGrid = styled.div`
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 40px;
+  padding-left: 16px;
 
-// Медиа-запросы для адаптивности
-export const mediaQueries = {
-  mobile: '@media (max-width: 768px)',
-  tablet: '@media (max-width: 1024px)',
-};
-
-// Добавляем стили для мобильных устройств
-export const responsiveStyles = `
-  ${mediaQueries.mobile} {
-    ${CartItem} {
-      grid-template-columns: 80px 1fr;
-      grid-template-rows: auto auto;
-      gap: 12px;
-    }
-    
-    ${QuantityControls} {
-      grid-column: 1 / -1;
-      justify-self: start;
-    }
-    
-    ${RemoveButton} {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-    }
+  ${media.down('tablet')} {
+    grid-template-columns: 1fr;
+    padding-left: 0;
+    gap: 20px;
   }
-  
-  ${mediaQueries.tablet} {
-    ${CartPageContainer} > div {
-      grid-template-columns: 1fr !important;
-      gap: 30px !important;
-    }
-    
-    ${CartSummary} {
-      position: static;
+`;
+
+// правая колонка — обёртка “Итого”, чтобы тянуться на мобиле
+export const CartSummaryCol = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+// форма адреса/коммента
+export const CartAddressForm = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+`;
+
+export const CartField = styled.label`
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+`;
+
+export const CartFieldLabel = styled.span`
+  font-size: 14px;
+  line-height: 1.2;
+  color: #111827;
+`;
+
+const baseInput = `
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.25rem;
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+
+  &:disabled { opacity: .6; }
+`;
+
+export const CartTextInput = styled.input`
+  ${baseInput}
+`;
+
+export const CartTextArea = styled.textarea`
+  ${baseInput}
+  resize: vertical;
+`;
+
+// блок под кнопку “Продолжить покупки”
+export const ContinueCartActions = styled.div`
+  margin-top: 16px;
+`;
+
+// мелкие адаптив-штрихи для карточек (если нужно)
+export const CartItemResponsive = styled.div`
+  display: contents;
+
+  ${media.down('tablet')} {
+    /* на мобильном чуть компактнее */
+    .item-image {
+      width: 96px;
+      height: 96px;
     }
   }
 `;

@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+
+import Image from 'next/image';
+
 import {
   BenefitsSection,
   BenefitsContainer,
@@ -8,7 +11,6 @@ import {
   BenefitIcon,
   BenefitTitle,
 } from './benefits.style';
-import Image from 'next/image';
 import { Modal } from '../../atoms/modal/modal';
 
 interface Benefit {
@@ -18,7 +20,7 @@ interface Benefit {
   description?: string;
 }
 
-const benefits: Benefit[] = [
+const BENEFITS: Benefit[] = [
   {
     id: '3',
     iconUrl:
@@ -52,7 +54,11 @@ const benefits: Benefit[] = [
   },
 ];
 
-export const Benefits: React.FC = () => {
+interface Props {
+  variant?: 'cart' | 'default';
+}
+
+export const Benefits: React.FC<Props> = ({ variant = 'default' }) => {
   const [activeBenefit, setActiveBenefit] = useState<Benefit | null>(null);
 
   const handleBenefitClick = (benefit: Benefit) => {
@@ -61,11 +67,30 @@ export const Benefits: React.FC = () => {
 
   const handleClose = () => setActiveBenefit(null);
 
+  if (variant === 'cart') {
+    return (
+      <BenefitsList variant="cart">
+        {BENEFITS.map(benefit => {
+          return (
+            <BenefitItem key={benefit.id} variant="cart">
+              <BenefitContent variant="cart">
+                <BenefitIcon variant="cart">
+                  <Image src={benefit.iconUrl} alt={benefit.title} width={16} height={16} />
+                </BenefitIcon>
+                <BenefitTitle variant="cart">{benefit.title}</BenefitTitle>
+              </BenefitContent>
+            </BenefitItem>
+          );
+        })}
+      </BenefitsList>
+    );
+  }
+
   return (
     <BenefitsSection>
       <BenefitsContainer>
         <BenefitsList>
-          {benefits.map((benefit, index) => {
+          {BENEFITS.map((benefit, index) => {
             return (
               <BenefitItem
                 key={benefit.id}

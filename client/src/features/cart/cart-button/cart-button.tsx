@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { CartButtonContainer, CartBadge } from './cart-button.style';
+import { useEffect, useState } from 'react';
+
 import { useAppSelector } from '@/hooks/redux';
 import { selectCartTotalItems } from '@/store/slices/cart-slice/cart.selectors';
+
+import { CartButtonContainer, CartBadge } from './cart-button.style';
 
 interface CartButtonProps {
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;

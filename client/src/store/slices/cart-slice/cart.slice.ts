@@ -26,6 +26,11 @@ const initialState: CartState = {
   error: null,
 };
 
+const getCartTotal = (cart: Cart | null): number => {
+  if (!cart) return 0;
+  return cart.items.reduce((acc, item) => acc + Number(item.product.price) * item.quantity, 0);
+};
+
 const cartSlice = createSlice({
   name: 'cart',
   initialState,
@@ -56,12 +61,8 @@ const cartSlice = createSlice({
         state.isLoading = false;
         if (!payload) return;
 
-        const { items } = payload;
-
-        const totalPrice = items.reduce((acc, item) => acc + item.product.price, 0);
-
         state.cart = payload;
-        state.totalPrice = totalPrice;
+        state.totalPrice = getCartTotal(payload);
       })
       .addCase(fetchCart.rejected, (state, action) => {
         state.isLoading = false;
@@ -75,6 +76,7 @@ const cartSlice = createSlice({
       .addCase(addToCart.fulfilled, (state, action) => {
         state.isLoading = false;
         state.cart = action.payload;
+        state.totalPrice = getCartTotal(action.payload);
       })
       .addCase(addToCart.rejected, (state, action) => {
         state.isLoading = false;
@@ -88,6 +90,7 @@ const cartSlice = createSlice({
       .addCase(updateCartItemQuantity.fulfilled, (state, action) => {
         state.isLoading = false;
         state.cart = action.payload;
+        state.totalPrice = getCartTotal(action.payload);
       })
       .addCase(updateCartItemQuantity.rejected, (state, action) => {
         state.isLoading = false;
@@ -101,6 +104,7 @@ const cartSlice = createSlice({
       .addCase(removeFromCart.fulfilled, (state, action) => {
         state.isLoading = false;
         state.cart = action.payload;
+        state.totalPrice = getCartTotal(action.payload);
       })
       .addCase(removeFromCart.rejected, (state, action) => {
         state.isLoading = false;
@@ -108,7 +112,7 @@ const cartSlice = createSlice({
       })
       // Получение общей стоимости корзины
       .addCase(fetchCartTotal.fulfilled, (state, action) => {
-        state.totalPrice = action.payload.total;
+        state.totalPrice = action.payload.total ?? state.totalPrice;
       })
       // Очистка корзины
       .addCase(clearCart.fulfilled, state => {

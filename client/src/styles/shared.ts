@@ -38,6 +38,7 @@ export const tokens = {
         strong: '#BDBDBD',
         inverse: '#444444',
         input: '#919191',
+        cart: '#d2d2d2',
       },
       divider: {
         default: '#ebebeb',
