@@ -2,13 +2,13 @@ import { useRef, useState, useEffect } from 'react';
 
 import {
   BannerContainer,
-  BackgroundImage,
-  BackgroundImageWrapper,
   Overlay,
   VideoWrapper,
   Content,
   ToggleButton,
+  LoaderWrapper,
 } from './video-banner.style';
+import { PageLoader } from '../page-loader/page-loader';
 
 export const PauseIcon = (
   <svg viewBox="0 0 32 32" width="32" height="32">
@@ -43,7 +43,7 @@ export interface VideoBannerProps {
 
 export const VideoBanner: React.FC<VideoBannerProps> = ({
   src,
-  backgroundImage,
+
   poster,
   height = '60vh',
   autoPlay = true,
@@ -55,7 +55,6 @@ export const VideoBanner: React.FC<VideoBannerProps> = ({
   children,
   contentAlign = 'center',
   preload = 'metadata',
-  priorityImage = false,
 }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(Boolean(autoPlay));
@@ -89,26 +88,12 @@ export const VideoBanner: React.FC<VideoBannerProps> = ({
     setIsVideoLoaded(true);
   };
 
-  const fallbackImage = poster || backgroundImage;
-  const shouldShowFallback = Boolean(fallbackImage) && (!isVideoLoaded || !shouldRenderVideo);
-
   return (
     <BannerContainer height={height} className={className}>
-      {fallbackImage && (
-        <BackgroundImageWrapper
-          isVisible={shouldShowFallback}
-          aria-hidden="true"
-          data-fallback-visible={shouldShowFallback}
-        >
-          <BackgroundImage
-            src={fallbackImage}
-            alt=""
-            fill
-            priority={priorityImage}
-            sizes="100vw"
-            quality={75}
-          />
-        </BackgroundImageWrapper>
+      {!isVideoLoaded && (
+        <LoaderWrapper>
+          <PageLoader />
+        </LoaderWrapper>
       )}
       {shouldRenderVideo && src && (
         <VideoWrapper>

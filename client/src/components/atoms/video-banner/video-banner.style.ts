@@ -1,4 +1,5 @@
 import Image from 'next/image';
+
 import styled from '@emotion/styled';
 
 export const BannerContainer = styled.section<{
@@ -88,4 +89,14 @@ export const ToggleButton = styled.button`
   svg {
     display: block;
   }
+`;
+
+export const LoaderWrapper = styled.div`
+  position: absolute;
+  inset: 0;
+  background: #000; /* или градиент, как у Dyson */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
 `;

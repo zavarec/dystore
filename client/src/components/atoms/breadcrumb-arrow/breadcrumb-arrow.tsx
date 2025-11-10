@@ -2,8 +2,8 @@ export const BreadcrumbArrow = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
-    width="0.75rem"
-    height="1.125rem"
+    width={props.width ?? '0.75rem'}
+    height={props.height ?? '1.125rem'}
     fill="rgb(85, 85, 85)"
     {...props}
   >

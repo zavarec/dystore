@@ -8,6 +8,7 @@ import { Footer } from '../atoms/footer';
 import { Header } from '../atoms/header';
 import { NoSSR } from '../atoms/no-ssr/no-ssr';
 import { AmoCrmWidget } from '../integrations/amo-crm-widget';
+import ChatPanel, { CHAT_CONTAINER_ID } from '../integrations/chat-panel';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -31,12 +32,18 @@ export const Layout: React.FC<LayoutProps> = ({ children, className }) => {
       </NoSSR>
       <PageContainer className={className}>
         <Main>{children}</Main>
-        <AmoCrmWidget
-          id={process.env.NEXT_PUBLIC_AMO_ID!}
-          hash={process.env.NEXT_PUBLIC_AMO_HASH!}
-          locale="ru"
-          color="#111827"
-        />
+
+        <ChatPanel />
+
+        <div>
+          <AmoCrmWidget
+            id={process.env.NEXT_PUBLIC_AMO_ID!}
+            hash={process.env.NEXT_PUBLIC_AMO_HASH!}
+            locale="ru"
+            containerSelector={`#${CHAT_CONTAINER_ID}`}
+            // color="#111827"
+          />
+        </div>
 
         {!isAdminRoute && <Footer />}
       </PageContainer>

@@ -1,4 +1,5 @@
 // src/components/integrations/AmoCrmWidget.tsx
+import { tokens } from '@/styles/shared';
 import { useEffect } from 'react';
 
 declare global {
@@ -15,19 +16,33 @@ type Props = {
   userId?: string; // свой идентификатор пользователя (опционально)
   locale?: string; // "ru" по умолчанию
   inline?: boolean; // соответствует параметру inline из скрипта
+  containerSelector?: string; // по умолчанию 'custom_chat_holder'
+  hideBubble?: boolean;
 };
 
 export function AmoCrmWidget({
   id,
   hash,
-  color = '#000',
+  color,
   userId,
   locale = 'ru',
   inline = false,
+  containerSelector,
 }: Props) {
   useEffect(() => {
-    // чтобы не вставлять скрипт дважды
     if (document.getElementById('amo-crm-button-js')) return;
+
+    const CHAT_THEME = {
+      header: false,
+      background: '#FFFFFF',
+      system_color: tokens.colors.semantic.text.primary,
+      message: {
+        outgoing_background: `!important #F3F3F3`, // фон сообщений пользователя
+        outgoing_color: tokens.colors.semantic.text.primary, // текст пользователя
+        incoming_background: '#F3F3F3', // фон ответов оператора
+        incoming_color: tokens.colors.semantic.text.primary, // текст ответов
+      },
+    };
 
     if (!inline) {
       const style = document.createElement('style');
@@ -42,34 +57,23 @@ export function AmoCrmWidget({
         bottom: 16px !important;
         transform: none !important;
         z-index: 2147483000 !important;
+        background:#000
       }
     }
   `;
       document.head.appendChild(style);
     }
 
-    // 1) конфиг виджета — ДО подключения скрипта
     window.amoSocialButtonConfig = {
-      hidden: false,
-      color,
-      ...(inline
-        ? {}
-        : {
-            onlinechat: {
-              mode: 'widget', // плавающий чат справа снизу
-              ...(userId ? { user_id: userId } : {}),
-              locale: {
-                extends: 'ru',
-                compose_placeholder: 'Напишите ваш вопрос…',
-              },
-              theme: {
-                header: false,
-              },
-            },
-          }),
+      hidden: false, // фирменный баббл показываем
+      onlinechat: {
+        mode: 'frame',
+        container: containerSelector,
+        ...(userId ? { user_id: userId } : {}),
+        locale: { extends: locale, compose_placeholder: 'Напишите ваш вопрос…' },
+        theme: CHAT_THEME,
+      },
     };
-
-    // 2) сам скрипт
 
     const boot = document.createElement('script');
     boot.id = 'amo-crm-button-js';
@@ -79,12 +83,40 @@ export function AmoCrmWidget({
 
     document.head.appendChild(boot);
 
+    // const bind = () => {
+    //   try {
+    //     window.amoSocialButton?.('onChatShow', () => {
+    //       document.body.classList.add('amochat-open');
+    //     });
+    //     window.amoSocialButton?.('onChatHide', () => {
+    //       document.body.classList.remove('amochat-open');
+    //     });
+    //   } catch {}
+    // };
+    // const t = setTimeout(bind, 1500);
+
+    // return () => {
+    //   clearTimeout(t);
+    //   document.body.classList.remove('amochat-open');
+    //   try {
+    //     window.amoSocialButton?.('runDestroy');
+    //   } catch {}
+    //   document.getElementById('amo-crm-button-js')?.remove();
+    //   document.getElementById('0_script')?.remove();
+    // };
+
     // необязательно: пример колбэков
     const onReady = () => {
       try {
         window.amoSocialButton?.('onChatReady', () => {
+          window.amoSocialButton?.('setMeta', { theme: CHAT_THEME });
           // можно, например, сразу показать чат:
-          // window.amoSocialButton?.('runChatShow');
+          window.amoSocialButton?.('onChatShow', () => {
+            window.amoSocialButton?.('runHide'); // скрыть баббл, когда чат открыт
+          });
+          window.amoSocialButton?.('onChatHide', () => {
+            window.amoSocialButton?.('runShow'); // показать обратно
+          });
         });
       } catch {}
     };
