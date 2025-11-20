@@ -16,7 +16,7 @@ import {
   ResultsDropdown,
   SearchIconWrap,
 } from './client-search.style';
-import { COMPANY_INFO } from '@/constants/contacts.constants';
+import { LINKS } from '@/constants/links.constants';
 import { Phone, MagnifyingGlass } from '@phosphor-icons/react';
 
 type SearchDocument = {
@@ -112,14 +112,28 @@ export const ClientSearch: React.FC = () => {
     if (results.length > 0) {
       router.push(`/product/${results[0]?.slug}`);
       setIsOpen(false);
+      setIsMobileSearchOpen(false);
+      setQuery('');
     }
   };
+
+  // Закрывать поиск при любом переходе по ссылке
+  useEffect(() => {
+    const close = () => {
+      setIsOpen(false);
+      setIsMobileSearchOpen(false);
+    };
+    router.events.on('routeChangeStart', close);
+    return () => {
+      router.events.off('routeChangeStart', close);
+    };
+  }, [router.events]);
 
   return (
     <ClientSearchWrapper ref={wrapperRef}>
       {!isMobileSearchOpen && (
         <MobileActions>
-          <a href={`tel:${COMPANY_INFO.COMPANY_PHONE_NUMBER.replace(/[^+0-9]/g, '')}`}>
+          <a href={LINKS.PHONE_TEL}>
             <IconButton aria-label="Позвонить">
               <Phone size={28} />
             </IconButton>
@@ -153,24 +167,27 @@ export const ClientSearch: React.FC = () => {
           $mobileOpen={isMobileSearchOpen}
         />
       </form>
-      {isMobileSearchOpen && (
-        <SearchIconWrap aria-hidden="true">
-          <svg viewBox="0 0 18 18" width="18" height="18" focusable="false">
-            <path
-              d="M14.436 13.1355C15.5385 11.754 16.2 10.0035 16.2 8.1C16.2 3.627 12.573 0 8.1 0C3.627 0 0 3.627 0 8.1C0 12.573 3.627 16.2 8.1 16.2C10.0035 16.2 11.754 15.5385 13.1355 14.436L16.6995 18L18 16.6995L14.436 13.1355ZM8.1 14.4C4.626 14.4 1.8 11.574 1.8 8.1C1.8 4.626 4.626 1.8 8.1 1.8C11.574 1.8 14.4 4.626 14.4 8.1C14.4 11.574 11.574 14.4 8.1 14.4Z"
-              fill="currentColor"
-              color="black"
-            />
-          </svg>
-        </SearchIconWrap>
-      )}
+      <SearchIconWrap aria-hidden="true" $mobileOpen={isMobileSearchOpen}>
+        <svg viewBox="0 0 18 18" width="18" height="18" focusable="false">
+          <path
+            d="M14.436 13.1355C15.5385 11.754 16.2 10.0035 16.2 8.1C16.2 3.627 12.573 0 8.1 0C3.627 0 0 3.627 0 8.1C0 12.573 3.627 16.2 8.1 16.2C10.0035 16.2 11.754 15.5385 13.1355 14.436L16.6995 18L18 16.6995L14.436 13.1355ZM8.1 14.4C4.626 14.4 1.8 11.574 1.8 8.1C1.8 4.626 4.626 1.8 8.1 1.8C11.574 1.8 14.4 4.626 14.4 8.1C14.4 11.574 11.574 14.4 8.1 14.4Z"
+            fill="currentColor"
+          />
+        </svg>
+      </SearchIconWrap>
 
       {isOpen && (query ? results.length > 0 : true) && (
         <ResultsDropdown>
           {query && results.length > 0 ? (
             results.map(item => (
               <Link key={item.id} href={`/product/${item.slug}`} passHref legacyBehavior>
-                <ResultItem>
+                <ResultItem
+                  onClick={() => {
+                    setIsOpen(false);
+                    setIsMobileSearchOpen(false);
+                    setQuery('');
+                  }}
+                >
                   <span className="title">{item.title}</span>
                   {typeof item.price === 'number' && (
                     <span className="price">{item.price.toLocaleString('ru-RU')} ₽</span>

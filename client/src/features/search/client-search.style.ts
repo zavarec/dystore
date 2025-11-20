@@ -97,7 +97,7 @@ export const EmptyState = styled.div`
   color: rgba(255, 255, 255, 0.7);
 `;
 
-export const SearchIconWrap = styled.span`
+export const SearchIconWrap = styled.span<{ $mobileOpen: boolean }>`
   position: absolute;
   left: 12px;
   top: 50%;
@@ -108,6 +108,14 @@ export const SearchIconWrap = styled.span`
   width: 18px;
   height: 18px;
   pointer-events: none;
-  color: rgba(255, 255, 255, 0.9);
+  color: #111; /* чёрная иконка на светлом инпуте */
   opacity: 0.9;
+
+  @media (max-width: 1100px) {
+    display: ${props => (props.$mobileOpen ? 'inline-flex' : 'none')};
+  }
+
+  @media (min-width: 1101px) {
+    display: inline-flex;
+  }
 `;

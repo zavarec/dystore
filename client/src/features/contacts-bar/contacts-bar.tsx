@@ -7,6 +7,7 @@ import { useAppDispatch } from '@/hooks';
 import { setContactModalOpen } from '@/store/slices/uiSlice';
 import { media } from '@/styles/breakpoints';
 import { tokens } from '@/styles/shared';
+import { LINKS } from '@/constants/links.constants';
 
 export const FooterContactsWrapper = styled.div`
   display: flex;
@@ -68,7 +69,7 @@ export const ContactsBar = () => {
     },
     {
       name: 'Phone',
-      href: 'tel:+74951064096',
+      href: LINKS.PHONE_TEL,
       src: '/images/icons/contacts/phone.png',
       alt: 'Позвонить',
     },
