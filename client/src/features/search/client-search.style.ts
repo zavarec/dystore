@@ -51,3 +51,18 @@ export const EmptyState = styled.div`
   font-size: 13px;
   color: rgba(255, 255, 255, 0.7);
 `;
+
+export const SearchIconWrap = styled.span`
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+  color: rgba(255, 255, 255, 0.9);
+  opacity: 0.9;
+`;
