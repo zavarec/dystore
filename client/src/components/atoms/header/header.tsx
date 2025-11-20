@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
@@ -19,7 +18,6 @@ import { CategoryTreeUtils } from '@/types/models/category.model';
 import {
   MotionHeaderContainer,
   HeaderContent,
-  Logo,
   Navigation,
   MobileMenuButton,
   MenuLine,
@@ -114,17 +112,6 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
     >
       <HeaderContent>
         <HeaderLeft>
-          <Logo href="/">
-            <Image
-              src="https://s3.twcstorage.ru/49dbf9e8-45b07930-284b-4614-95f5-5a9bdcbd9f92/uploads/2fa45b9c-691a-4027-aa83-3e800e2a35a4-dyson-logo.svg"
-              alt="DysonGroup"
-              width={100}
-              height={24}
-              sizes="(max-width: 768px) 40vw, 20vw"
-              priority
-            />
-          </Logo>
-
           <Navigation $isOpen={isMobileMenuOpen}>
             {categoriesLoading ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0' }}>

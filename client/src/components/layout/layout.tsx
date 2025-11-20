@@ -6,6 +6,7 @@ import { ContactRequestModal } from '@/features/contact-us-modal/contact-request
 import { PageContainer, Main } from './layout.style';
 import { Footer } from '../atoms/footer';
 import { Header } from '../atoms/header';
+import { TopHeader } from '../atoms/top-header';
 import { NoSSR } from '../atoms/no-ssr/no-ssr';
 import { AmoCrmWidget } from '../integrations/amo-crm-widget';
 import ChatPanel, { CHAT_CONTAINER_ID } from '../integrations/chat-panel';
@@ -28,6 +29,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, className }) => {
       }}
     >
       <NoSSR fallback={null}>
+        <TopHeader />
         <Header />
       </NoSSR>
       <PageContainer className={className}>

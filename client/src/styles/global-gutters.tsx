@@ -8,10 +8,12 @@ export function GlobalGutters() {
         :root {
           /* адаптивный gutter: 16px → 70px */
           --page-gutter: clamp(16px, 5vw, 70px);
-          --header-h: 78px;
+          --top-header-h: 40px;
+          /* общий отступ сверху под оба хедера */
+          --header-h: 118px; /* 40 + 78 */
           @media (max-width: 768px) {
             :root {
-              --header-h: 68px;
+              --header-h: 108px; /* 40 + 68 */
             }
           }
         }

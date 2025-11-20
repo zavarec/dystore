@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 
 const HeaderContainer = styled.header<{ $isScrolled: boolean }>`
   position: fixed;
-  top: 0;
+  top: var(--top-header-h, 0px);
   left: 0;
   right: 0;
   z-index: 1000;
@@ -74,7 +74,7 @@ export const Navigation = styled.nav<{ $isOpen: boolean }>`
   @media (max-width: 1100px) {
     margin-left: 0;
     position: fixed;
-    top: 60px;
+    top: calc(var(--top-header-h, 0px) + 60px);
     left: 0;
     right: 0;
     background: rgba(0, 0, 0, 0.98);
