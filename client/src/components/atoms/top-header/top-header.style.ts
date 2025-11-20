@@ -13,6 +13,9 @@ export const TopHeaderContainer = styled.header`
   z-index: 1100;
   border-bottom: 1px solid #333;
   padding: 24px 0;
+  @media (max-width: 1100px) {
+    display: none;
+  }
 `;
 
 export const TopHeaderContent = styled.div`

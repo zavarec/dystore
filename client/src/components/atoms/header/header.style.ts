@@ -15,6 +15,9 @@ const HeaderContainer = styled.header<{ $isScrolled: boolean }>`
     props.$isScrolled ? '1px solid rgba(0, 0, 0, 0.1)' : '1px solid transparent'};
   transition: all 0.3s ease;
   box-shadow: ${props => (props.$isScrolled ? '0 2px 20px rgba(0, 0, 0, 0.1)' : 'none')};
+  @media (max-width: 1100px) {
+    top: 0;
+  }
 `;
 
 export const MotionHeaderContainer = motion(HeaderContainer);
@@ -115,8 +118,18 @@ export const HeaderLeft = styled.div`
   display: flex;
   align-items: center;
   gap: 24px;
-  flex: 1; /* тянем левую часть */
+
   min-width: 0;
+  @media (min-width: 1100px) {
+    flex: 1; /* тянем левую часть */
+  }
+`;
+
+export const MobileLogo = styled(Logo)`
+  display: none;
+  @media (max-width: 1100px) {
+    display: flex;
+  }
 `;
 
 export const StyledNavLink = styled.a<{ $isActive: boolean }>`
@@ -203,7 +216,7 @@ export const SearchContainer = styled.div`
 
   @media (max-width: 1100px) {
     width: 100%;
-    order: -1;
+    flex: 1;
   }
 `;
 

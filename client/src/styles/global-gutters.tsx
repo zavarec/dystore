@@ -11,9 +11,11 @@ export function GlobalGutters() {
           --top-header-h: 40px;
           /* общий отступ сверху под оба хедера */
           --header-h: 118px; /* 40 + 78 */
-          @media (max-width: 768px) {
+          /* мобильная/планшетная точка совпадает с брейкпоинтом хедера */
+          @media (max-width: 1100px) {
             :root {
-              --header-h: 108px; /* 40 + 68 */
+              --top-header-h: 0px; /* один хеддер */
+              --header-h: 68px; /* высота контента 60px + внутренний отступ 8px */
             }
           }
         }

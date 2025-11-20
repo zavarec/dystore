@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import Image from 'next/image';
 
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -20,6 +21,7 @@ import {
   SearchContainer,
   HeaderLeft,
   HeaderRight,
+  MobileLogo,
 } from './header.style';
 
 interface HeaderProps {
@@ -87,6 +89,26 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
     >
       <HeaderContent>
         <HeaderLeft>
+          <MobileMenuButton
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Меню"
+          >
+            {[0, 1, 2].map(index => (
+              <MenuLine key={index} $isOpen={isMobileMenuOpen} $index={index} />
+            ))}
+          </MobileMenuButton>
+
+          <MobileLogo href="/">
+            <Image
+              src="https://s3.twcstorage.ru/49dbf9e8-45b07930-284b-4614-95f5-5a9bdcbd9f92/uploads/2fa45b9c-691a-4027-aa83-3e800e2a35a4-dyson-logo.svg"
+              alt="DysonGroup"
+              width={74}
+              height={28}
+              sizes="(max-width: 768px) 40vw, 20vw"
+              priority
+            />
+          </MobileLogo>
+
           <Navigation $isOpen={isMobileMenuOpen}>
             {categoriesLoading ? (
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '8px 0' }}>
@@ -126,15 +148,6 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
               <CartButton />
             </Link>
           </SearchContainer>
-
-          <MobileMenuButton
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Меню"
-          >
-            {[0, 1, 2].map(index => (
-              <MenuLine key={index} $isOpen={isMobileMenuOpen} $index={index} />
-            ))}
-          </MobileMenuButton>
         </HeaderRight>
       </HeaderContent>
     </MotionHeaderContainer>
