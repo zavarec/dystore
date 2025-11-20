@@ -7,8 +7,8 @@ import {
   Content,
   ToggleButton,
   LoaderWrapper,
+  VideoSpinner,
 } from './video-banner.style';
-import { PageLoader } from '../page-loader/page-loader';
 
 export const PauseIcon = (
   <svg viewBox="0 0 32 32" width="32" height="32">
@@ -63,6 +63,7 @@ export const VideoBanner: React.FC<VideoBannerProps> = ({
 
   useEffect(() => {
     setShouldRenderVideo(Boolean(src));
+    setIsVideoLoaded(!src); // avoid hanging loader when there is no video src
   }, [src]);
 
   useEffect(() => {
@@ -88,11 +89,16 @@ export const VideoBanner: React.FC<VideoBannerProps> = ({
     setIsVideoLoaded(true);
   };
 
+  const handleVideoError = () => {
+    // Gracefully stop showing loader if video failed to load/play
+    setIsVideoLoaded(true);
+  };
+
   return (
     <BannerContainer height={height} className={className}>
-      {!isVideoLoaded && (
+      {!isVideoLoaded && shouldRenderVideo && (
         <LoaderWrapper>
-          <PageLoader />
+          <VideoSpinner aria-label="Загрузка видео" />
         </LoaderWrapper>
       )}
       {shouldRenderVideo && src && (
@@ -106,6 +112,7 @@ export const VideoBanner: React.FC<VideoBannerProps> = ({
             preload={preload}
             poster={poster}
             onLoadedData={handleVideoLoaded}
+            onError={handleVideoError}
             style={{ opacity: isVideoLoaded ? 1 : 0, transition: 'opacity 0.6s ease' }}
           >
             <source src={src} />

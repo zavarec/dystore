@@ -1,5 +1,6 @@
 import Image from 'next/image';
 
+import { keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
 
 export const BannerContainer = styled.section<{
@@ -99,4 +100,18 @@ export const LoaderWrapper = styled.div`
   align-items: center;
   justify-content: center;
   z-index: 2;
+`;
+
+const spin = keyframes`
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+`;
+
+export const VideoSpinner = styled.div`
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #fff;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  animation: ${spin} 0.8s linear infinite;
 `;
