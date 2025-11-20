@@ -4,15 +4,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import { MobileCategoryList } from '@/components/atoms/mobile-category-list/mobile-category-list';
-import { NoSSR } from '@/components/atoms/no-ssr/no-ssr';
 import { Skeleton } from '@/components/atoms/skeleton';
 import { CartButton } from '@/features/cart/cart-button/cart-button';
+import { ClientSearch } from '@/features/search/client-search';
 import { CategoryDropdown } from '@/features/categories/category-dropdown';
-import { useAppSelector, useAppDispatch } from '@/hooks/redux';
 import { useCategories } from '@/hooks/useCategories';
-import { selectIsAuthenticated, selectUser } from '@/store/slices/auth-slice/auth.selectors';
-import { logout } from '@/store/slices/auth-slice/auth.thunks';
-import { setAuthModalOpen } from '@/store/slices/uiSlice';
 import { CategoryTreeUtils } from '@/types/models/category.model';
 
 import {
@@ -22,10 +18,6 @@ import {
   MobileMenuButton,
   MenuLine,
   SearchContainer,
-  AuthButton,
-  UserInfo,
-  UserName,
-  LogoutButton,
   HeaderLeft,
   HeaderRight,
 } from './header.style';
@@ -40,10 +32,6 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
   // const [searchQuery, setSearchQuery] = useState('');
 
   const router = useRouter();
-  const dispatch = useAppDispatch();
-
-  const isAuthenticated = useAppSelector(selectIsAuthenticated);
-  const user = useAppSelector(selectUser);
 
   const { categories, loading: categoriesLoading } = useCategories();
 
@@ -89,19 +77,6 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
   //   }
   // };
 
-  const handleLogout = async () => {
-    await dispatch(logout());
-    router.push('/');
-  };
-
-  const handleAuthClick = () => {
-    if (isAuthenticated) {
-      router.push('/profile');
-    } else {
-      dispatch(setAuthModalOpen(true));
-    }
-  };
-
   return (
     <MotionHeaderContainer
       $isScrolled={isScrolled}
@@ -145,36 +120,7 @@ export const Header: React.FC<HeaderProps> = ({ className }) => {
 
         <HeaderRight>
           <SearchContainer>
-            {/* todo: test and add search products in all categories functionality */}
-            {/* <form onSubmit={handleSearch}>
-              <SearchInput
-                type="text"
-                placeholder="Поиск товаров..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-              />
-            </form> */}
-
-            <NoSSR
-              fallback={
-                <AuthButton onClick={handleAuthClick} aria-label="Войти в аккаунт">
-                  Войти
-                </AuthButton>
-              }
-            >
-              {isAuthenticated && user ? (
-                <UserInfo>
-                  <UserName>{user.username}</UserName>
-                  <LogoutButton onClick={handleLogout} aria-label="Выйти из аккаунта">
-                    Выйти
-                  </LogoutButton>
-                </UserInfo>
-              ) : (
-                <AuthButton onClick={handleAuthClick} aria-label="Войти в аккаунт">
-                  Войти
-                </AuthButton>
-              )}
-            </NoSSR>
+            <ClientSearch />
 
             <Link href="/cart" passHref legacyBehavior>
               <CartButton />

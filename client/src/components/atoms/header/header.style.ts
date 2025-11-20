@@ -199,6 +199,7 @@ export const SearchContainer = styled.div`
   display: flex;
   align-items: center;
   gap: 16px;
+  position: relative;
 
   @media (max-width: 1100px) {
     width: 100%;

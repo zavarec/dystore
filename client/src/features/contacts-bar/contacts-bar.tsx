@@ -68,7 +68,7 @@ export const ContactsBar = () => {
     },
     {
       name: 'Phone',
-      href: 'tel:+79991234567',
+      href: 'tel:+74951064096',
       src: '/images/icons/contacts/phone.png',
       alt: 'Позвонить',
     },

@@ -60,4 +60,18 @@ export const TopNav = styled.nav`
       font-size: 13px;
     }
   }
+  margin: 0 24px;
+`;
+
+export const TopRight = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+`;
+
+export const TopPhoneNumber = styled.a`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
 `;
