@@ -26,6 +26,7 @@ import { join } from "path";
 import { UploadModule } from "./upload/upload.module";
 import { AmocrmModule } from "./amo-crm/amo-crm.module";
 import { ContactModule } from "./contact/contact.module";
+import { YandexYmlModule } from "./yml/yandex-yml.module";
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { ContactModule } from "./contact/contact.module";
     UploadModule,
     AmocrmModule,
     ContactModule,
+    YandexYmlModule,
   ],
   controllers: [AppController, CsrfController],
   providers: [
