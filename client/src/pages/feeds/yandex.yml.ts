@@ -1,26 +1,26 @@
 import type { GetServerSideProps } from 'next';
 
-const BACKEND_API_URL = process.env.API_URL_SERVER || 'http://localhost:3001/api';
-
 export const getServerSideProps: GetServerSideProps = async ({ res, req }) => {
-  const url = `${BACKEND_API_URL}/feeds/yandex.yml`;
+  // Ходим через внутренний Next API proxy, чтобы избежать внешних сетевых/SSL ограничений
+  const proto = (req.headers['x-forwarded-proto'] as string) || 'https';
+  const host = req.headers['host'] as string;
+  const proxyUrl = `${proto}://${host}/api/proxy/feeds/yandex.yml`;
 
   try {
-    const upstream = await fetch(url, {
+    const upstream = await fetch(proxyUrl, {
       method: 'GET',
       headers: {
-        // Пробрасываем язык/локаль и user-agent — иногда полезно для бэкенда
-        'accept-language': req.headers['accept-language'] || '',
-        'user-agent': req.headers['user-agent'] || '',
+        'accept-language': (req.headers['accept-language'] as string) || '',
+        'user-agent': (req.headers['user-agent'] as string) || '',
       },
-      // кеширование реализуем через заголовки ответа
     });
 
     // Пробрасываем ключевые заголовки
     res.statusCode = upstream.status;
     upstream.headers.forEach((value, key) => {
       const lower = key.toLowerCase();
-      if (['content-encoding', 'content-length', 'transfer-encoding', 'connection'].includes(lower)) return;
+      if (['content-encoding', 'content-length', 'transfer-encoding', 'connection'].includes(lower))
+        return;
       res.setHeader(key, value);
     });
 
@@ -35,7 +35,11 @@ export const getServerSideProps: GetServerSideProps = async ({ res, req }) => {
     const xml = await upstream.text();
     res.write(xml);
     res.end();
-  } catch (e) {
+  } catch (e: any) {
+    console.error('YML feed proxy error', {
+      message: e?.message,
+      code: e?.code,
+    });
     res.statusCode = 502;
     res.setHeader('Content-Type', 'text/plain; charset=UTF-8');
     res.write('Failed to fetch YML feed');
@@ -49,7 +53,3 @@ export const getServerSideProps: GetServerSideProps = async ({ res, req }) => {
 export default function YandexYmlFeed() {
   return null;
 }
-
-
-
-
