@@ -11,6 +11,7 @@ coverage
 out
 
 # Nest / server
+server/dist*
 server/dist
 server/logs
 server/coverage
