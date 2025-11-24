@@ -52,7 +52,7 @@ export const Footer: React.FC<FooterProps> = ({ className }) => {
                 onClick={handleContactClick}
                 aria-label="Открыть форму обратной связи"
               >
-                {COMPANY_INFO.COMPANY_EMAIL_ADRESS}
+                {COMPANY_INFO.INFO_EMAIL_ADRESS}
               </FooterEmailButton>
             </FooterText>
 

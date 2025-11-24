@@ -2,4 +2,7 @@ import { COMPANY_INFO } from './contacts.constants';
 
 export const LINKS = {
   PHONE_TEL: `tel:${COMPANY_INFO.COMPANY_PHONE_NUMBER.replace(/[^+0-9]/g, '')}`,
+  INFO_EMAIL_MAILTO: `mailto:${COMPANY_INFO.INFO_EMAIL_ADRESS}`,
+  SUPPORT_EMAIL_MAILTO: `mailto:${COMPANY_INFO.SUPPORT_EMAIL_ADRESS}`,
+  COMPANY_EMAIL_MAILTO: `mailto:${COMPANY_INFO.COMPANY_EMAIL_ADRESS}`,
 } as const;

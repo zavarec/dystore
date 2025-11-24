@@ -23,6 +23,7 @@ import {
   ContactsPageContainer,
   ContactsSection,
 } from '@/styles/pages/contacts.style';
+import { LINKS } from '@/constants/links.constants';
 
 const ContactsPage = () => {
   const org = {
@@ -105,7 +106,7 @@ const ContactsPage = () => {
                 </ContactsCardText>
               </ContactsCardContent>
 
-              <ContactsCTA href="tel:+78005501474">Позвоните</ContactsCTA>
+              <ContactsCTA href={LINKS.PHONE_TEL}>Позвоните</ContactsCTA>
             </ContactsCard>
 
             <ContactsCard>

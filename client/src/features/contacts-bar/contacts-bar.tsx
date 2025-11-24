@@ -81,7 +81,7 @@ export const ContactsBar = () => {
     },
     {
       name: 'Email',
-      href: 'mailto:support@dyson-group.ru',
+      href: LINKS.INFO_EMAIL_MAILTO,
       src: '/images/icons/contacts/email.png',
       alt: 'Email',
     },
