@@ -23,6 +23,7 @@ export interface Order {
 export interface CreateOrderRequest {
   deliveryAddress: string;
   comment?: string;
+  email?: string;
 }
 
 export enum OrderStatus {

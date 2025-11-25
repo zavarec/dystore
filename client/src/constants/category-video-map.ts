@@ -11,4 +11,6 @@ export const categoryVideoMap: Record<string, string> = {
     'https://video-eu.assetsadobe.com/dyson/_renditions_/78a/78a24440-da68-4363-9086-91ee548e72ef/avs/DYS_Q4G-2021_Corrale-Cutdown_16x9_Homepage-0x540-2000k.mp4?',
   'multistaylery-dyson-airwrap':
     'https://www.dyson.video/dyson/_renditions_/64e/64ed47ca-37d7-4afa-b9a4-f887a0ad4f7b/avs/Reducedfilesize_stylingguide_hero_diversity%26tools_film_1-1440x0-2000k.mp4',
+  headphones:
+    'https://s3.twcstorage.ru/49dbf9e8-45b07930-284b-4614-95f5-5a9bdcbd9f92/uploads/34105ec1-54f8-4894-a55d-37a1b18c8dc9-DYS_571H_WP02_COMFORT_15S_DIRECT_16x9_CLEAN_(SPIN)-1440x0-2000k.mp4',
 };

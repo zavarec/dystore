@@ -68,6 +68,8 @@ const CartPage: React.FC = () => {
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [comment, setComment] = useState('');
+  const [email, setEmail] = useState('');
+  const [isPolicyAccepted, setIsPolicyAccepted] = useState(false);
 
   const cartItems = useAppSelector(selectCartItems);
   const totalItems = useAppSelector(selectCartTotalItems);
@@ -126,6 +128,11 @@ const CartPage: React.FC = () => {
       return;
     }
 
+    if (!isPolicyAccepted) {
+      toast.error('Для оформления заказа подтвердите ознакомление с Политикой конфиденциальности');
+      return;
+    }
+
     if (!isAuth) {
       dispatch(setAuthModalOpen(true));
       return;
@@ -142,11 +149,13 @@ const CartPage: React.FC = () => {
         ),
       );
 
-      const payload: { deliveryAddress: string; comment?: string } = {
+      const payload: { deliveryAddress: string; comment?: string; email?: string } = {
         deliveryAddress: (deliveryAddress || 'Адрес не указан').trim(),
       };
       const trimmedComment = comment.trim();
       if (trimmedComment) payload.comment = trimmedComment;
+      const trimmedEmail = email.trim();
+      if (trimmedEmail) payload.email = trimmedEmail;
 
       await OrdersService.createOrder(payload);
 
@@ -292,6 +301,17 @@ const CartPage: React.FC = () => {
               </CartField>
 
               <CartField>
+                <CartFieldLabel>Электронная почта (необязательно)</CartFieldLabel>
+                <CartTextInput
+                  type="email"
+                  placeholder="example@domain.ru"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  disabled={isCheckingOut || isCartLoading}
+                />
+              </CartField>
+
+              <CartField>
                 <CartFieldLabel>Комментарий к заказу (необязательно)</CartFieldLabel>
                 <CartTextArea
                   placeholder="Например: позвоните за 30 минут до доставки"
@@ -319,9 +339,34 @@ const CartPage: React.FC = () => {
             </TotalRow>
 
             <CheckoutSection>
+              <CartField
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}
+              >
+                <input
+                  type="checkbox"
+                  checked={isPolicyAccepted}
+                  onChange={e => setIsPolicyAccepted(e.target.checked)}
+                  disabled={isCheckingOut || isCartLoading}
+                  aria-label="Ознакомлен с Политикой конфиденциальности"
+                />
+                <span style={{ fontSize: 14, color: '#374151' }}>
+                  Я ознакомлен(а) с{' '}
+                  <Link
+                    href="/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      textDecoration: 'underline',
+                    }}
+                  >
+                    Политикой конфиденциальности
+                  </Link>
+                </span>
+              </CartField>
+
               <Button
                 onClick={handleCheckout}
-                disabled={isCheckingOut || isCartLoading}
+                disabled={isCheckingOut || isCartLoading || !isPolicyAccepted}
                 size="large"
                 fullWidth
                 variant={ButtonVariant.PRIMARY}

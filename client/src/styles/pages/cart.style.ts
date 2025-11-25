@@ -215,7 +215,6 @@ export const CheckoutSection = styled.div`
   margin-top: 24px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
 `;
 
 export const EmptyCart = styled.div`
@@ -260,7 +259,7 @@ export const ContinueShoppingButton = styled.button`
 `;
 export const CartContentGrid = styled.div`
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 2fr 1.2fr;
   gap: 40px;
   padding-left: 16px;
 

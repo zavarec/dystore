@@ -18,7 +18,7 @@ const heroSlides: CarouselSlide[] = [
     title: 'Добро пожаловать в Dyson Group',
     subtitle: 'Откройте для себя мир качественных товаров по доступным ценам',
     video:
-      'https://video-eu.assetsadobe.com/dyson/_renditions_/526/5261034a-d1bc-40a2-a45c-9125ef7c693a/avs/Dyson_EMEA_Summer%20Promo_Social_1280x600_6s_XCAT_DEALPAGE-BANNER.mp4_master-0x540-2000k.mp4?',
+      'https://s3.twcstorage.ru/49dbf9e8-45b07930-284b-4614-95f5-5a9bdcbd9f92/uploads/e0f8e804-bda7-4c92-9c3d-adb9ec6ab258-Dyson_EMEA_Summer Promo_Social_1280x600_6s_XCAT_DEALPAGE-BANNER.mp4_master-0x540-2000k.mp4',
     poster: '/images/hero/1.webp',
     background: '/images/hero/1.webp',
   },

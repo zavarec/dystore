@@ -25,7 +25,7 @@ const BENEFITS: Benefit[] = [
     id: '3',
     iconUrl:
       'https://s3.twcstorage.ru/49dbf9e8-45b07930-284b-4614-95f5-5a9bdcbd9f92/uploads/658c6873-1180-4064-bbf5-7b345cc60006-money-back-dollar2 (2).png',
-    title: 'Гарантия лучшей цены',
+    title: 'Лучшая цена',
     description: 'Мы гарантируем лучшую цену на рынке',
   },
   {

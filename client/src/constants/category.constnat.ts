@@ -7,6 +7,6 @@ export const allCategoriesPreviewImage = {
     'https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/products/hair-care/505d/consumer/pdp/ceramic-pink-rose-gold/cards/Ceramic-Pink-Range_Tile.jpg',
   lighting:
     'https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/products/lighting/category/creative-lighting/CD06_MULTI-087_CF06-RGB_N552ARangeLineUp-WHSIL_BLK-BS_LightOff-A4_Ws.jpg',
-  //   headphones:
-  //     'https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/home-page/homepage-category-tiles-headphones-new.jpg',
+    headphones:
+      'https://dyson-h.assetsadobe2.com/is/image/content/dam/dyson/home-page/homepage-category-tiles-headphones-new.jpg',
 };
