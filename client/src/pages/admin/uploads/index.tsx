@@ -405,7 +405,7 @@ const AdminUploadsPage: NextPage = () => {
         onUploaded={handleUploaded}
         accept={['image/*', 'application/pdf', 'video/*', 'audio/*']}
         maxFiles={20}
-        maxSize={10 * 1024 * 1024} // 10MB
+        maxSize={25 * 1024 * 1024} // 25MB
       />
     </AdminLayout>
   );

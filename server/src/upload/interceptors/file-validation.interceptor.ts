@@ -1,5 +1,3 @@
-
-
 // src/upload/interceptors/file-validation.interceptor.ts
 import {
   Injectable,
@@ -7,20 +5,20 @@ import {
   ExecutionContext,
   CallHandler,
   BadRequestException,
-} from '@nestjs/common';
-import { Observable } from 'rxjs';
+} from "@nestjs/common";
+import { Observable } from "rxjs";
 
 @Injectable()
 export class FileValidationInterceptor implements NestInterceptor {
   constructor(
-    private readonly maxSize: number = 10 * 1024 * 1024, // 10MB
+    private readonly maxSize: number = 25 * 1024 * 1024, // 25MB
     private readonly allowedTypes: string[] = [
-      'image/jpeg',
-      'image/png', 
-      'image/gif',
-      'image/webp',
-      'application/pdf',
-    ]
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+      "application/pdf",
+    ],
   ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
@@ -28,7 +26,7 @@ export class FileValidationInterceptor implements NestInterceptor {
     const files = request.files || [request.file];
 
     if (!files || files.length === 0) {
-      throw new BadRequestException('Файлы не найдены');
+      throw new BadRequestException("Файлы не найдены");
     }
 
     // Валидация каждого файла
@@ -38,21 +36,21 @@ export class FileValidationInterceptor implements NestInterceptor {
       // Проверка размера
       if (file.size > this.maxSize) {
         throw new BadRequestException(
-          `Файл ${file.originalname} превышает максимальный размер ${this.maxSize / 1024 / 1024}MB`
+          `Файл ${file.originalname} превышает максимальный размер ${this.maxSize / 1024 / 1024}MB`,
         );
       }
 
       // Проверка типа
       if (!this.allowedTypes.includes(file.mimetype)) {
         throw new BadRequestException(
-          `Тип файла ${file.mimetype} не поддерживается`
+          `Тип файла ${file.mimetype} не поддерживается`,
         );
       }
 
       // Проверка имени файла на безопасность
       if (this.hasUnsafeCharacters(file.originalname)) {
         throw new BadRequestException(
-          `Небезопасное имя файла: ${file.originalname}`
+          `Небезопасное имя файла: ${file.originalname}`,
         );
       }
     }

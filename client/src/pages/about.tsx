@@ -4,7 +4,8 @@ import { AboutCompany } from '@/features/about-company/about-company';
 const AboutPage = () => (
   <AboutCompany
     heading="Сведения о компании"
-    companyName="Dyson-Group LLC"
+    companyName="Dyson-Group"
+    legalCompanyName="ИП Мурсалов Хаял Ариф Оглы"
     addressLines={['ул. Воронежская, 46', 'Москва', 'Россия', '115597']}
     companyNumberLabel="ОГРН/регистрационный номер"
     companyNumber="322774600478526"
@@ -13,7 +14,6 @@ const AboutPage = () => (
     contactEmail={COMPANY_INFO.COMPANY_EMAIL_ADRESS}
     breadcrumbs={[
       { href: '/', label: 'Главная' },
-      { href: '/inside', label: 'О нас' },
       { href: '/terms', label: 'Условия' },
     ]}
   />

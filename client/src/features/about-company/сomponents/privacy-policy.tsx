@@ -14,6 +14,7 @@ import {
   AboutCompanySection,
   AboutCompanyText,
 } from '../about-company.style';
+import { LINKS } from '@/constants/links.constants';
 
 const TocLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
   <li>
@@ -272,7 +273,10 @@ export const PrivacyPolicy: React.FC<{
               </li>
               <li>
                 Актуализация ПДн и отзыв согласия:{' '}
-                <a href="mailto:dyson-group@yandex.com">dyson-group@yandex.com</a>.
+                <a style={{ textDecoration: 'underline' }} href={LINKS.SUPPORT_EMAIL_MAILTO}>
+                  {COMPANY_INFO.SUPPORT_EMAIL_ADRESS}
+                </a>{' '}
+                .
               </li>
               <li>
                 Срок обработки определяется целями; по достижении целей ПДн
@@ -329,11 +333,26 @@ export const PrivacyPolicy: React.FC<{
             <AboutCompanyList as="ul">
               <li>
                 Вопросы по обработке ПДн:{' '}
-                <a href="mailto:dyson-group@yandex.com">{COMPANY_INFO.COMPANY_EMAIL_ADRESS}</a>.
+                <a style={{ textDecoration: 'underline' }} href={LINKS.SUPPORT_EMAIL_MAILTO}>
+                  {COMPANY_INFO.SUPPORT_EMAIL_ADRESS}
+                </a>{' '}
+                .
               </li>
               <li>
                 Политика действует бессрочно до замены новой версией. Актуальная версия:
                 https://dyson-group.ru/privacy
+              </li>
+              <li>
+                <li>
+                  Компания имеет право отправлять Пользователю уведомления о новых продуктах и
+                  услугах, специальных предложениях и различных событиях. <br />
+                  Пользователь может отказаться от получения сообщений, направив Компании письмо на
+                  адрес электронной почты {''}
+                  <a style={{ textDecoration: 'underline' }} href={LINKS.SUPPORT_EMAIL_MAILTO}>
+                    {COMPANY_INFO.SUPPORT_EMAIL_ADRESS}
+                  </a>{' '}
+                  с пометкой «Отказ от уведомлений».
+                </li>
               </li>
             </AboutCompanyList>
           </AboutCompanySection>

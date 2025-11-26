@@ -44,7 +44,7 @@ export interface UseFileUploadReturn {
 export const useFileUpload = (options: UseFileUploadOptions = {}): UseFileUploadReturn => {
   const {
     multiple = false,
-    maxSize = 10 * 1024 * 1024, // 10MB по умолчанию
+    maxSize = 25 * 1024 * 1024, // 25MB по умолчанию
     allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
     onSuccess,
     onError,

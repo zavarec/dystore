@@ -103,7 +103,7 @@ export class OrdersService {
     }
 
     // Создаем заказ с элементами в одной транзакции
-    const order = await this.prisma.order.create({
+    const order: OrderWithItems = await this.prisma.order.create({
       data: {
         userId,
         totalPrice,
@@ -111,6 +111,8 @@ export class OrdersService {
         status: OrderStatus.PENDING,
         deliveryAddress: createOrderDto.deliveryAddress,
         comment: createOrderDto.comment,
+        deliveryMethod: createOrderDto.deliveryMethod ?? undefined,
+        paymentMethod: createOrderDto.paymentMethod ?? undefined,
         customerName: createOrderDto.name ?? undefined,
         customerEmail: createOrderDto.email ?? undefined,
         customerPhone: createOrderDto.phone ?? undefined,

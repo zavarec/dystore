@@ -43,7 +43,7 @@ export const FileUploadModal: React.FC<FileUploadModalProps> = ({
   onUploaded,
   accept = ['image/*', 'application/pdf', 'video/*', 'audio/*'],
   maxFiles = 10,
-  maxSize = 10 * 1024 * 1024, // 10MB по умолчанию
+  maxSize = 25 * 1024 * 1024, // 25MB по умолчанию
 }) => {
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);

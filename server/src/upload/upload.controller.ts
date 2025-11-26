@@ -163,7 +163,12 @@ export class UploadController {
   @UseGuards(JwtAuthGuard)
   @Post("single")
   // @Public()
-  @UseInterceptors(FileInterceptor("file", { storage: multer.memoryStorage() }))
+  @UseInterceptors(
+    FileInterceptor("file", {
+      storage: multer.memoryStorage(),
+      limits: { fileSize: 25 * 1024 * 1024 }, // 25MB
+    }),
+  )
   async uploadSingle(
     @UploadedFile() file: Express.Multer.File,
     @Body() metadata: UploadFileDto,
@@ -233,6 +238,7 @@ export class UploadController {
   @UseInterceptors(
     FilesInterceptor("files", 10, {
       storage: multer.memoryStorage(),
+      limits: { fileSize: 25 * 1024 * 1024 }, // 25MB на файл
     }),
   )
   @Post("multiple")

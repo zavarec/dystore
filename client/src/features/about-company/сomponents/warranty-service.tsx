@@ -58,7 +58,7 @@ export const WarrantyService: React.FC<{
             <AboutCompanyList>
               <li>Подготовьте: товар, гарантийный талон и документ, подтверждающий покупку.</li>
               <li>
-                Свяжитесь с нами: <strong>{COMPANY_INFO.COMPANY_EMAIL_ADRESS}</strong> или{' '}
+                Свяжитесь с нами: <strong>{COMPANY_INFO.SUPPORT_EMAIL_ADRESS}</strong> или{' '}
                 <strong>{COMPANY_INFO.COMPANY_PHONE_NUMBER}</strong>. Мы подскажем ближайший
                 авторизованный сервис.
               </li>

@@ -264,6 +264,8 @@ model Order {
   status          OrderStatus @default(PENDING)
   deliveryAddress String?
   comment         String?
+  deliveryMethod  String?
+  paymentMethod   String?
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
 

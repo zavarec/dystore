@@ -129,7 +129,7 @@ export const ProductImageUpload: React.FC<ProductImageUploadProps> = ({
 
   // Валидация файла
   const validateFile = useCallback((file: File): string | null => {
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    const maxSize = 25 * 1024 * 1024; // 25MB
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
 
     if (!allowedTypes.includes(file.type)) {
@@ -137,7 +137,7 @@ export const ProductImageUpload: React.FC<ProductImageUploadProps> = ({
     }
 
     if (file.size > maxSize) {
-      return 'Размер файла не должен превышать 10MB';
+      return 'Размер файла не должен превышать 25MB';
     }
 
     return null;
@@ -357,7 +357,7 @@ export const ProductImageUpload: React.FC<ProductImageUploadProps> = ({
                 <UploadSubtitle>Перетащите изображение сюда или нажмите для выбора</UploadSubtitle>
                 <UploadHint>
                   <p>Поддерживаются: JPG, PNG, GIF, WebP</p>
-                  <p>Максимальный размер: 10MB</p>
+                  <p>Максимальный размер: 25MB</p>
                 </UploadHint>
               </>
             )}
