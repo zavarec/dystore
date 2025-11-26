@@ -103,32 +103,46 @@ export class OrdersService {
     }
 
     // Создаем заказ с элементами в одной транзакции
-    const order: OrderWithItems = await this.prisma.order.create({
-      data: {
-        userId,
-        totalPrice,
-        orderNumber: genOrderNumber(), // <-- обязательное поле
-        status: OrderStatus.PENDING,
-        deliveryAddress: createOrderDto.deliveryAddress,
-        comment: createOrderDto.comment,
-        deliveryMethod: createOrderDto.deliveryMethod ?? undefined,
-        paymentMethod: createOrderDto.paymentMethod ?? undefined,
-        customerName: createOrderDto.name ?? undefined,
-        customerEmail: createOrderDto.email ?? undefined,
-        customerPhone: createOrderDto.phone ?? undefined,
-        items: {
-          create: orderItems,
-        },
-      },
-      include: {
-        items: {
-          include: {
-            product: true,
+    let order: OrderWithItems;
+    try {
+      order = await this.prisma.order.create({
+        data: {
+          userId,
+          totalPrice,
+          orderNumber: genOrderNumber(), // <-- обязательное поле
+          status: OrderStatus.PENDING,
+          deliveryAddress: createOrderDto.deliveryAddress,
+          comment: createOrderDto.comment,
+          deliveryMethod: createOrderDto.deliveryMethod ?? undefined,
+          paymentMethod: createOrderDto.paymentMethod ?? undefined,
+          customerName: createOrderDto.name ?? undefined,
+          customerEmail: createOrderDto.email ?? undefined,
+          customerPhone: createOrderDto.phone ?? undefined,
+          items: {
+            create: orderItems,
           },
         },
-        user: true,
-      },
-    });
+        include: {
+          items: {
+            include: {
+              product: true,
+            },
+          },
+          user: true,
+        },
+      });
+    } catch (e: any) {
+      this.logger.error(`Order create error: ${e?.message ?? e}`);
+      // Prisma уникальный индекс (например, по orderNumber)
+      if (e?.code === "P2002" && String(e?.meta?.target || "").includes("orderNumber")) {
+        throw new BadRequestException(
+          "Не удалось создать заказ: дублируется номер заказа. Повторите попытку.",
+        );
+      }
+      throw new BadRequestException(
+        "Не удалось создать заказ: " + (e?.message ?? "неизвестная ошибка"),
+      );
+    }
 
     // Очищаем корзину
     await this.cartService.clearCartByIdentity({ userId });

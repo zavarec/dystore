@@ -140,9 +140,10 @@ const CartPage: React.FC = () => {
 
     setIsCheckingOut(true);
     try {
+      // Синхронизируем точные количества на сервере, не увеличивая их повторно
       await Promise.all(
         cartItems.map((item: CartItemType) =>
-          CartService.addToCart({
+          CartService.setCartItemQuantity({
             productId: item.productId,
             quantity: item.quantity,
           }),

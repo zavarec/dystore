@@ -79,16 +79,17 @@ export const DysonProductCard: React.FC<DysonProductCardProps> = ({ product, ind
               blurDataURL={genericBlur}
             />
           </ProductImage>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <ProductTitle>
+              <span>Беспроводной пылесос {product.name}</span>
+            </ProductTitle>
 
-          <ProductTitle>
-            <span>{product.name}</span>
-          </ProductTitle>
+            <RatingContainer>
+              <StarRating>{renderStars(product.rating || 4)}</StarRating>
 
-          <RatingContainer>
-            <StarRating>{renderStars(product.rating || 4)}</StarRating>
-
-            <ReviewCount>{product.reviewCount || 509}</ReviewCount>
-          </RatingContainer>
+              <ReviewCount>{product.reviewCount || 509}</ReviewCount>
+            </RatingContainer>
+          </div>
         </ProductTitleWithImageWrapper>
 
         <ProductInfo>
