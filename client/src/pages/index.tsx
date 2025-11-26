@@ -5,7 +5,7 @@ import type { GetStaticProps, NextPage } from 'next';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 
 import { SEOHead } from '@/components/atoms/seo-head/seo-head';
-import { HeroSpotlight } from '@/components/hero-spotlight/hero-spotlight';
+import { HeroSpotlight, HeroSpotlightProps } from '@/components/hero-spotlight/hero-spotlight';
 import { Benefits } from '@/components/sections/benefits';
 import { Categories } from '@/components/sections/categories';
 import { Hero } from '@/components/sections/hero';
@@ -85,7 +85,7 @@ const HomePage: NextPage = () => {
       'https://s3.twcstorage.ru/49dbf9e8-45b07930-284b-4614-95f5-5a9bdcbd9f92/uploads/cd7c4937-07e2-42d6-8fb0-3954381fce1c-15-HP10-Gallery-Image-04.jpg',
     buttonPrimary: {
       label: 'Посмотреть',
-      href: '/product/dyson-purifier-hotcool-gen1-hp10-purifying-fan-heater-whitenickel',
+      href: '/product/ochistitel-uvlazhnitel-vozduha-dyson-purifier-humidifycool-formaldehyde-ph04',
     },
 
     motifImage: {
@@ -102,7 +102,7 @@ const HomePage: NextPage = () => {
       'https://s3.twcstorage.ru/49dbf9e8-45b07930-284b-4614-95f5-5a9bdcbd9f92/uploads/c65b32c1-63fc-43a9-8c28-3e9b83f45959-Web_590-Static-Banner-T3-T4.jpg',
     buttonPrimary: {
       label: 'Посмотреть',
-      href: '/product/dyson-airwrap-co-anda2x',
+      href: '/product/multistayler-dyson-airwrap-co-anda2x-multi-styler-and-dryer-straightwavy',
     },
 
     motifImage: {
@@ -124,7 +124,7 @@ const HomePage: NextPage = () => {
 
       <Benefits />
 
-      <HeroSpotlight {...promo1} />
+      <HeroSpotlight {...(promo1 as HeroSpotlightProps)} />
 
       <HeroSpotlight {...promo2} />
       {/* <HomeSections /> */}

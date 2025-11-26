@@ -101,7 +101,7 @@ export const ProductTitle = styled.h3`
   line-height: 1.3;
   margin-bottom: 12px;
   color: #333;
-  height: calc(1.3em * 2); /* высота ровно под две строки */
+  /* height: calc(1.3em * 2); высота ровно под две строки */
 
   a {
     text-decoration: none;

@@ -9,7 +9,7 @@ interface MotifImage {
   height?: number;
 }
 
-interface HeroSpotlightProps {
+export interface HeroSpotlightProps {
   /** Фон десктоп */
   bgImage: string;
   /** Фон мобилки (необязательно) */
@@ -170,7 +170,6 @@ const Btn = styled.a<{ variant?: 'primary' | 'secondary' }>`
 
 export const HeroSpotlight: React.FC<HeroSpotlightProps> = ({
   bgImage,
-
   focalDesktop = 'center',
   focalMobile = 'center',
   overlay = 0.7,

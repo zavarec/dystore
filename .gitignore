@@ -30,4 +30,4 @@ server/uploads/
 *.dump
 *.sql
 *.mp4
-
+!server/prisma/migrations/**/migration.sql
