@@ -81,7 +81,7 @@ export const DysonProductCard: React.FC<DysonProductCardProps> = ({ product, ind
           </ProductImage>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <ProductTitle>
-              <span>Беспроводной пылесос {product.name}</span>
+              <span>{product.name}</span>
             </ProductTitle>
 
             <RatingContainer>
