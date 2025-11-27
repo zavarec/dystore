@@ -46,7 +46,7 @@ const HomePage: NextPage = () => {
       title: 'DysonGroup - Официальный магазин техники Dyson',
       description:
         'Купить технику Dyson с официальной гарантией. Пылесосы, фены, очистители воздуха.',
-      image: 'https://dyson-group.ru/images/og-home.jpg',
+      image: '',
       imageAlt: 'DysonGroup - магазин техники Dyson',
       url: 'https://dyson-group.ru',
       type: 'website',

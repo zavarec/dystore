@@ -21,6 +21,7 @@ import {
   ProductTitleWithImageWrapper,
 } from './dyson-product-card.style';
 
+
 interface DysonProductCardProps {
   product: ProductWithDetails;
   index?: number;

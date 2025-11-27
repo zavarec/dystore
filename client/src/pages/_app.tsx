@@ -149,7 +149,7 @@ const globalStyles = css`
 
 const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const dispatch = useAppDispatch();
-  const [isHydrated, setIsHydrated] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(() => typeof window === 'undefined');
 
   useEffect(() => {
     (async () => {
@@ -167,13 +167,13 @@ const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) 
     })();
   }, [dispatch]);
 
-  // ✅ ИСПРАВЛЕНИЕ: Предотвращаем hydration mismatch
-  // Показываем контент с suppressHydrationWarning до завершения hydration
-  if (!isHydrated) {
-    return <Preloader />;
-  }
-
-  return <>{children}</>;
+  // ✅ ИСПРАВЛЕНИЕ: не блокируем SSR — показываем прелоадер как оверлей
+  return (
+    <>
+      {children}
+      {!isHydrated && <Preloader />}
+    </>
+  );
 };
 
 function MyApp({ Component, ...rest }: AppProps) {
