@@ -147,7 +147,10 @@ export class OrdersService {
     } catch (e: any) {
       this.logger.error(`Order create error: ${e?.message ?? e}`);
       // Prisma уникальный индекс (например, по orderNumber)
-      if (e?.code === "P2002" && String(e?.meta?.target || "").includes("orderNumber")) {
+      if (
+        e?.code === "P2002" &&
+        String(e?.meta?.target || "").includes("orderNumber")
+      ) {
         throw new BadRequestException(
           "Не удалось создать заказ: дублируется номер заказа. Повторите попытку.",
         );
@@ -189,16 +192,19 @@ export class OrdersService {
     this.telegramService.sendMessage(message).catch(() => undefined);
 
     // 7) amoCRM (best effort)
+
+    const totalPriceNumber = Number(order.totalPrice ?? totalPrice); // подстраховка
+
     try {
       const { leadId, contactId } = await this.amoOrdersService.createOrderLead(
         {
           orderId: order.orderNumber,
-          total: order.totalPrice,
+          total: totalPriceNumber,
           items: order.items.map((i) => ({
             productId: String(i.productId),
             name: i.product?.name ?? `#${i.productId}`,
             quantity: i.quantity,
-            price: i.priceAtPurchase,
+            price: Number(i.priceAtPurchase),
           })),
           customer: {
             name: order.customerName ?? order.user?.name ?? undefined,

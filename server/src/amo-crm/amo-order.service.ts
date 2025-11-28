@@ -1,5 +1,5 @@
 // src/amocrm/amo-orders.service.ts
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { AmoHttpService } from "./amo-http.service";
 import { AmoAuthService } from "./amo-auth.service";
@@ -20,6 +20,7 @@ export class AmoOrdersService {
     private readonly http: AmoHttpService,
     private readonly auth: AmoAuthService,
     private readonly products: AmoProductsService,
+    private readonly logger = new Logger(AmoOrdersService.name),
   ) {}
 
   private get pipelineId() {
@@ -33,6 +34,9 @@ export class AmoOrdersService {
   }
   private get catalogId() {
     return Number(this.cfg.get("AMO_PRODUCTS_CATALOG_ID"));
+  }
+  private get productPriceId() {
+    return Number(this.cfg.get("AMO_CF_PRODUCT_PRICE_ID"));
   }
 
   private leadCfv(order: OrderDTO) {
@@ -55,6 +59,20 @@ export class AmoOrdersService {
       });
     if (commentId && order.comment)
       cfv.push({ field_id: commentId, values: [{ value: order.comment }] });
+
+    if (this.productPriceId && order.items.length) {
+      const totalItemsPrice = Math.round(
+        order.items.reduce((acc, item) => acc + item.price * item.quantity, 0),
+      );
+      cfv.push({
+        field_id: this.productPriceId,
+        values: [
+          {
+            value: totalItemsPrice,
+          },
+        ],
+      });
+    }
     return cfv.length ? cfv : undefined;
   }
 
@@ -117,6 +135,11 @@ export class AmoOrdersService {
           : undefined,
       },
     ];
+
+    this.logger.log(
+      "AMO payload (lead create)",
+      JSON.stringify(payload, null, 2),
+    );
 
     const created = await this.http.request<any>({
       url: `leads`,
