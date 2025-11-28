@@ -149,7 +149,7 @@ const globalStyles = css`
 
 const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const dispatch = useAppDispatch();
-  const [isHydrated, setIsHydrated] = useState(() => typeof window === 'undefined');
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
     (async () => {

@@ -49,25 +49,38 @@ export class OrdersService {
   ): Promise<OrderWithItems> {
     let cart: CartWithItems | null = null;
 
-    if (userId) {
-      cart = await this.cartService.getCartWithItems({ userId });
-    }
-
-    if (!cart && cartToken) {
+    // 1) Сначала пытаемся взять корзину по токену сессии (актуальная клиентская корзина)
+    if (cartToken) {
       cart = await this.cartService.getCartWithItems({ token: cartToken });
+
+      // Если пользователь авторизован и корзина без привязки — привяжем
       if (cart && userId && !cart.userId) {
         try {
           await this.prisma.cart.update({
             where: { id: cart.id },
             data: { userId },
           });
-
           cart.userId = userId;
         } catch (e) {
           this.logger.error(
             "Failed to attach cart to user: " + String(e?.message),
           );
         }
+      }
+    }
+
+    // 2) Если по токену ничего не нашли — пробуем активную корзину пользователя
+    if (!cart && userId) {
+      cart = await this.cartService.getCartWithItems({ userId });
+    }
+
+    // 3) Если нашли корзину пользователя, но она пустая — попробуем ещё раз по токену (вдруг есть дубликат с товарами)
+    if (cart && (!cart.items || cart.items.length === 0) && cartToken) {
+      const tokenCart = await this.cartService.getCartWithItems({
+        token: cartToken,
+      });
+      if (tokenCart && tokenCart.items && tokenCart.items.length > 0) {
+        cart = tokenCart;
       }
     }
 

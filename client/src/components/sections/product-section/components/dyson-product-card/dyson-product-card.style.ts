@@ -18,6 +18,15 @@ export const Card = styled(motion.div)`
     border-color: black;
   }
 
+  /* Делаем кликабельную область (Link -> a) флекс-колонкой и растягиваем на всю высоту,
+     чтобы кнопка добавления в корзину всегда прижималась к низу карточки */
+  a {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: 100%;
+  }
+
   @media (max-width: 768px) {
     max-width: 320px;
   }
@@ -35,7 +44,9 @@ export const ProductTitleWithImageWrapper = styled.div`
 
   padding-left: 20px;
 
-  border-bottom: 1px solid #e0e0e0;
+  /* Убираем внутреннюю разделительную линию, чтобы не было «лесенки» в сетке карточек */
+  /* border-bottom: 1px solid #e0e0e0; */
+  padding-bottom: 12px;
 `;
 
 export const SaveBadge = styled.div`
@@ -102,6 +113,10 @@ export const ProductTitle = styled.h3`
   margin-bottom: 12px;
   color: #333;
   /* height: calc(1.3em * 2); высота ровно под две строки */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 
   a {
     text-decoration: none;
