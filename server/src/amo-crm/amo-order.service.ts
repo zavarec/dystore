@@ -15,12 +15,13 @@ import { OrderDTO } from "./dto/amo-crm-order.dto";
  */
 @Injectable()
 export class AmoOrdersService {
+  private readonly logger = new Logger(AmoOrdersService.name);
+
   constructor(
     private readonly cfg: ConfigService,
     private readonly http: AmoHttpService,
     private readonly auth: AmoAuthService,
     private readonly products: AmoProductsService,
-    private readonly logger = new Logger(AmoOrdersService.name),
   ) {}
 
   private get pipelineId() {
