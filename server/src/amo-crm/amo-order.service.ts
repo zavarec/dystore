@@ -165,6 +165,7 @@ export class AmoOrdersService {
           name: it.name,
           sku: it.sku,
           price: it.price,
+          unit: "шт",
         });
       }
 

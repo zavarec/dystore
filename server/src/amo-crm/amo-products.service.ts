@@ -26,9 +26,13 @@ export class AmoProductsService {
     name: string;
     sku?: string;
     price?: number;
+    unit?: string; // Единица измерения (например, "шт")
   }) {
     const skuId = Number(this.cfg.get("AMO_CF_CATALOG_SKU_ID") || 0);
-    const priceId = Number(this.cfg.get("AMO_CF_CATALOG_PRICE_ID") || 0);
+    const priceId = Number(
+      this.cfg.get("AMO_CF_CATALOG_ELEMENT_PRICE_ID") || 0,
+    );
+    const unitId = Number(this.cfg.get("AMO_CF_CATALOG_UNIT_ID") || 0);
 
     const cf: any[] = [];
     if (skuId > 0 && params.sku) {
@@ -39,6 +43,12 @@ export class AmoProductsService {
         field_id: priceId,
         values: [{ value: Math.round(params.price) }],
       });
+    }
+    if (unitId > 0) {
+      const unitValue = (params.unit || "шт").trim();
+      if (unitValue) {
+        cf.push({ field_id: unitId, values: [{ value: unitValue }] });
+      }
     }
 
     const payload = [
